@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>5AL Kick — Activate</title>
+<link rel="icon" href="./icon-192.png">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0a0b0f;color:#fff;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:20px}
+  .card{width:100%;max-width:420px;background:#12141a;border:1px solid #23262f;border-radius:20px;padding:28px 22px;text-align:center}
+  .logo{display:flex;align-items:center;justify-content:center;gap:10px;font-weight:800;font-size:22px;margin-bottom:18px}
+  .logo img{width:40px;height:40px;border-radius:10px}
+  h1{font-size:20px;margin:0 0 8px}
+  p{color:#b6bac4;line-height:1.6;margin:0 0 18px;font-size:15px}
+  input{width:100%;font-size:30px;letter-spacing:6px;text-align:center;text-transform:uppercase;background:#0a0b0f;color:#fff;border:2px solid #2a2e39;border-radius:12px;padding:12px;margin-bottom:16px;direction:ltr}
+  input:focus{outline:none;border-color:#e50914}
+  #tt{font-size:17px;letter-spacing:0;text-transform:none;margin-bottom:12px}
+  .hint{font-size:13px;color:#8a8f9c;margin:-4px 0 14px}
+  button{width:100%;font-size:17px;font-weight:700;color:#fff;background:#e50914;border:0;border-radius:12px;padding:14px;cursor:pointer}
+  button:disabled{opacity:.5}
+  .msg{margin-top:14px;font-size:14px;min-height:20px}
+  .err{color:#ff6b6b}.ok{color:#4cd48b;font-size:17px}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo"><img src="./icon-192.png" alt=""><span>5AL Kick</span></div>
+  <div id="form">
+    <h1 id="t-title"></h1>
+    <p id="t-sub"></p>
+    <input id="code" maxlength="9" placeholder="XXXX-XXXX" autocomplete="off" autocapitalize="characters" spellcheck="false">
+    <input id="tt" maxlength="40" placeholder="TikTok @username" autocomplete="off" autocapitalize="none" spellcheck="false">
+    <div class="hint" id="t-tt"></div>
+    <button id="go"></button>
+  </div>
+  <div class="msg" id="msg"></div>
+</div>
+<script>
+(function(){
+  var ar = (navigator.language || 'ar').toLowerCase().indexOf('ar') === 0;
+  document.documentElement.lang = ar ? 'ar' : 'en';
+  document.documentElement.dir = ar ? 'rtl' : 'ltr';
+  var T = ar ? {
+    title:'تفعيل التلفزيون', sub:'اكتب الرمز الظاهر على شاشة التلفزيون، ثم سجّل دخولك بحساب Kick.',
+    go:'تسجيل الدخول بـ Kick', badcode:'اكتب الرمز كاملاً (٨ خانات)', working:'جارٍ التفعيل…',
+    done:'تم! ارجع للتلفزيون، يدخل تلقائياً ✓', fail:'صار خطأ، جرّب مرة ثانية', expired:'الرمز غير صحيح أو انتهت صلاحيته. حدّث الرمز من التلفزيون.', cfg:'الموقع غير مجهّز (KICK_CLIENT_ID ناقص).', tt:'اختياري: اسم حسابك في تيك توك (علني) لعرض فيديوهات من تتابعهم. بدون كلمة سر.'
+  } : {
+    title:'Activate your TV', sub:'Enter the code shown on your TV, then log in with your Kick account.',
+    go:'Log in with Kick', badcode:'Enter the full 8-character code', working:'Activating…',
+    done:'Done! Go back to your TV — it signs in automatically ✓', fail:'Something went wrong, please try again', expired:'Code is wrong or expired. Refresh the code on the TV.', cfg:'Site is not configured (KICK_CLIENT_ID missing).', tt:'Optional: your public TikTok username, to show videos from people you follow. No password needed.'
+  };
+  var $ = function(i){ return document.getElementById(i); };
+  $('t-title').textContent = T.title; $('t-sub').textContent = T.sub; $('go').textContent = T.go; $('t-tt').textContent = T.tt;
+  var FN = '/api/', REDIRECT = location.origin + '/index.html';  // default; override with the KICK_REDIRECT_URI env var on Cloudflare = the exact Redirect URL saved in the Kick app
+  function msg(t, cls){ $('msg').className = 'msg ' + (cls || ''); $('msg').textContent = t || ''; }
+  function b64url(buf){ var s=''; new Uint8Array(buf).forEach(function(b){ s += String.fromCharCode(b); }); return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); }
+  function fmt(v){ v = v.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,8); return v.length > 4 ? v.slice(0,4) + '-' + v.slice(4) : v; }
+
+  var qs = new URLSearchParams(location.search);
+  var pre = qs.get('code');
+  if(pre && !qs.get('state')) $('code').value = fmt(pre);
+  $('code').addEventListener('input', function(){ this.value = fmt(this.value); });
+
+  async function start(){
+    var code = fmt($('code').value);
+    if(code.length !== 9){ msg(T.badcode, 'err'); return; }
+    $('go').disabled = true; msg(T.working);
+    try{
+      var cfg = await (await fetch(FN + 'kick-auth?action=config')).json();
+      if(!cfg.client_id){ msg(T.cfg, 'err'); $('go').disabled = false; return; }
+      var arr = crypto.getRandomValues(new Uint8Array(48));
+      var verifier = b64url(arr);
+      var digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(verifier));
+      var st = b64url(crypto.getRandomValues(new Uint8Array(16)));
+      if(cfg.redirect_uri) REDIRECT = cfg.redirect_uri;
+      sessionStorage.setItem('tvRedirect', REDIRECT);
+      sessionStorage.setItem('tvVerifier', verifier);
+      sessionStorage.setItem('tvState', st);
+      sessionStorage.setItem('tvCode', code);
+      sessionStorage.setItem('tvTT', $('tt').value.trim());
+      var u = new URL('https://id.kick.com/oauth/authorize');
+      u.searchParams.set('response_type','code');
+      u.searchParams.set('client_id', cfg.client_id);
+      u.searchParams.set('redirect_uri', REDIRECT);
+      u.searchParams.set('scope','user:read chat:write channel:read channel:write channel:rewards');
+      u.searchParams.set('code_challenge', b64url(digest));
+      u.searchParams.set('code_challenge_method','S256');
+      u.searchParams.set('state', st);
+      location.href = u.toString();
+    }catch(e){ msg(T.fail, 'err'); $('go').disabled = false; }
+  }
+  $('go').addEventListener('click', start);
+
+  async function finish(){
+    var code = qs.get('code'), st = qs.get('state');
+    var verifier = sessionStorage.getItem('tvVerifier'), saved = sessionStorage.getItem('tvState'), uc = sessionStorage.getItem('tvCode');
+    history.replaceState({}, '', '/activate');
+    REDIRECT = sessionStorage.getItem('tvRedirect') || REDIRECT;
+    $('form').style.display = 'none';
+    if(!verifier || st !== saved || !uc){ $('form').style.display = ''; msg(T.fail, 'err'); return; }
+    msg(T.working);
+    try{
+      var r = await fetch(FN + 'kick-auth?action=token', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ code: code, code_verifier: verifier, redirect_uri: REDIRECT }) });
+      var auth = await r.json();
+      if(!auth || !auth.access_token){ var why = auth && (auth.error_description || auth.message || auth.error) || ('HTTP ' + r.status); $('form').style.display = ''; msg(T.fail + ' [' + why + ']', 'err'); return; }
+      auth.obtained_at = Date.now();
+      var a = await fetch(FN + 'tv-link?action=approve', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ user_code: uc, auth: auth, tt: sessionStorage.getItem('tvTT') || '' }) });
+      sessionStorage.removeItem('tvVerifier'); sessionStorage.removeItem('tvState'); sessionStorage.removeItem('tvCode'); sessionStorage.removeItem('tvTT');
+      if(a.ok) msg(T.done, 'ok');
+      else { $('form').style.display = ''; msg(a.status === 404 ? T.expired : T.fail + ' [HTTP ' + a.status + ']', 'err'); }
+    }catch(e){ $('form').style.display = ''; msg(T.fail + ' [' + (e && e.message || e) + ']', 'err'); }
+  }
+  if(qs.get('code') && qs.get('state')) finish();
+})();
+</script>
+</body>
+</html>

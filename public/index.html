@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#000000">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="./manifest.json">
+<title>5AL</title>
+<style>html,body{margin:0;height:100%;background:#000;overflow:hidden}
+#sq-frame{position:fixed;border:0;background:#000;left:50%;top:50%;transform:translate(-50%,-50%)}</style>
+</head><body>
+<iframe id="sq-frame" allow="autoplay; encrypted-media; picture-in-picture"></iframe>
+<script>
+/* SQUARE-FRAME shell. To REVERT: set FRAME_ENABLED=false (or open with ?frame=off). */
+(function(){
+  var FRAME_ENABLED = true;
+  var qs = new URLSearchParams(location.search);
+  var q = qs.get('frame');
+  try{ if(q) localStorage.setItem('ls_frame', q); }catch(e){}
+  var mode = '16:9';
+  try{ mode = localStorage.getItem('ls_frame') || '16:9'; }catch(e){}
+  qs.delete('frame');
+  var rest = qs.toString();
+  var target = './app.html' + (rest ? '?' + rest : '') + location.hash;
+  if(!FRAME_ENABLED || mode === 'off'){ location.replace(target); return; }
+  var f = document.getElementById('sq-frame');
+  var m = /^(\d+):(\d+)$/.exec(mode), r = m ? (+m[1])/(+m[2]) : 1;
+  /* Render at a fixed virtual TV size (1280 CSS px wide) and scale it to fit, so the
+     app never drops below its 720px "phone layout" breakpoint. */
+  function fit(){
+    var bw = 1280, bh = bw/r, sc = Math.min(innerWidth/bw, innerHeight/bh);
+    f.style.width = bw+'px'; f.style.height = Math.round(bh)+'px';
+    f.style.transform = 'translate(-50%,-50%) scale('+sc+')';
+  }
+  fit(); addEventListener('resize', fit);
+  function fo(){ try{ f.contentWindow.focus(); }catch(e){} }
+  f.addEventListener('load', fo); addEventListener('focus', fo);
+  addEventListener('keydown', fo, true); addEventListener('pointerdown', fo, true);
+  f.src = target;
+})();
+</script>
+</body></html>
