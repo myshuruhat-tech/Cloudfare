@@ -1,0 +1,6 @@
+{
+  "name": "live-screen",
+  "version": "1.3.0",
+  "private": true,
+  "description": "Live Screen - Kick viewer PWA on Cloudflare Workers"
+}
