@@ -1,0 +1,15 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "app.netlify.elegant_empanada_94e121.twa",
+      "sha256_cert_fingerprints": [
+        "9D:F2:E2:98:C3:DE:13:E0:2C:D6:44:1B:FC:2D:61:5D:94:72:59:C8:67:3B:9B:60:9F:B2:0C:00:2A:A6:2B:96",
+        "9B:3F:8F:DC:39:12:C0:98:E4:A1:92:96:68:46:88:41:7B:CA:2D:DB:3B:9A:C7:C6:29:25:0A:BA:12:35:D3:DA"
+      ]
+    }
+  }
+]
