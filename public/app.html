@@ -5060,7 +5060,7 @@ function activate(el){
     if(favHas(ch)) removeFavorite(ch); else { addFavorite(ch); notifOffFollowToast(); }
     const on = favHas(ch);
     el.classList.toggle('on', on);
-    el.textContent = on ? t('followingBtn') : t('saveFav');
+    if(on) el.innerHTML = bellIcon(ch); else el.textContent = t('saveFav');
     return;
   }
   if(el.dataset.screen){
@@ -8471,7 +8471,7 @@ async function renderChannelPage(wrap, channel, avatar, liveStream){
     <div class="chan-head">
       <div class="offline-avatar" id="offline-avatar" title="${t('openChannel')}">${avatarHtml}</div>
       <div class="chan-head-text"><div class="chan-name">${escapeHtml(channel)}</div>${statusHtml}<div class="chan-followers" id="chan-followers"></div></div>
-      <div class="chan-follow${isFollowing ? ' on' : ''}" id="chan-follow" data-nav tabindex="-1" data-channel-follow="${escapeHtml(channel)}">${isFollowing ? t('followingBtn') : t('saveFav')}</div>
+      <div class="chan-follow${isFollowing ? ' on' : ''}" id="chan-follow" data-nav tabindex="-1" data-channel-follow="${escapeHtml(channel)}">${isFollowing ? bellIcon(channel) : t('saveFav')}</div>
     </div>
     ${watchLiveHtml}
     <div id="offline-vods">
@@ -13895,6 +13895,35 @@ html body .ctx-item.sep{ margin-top:1.4vh; }
 html body .ctx-item.danger{ color:#ff8a8a; background:rgba(255,70,70,.07); border-color:rgba(255,90,90,.18); }
 html body .ctx-item.danger.focused{ color:#b00010; background:#fff; }
 @media (prefers-reduced-motion:reduce){ html body #ctx-box, html body .ctx-item, html body .ctx-av::before, html body #ctx-title::after{ animation:none !important; } }
+
+/* v181: chat open -> the control bar must fit the narrower video column (it overflowed to the left) */
+#player-top-row:has(#chat-overlay.visible) #player-overlay .player-bar{ gap:.5vw; padding-inline:1vw; }
+#player-top-row:has(#chat-overlay.visible) #player-overlay .center-controls{ min-width:0; padding:1vh 1vw; gap:.5vw; }
+#player-top-row:has(#chat-overlay.visible) #player-overlay .side-bar{ gap:.6vw; }
+#player-top-row:has(#chat-overlay.visible) #player-overlay #follow-cap .channel-avatar{ width:8.4vh; height:8.4vh; }
+#player-top-row:has(#chat-overlay.visible) #player-overlay #player-fav{ width:6.2vh; height:6.2vh; }
+#player-top-row:has(#chat-overlay.visible) #player-overlay .mini-btn{ width:5.8vh; height:5.8vh; }
+#player-top-row:has(#chat-overlay.visible) #player-overlay .center-playbtn{ width:7.4vh; height:7.4vh; }
+#player-top-row:has(#chat-overlay.visible) #player-overlay #player-gear{ width:7.4vh; height:7.4vh; }
+#player-top-row:has(#chat-overlay.visible) #player-overlay .player-bar > *{ min-width:0; }
+#player-top-row:has(#chat-overlay.visible) #player-title .pt-title{ font-size:3.8vh; }
+
+/* v182: channel page — Live card sits in the left corner at the same size as every other card; Follow = red/white, Following = bell */
+html body .channel-page-live-row{ max-width:none !important; width:100%; margin:0 0 3vh !important; }
+html body .channel-page-live-row .row-title{ text-align:start !important; }
+html body .channel-page-watch{ width:var(--yt-w) !important; max-width:var(--yt-w); margin:0 !important; }
+html body .channel-page-watch > .card, html body .channel-page-watch > .card.hero{ width:100% !important; max-width:none !important; flex:none !important; padding:0 !important; background:transparent !important; border:0 !important; border-radius:0 !important; box-shadow:none !important; transform:none !important; }
+html body .channel-page-watch .card .thumb{ aspect-ratio:16/9 !important; width:100%; border-radius:1.1vw !important; overflow:hidden; transform:none !important; box-shadow:none; }
+html body .channel-page-watch .card .thumb img{ width:100%; height:100%; object-fit:cover !important; object-position:center !important; }
+html body .channel-page-watch .card.focused{ transform:none !important; background:transparent !important; box-shadow:none !important; border-color:transparent !important; }
+html body .channel-page-watch .card.focused .thumb{ box-shadow:0 0 0 .32vw var(--yt-gapring), 0 0 0 .62vw var(--yt-ring) !important; }
+html body .chan-follow{ background:#E50914 !important; color:#fff !important; border-color:#E50914 !important; display:inline-flex; align-items:center; justify-content:center; }
+html body .chan-follow.on{ background:transparent !important; color:#fff !important; border-color:#fff !important; padding:.9vw 1.6vw; }
+html body .chan-follow.on svg{ width:2.4vw; height:2.4vw; display:block; }
+html body .chan-follow.focused{ background:#fff !important; color:#000 !important; border-color:#fff !important; }
+html[data-theme="light"] .chan-follow:not(.on), html[data-theme="mixed"] .chan-follow:not(.on){ color:#fff !important; }
+html[data-theme="light"] .chan-follow.on, html[data-theme="mixed"] .chan-follow.on{ color:var(--text) !important; border-color:var(--text) !important; }
+html[data-theme="light"] .chan-follow.focused, html[data-theme="mixed"] .chan-follow.focused{ background:#12161C !important; color:#fff !important; border-color:#12161C !important; }
 </style>
 <script id="pl-module">
 /* v176: Playlists (inside the Library tabs). Long-press a video/clip -> "Add to playlist". Plays the list in order. */
