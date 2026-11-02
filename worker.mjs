@@ -43,6 +43,7 @@ export default {
     try { if (typeof process !== 'undefined' && process.env) for (const k of Object.keys(env)) if (typeof env[k] === 'string') process.env[k] = env[k]; } catch (e) {}
     const url = new URL(request.url);
     const p = url.pathname;
+        if (p === '/') return env.ASSETS.fetch(new Request(new URL('/index.html', url), request));
     if (p === '/activate') return env.ASSETS.fetch(new Request(new URL('/activate.html', url), request));
     if (p === '/.well-known/assetlinks.json') {
       const r = await env.ASSETS.fetch(new Request(new URL('/well-known/assetlinks.json', url), request));
