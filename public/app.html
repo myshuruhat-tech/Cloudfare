@@ -1651,6 +1651,18 @@ html[dir=rtl] #player-top-row #chat-overlay{ order:-1; }
 
 .qm-row.tagline{ background:none; font-size:2vh; font-weight:600; opacity:.6; padding-top:.6vh; }
 .qm-row.focused{ background:#fff; color:#000; }
+
+#screen-search.kb-off #keyboard{ display:none !important; }
+/* v183: search keys shown as capitals (typing still gives lowercase) */
+#screen-search #keyboard .key{ text-transform:uppercase; }
+/* v183: channel-page bell sheet: big, blurred backdrop */
+#chan-bell-menu{ display:none; position:fixed; inset:0; z-index:100000; align-items:center; justify-content:center; flex-direction:column; direction:ltr; background:rgba(0,0,0,.55); -webkit-backdrop-filter:blur(2.2vw); backdrop-filter:blur(2.2vw); }
+#chan-bell-menu.show{ display:flex; animation:qmUp .2s ease; }
+#chan-bell-menu .bm-row{ width:42vw; padding:1.6vw 2.2vw; font-size:2.2vw; margin:.3vw 0; background:rgba(255,255,255,.08); }
+#chan-bell-menu .bm-row .bm-ico{ width:3vw; height:3vw; } #chan-bell-menu .bm-row .bm-check{ width:2.6vw; height:2.6vw; }
+#chan-bell-menu .bm-row.focused{ background:#fff; color:#000; }
+#chan-bell-menu .bm-row.focused .bm-check{ color:#000; }
+#chan-bell-menu .bm-row.danger{ color:#ff6b6b; } #chan-bell-menu .bm-row.danger.focused{ color:#c00; }
 /* bell menu */
 #bell-menu{ display:none; position:absolute; left:1.4vw; bottom:21vh; z-index:9; min-width:34vw; padding:1.2vh; border-radius:2.4vh; background:#212121; box-shadow:0 1.4vh 4vh rgba(0,0,0,.6); }
 #bell-menu.show{ display:block; animation:qmUp .2s ease; }
@@ -3831,7 +3843,7 @@ window.__lsGateOpen = false;
           <div class="search-textlist" id="search-textlist"></div>
         </div>
         <div class="search-right">
-          <div class="search-box" id="search-box" data-nav tabindex="-1">
+          <div class="search-box" id="search-box">
             <span class="val" id="search-val">&nbsp;</span><span class="cursor">|</span>
           </div>
           <div class="sr-tabs" id="sr-tabs"></div>
@@ -4080,6 +4092,12 @@ window.__lsGateOpen = false;
         <span class="setting-label" data-i18n="kickLoginLabel"></span>
         <span class="setting-val" id="set-kick-login-val"></span>
       </div>
+
+      <div class="row-title" style="margin-top:3vh;" id="set-hist-title"></div>
+      <div class="setting-row" id="set-sh-pause" data-nav tabindex="-1"><span class="setting-label" id="set-sh-pause-l"></span><span class="setting-val" id="set-sh-pause-v"></span></div>
+      <div class="setting-row action" id="set-sh-clear" data-nav tabindex="-1"><span class="setting-label" id="set-sh-clear-l"></span><span class="setting-val"></span></div>
+      <div class="setting-row" id="set-wh-pause" data-nav tabindex="-1"><span class="setting-label" id="set-wh-pause-l"></span><span class="setting-val" id="set-wh-pause-v"></span></div>
+      <div class="setting-row action" id="set-wh-clear" data-nav tabindex="-1"><span class="setting-label" id="set-wh-clear-l"></span><span class="setting-val"></span></div>
 
       <div class="row-title" style="margin-top:3vh;" data-i18n="playbackSection"></div>
       <div class="setting-row" id="set-autodl" data-nav tabindex="-1" data-setting="autoDl">
@@ -4442,6 +4460,7 @@ function saveAccount(){ localStorage.setItem('livescreen_account', JSON.stringif
 
 // Records that the viewer just opened a live channel (local-only, last 60 plays).
 function logWatchHistory(channel){
+  if(histPaused('watch')) return;
   const key = (channel || '').toLowerCase();
   const match = state.lastStreams.find(s => (s.slug || '').toLowerCase() === key);
   const cat = match && match.category ? match.category.name : '';
@@ -4584,7 +4603,7 @@ function activeModalRoot(){
   if(ssOverlay && ssOverlay.classList.contains('show')) return ssOverlay;
   const naM = document.getElementById('notif-ask');
   if(naM && naM.classList.contains('show')) return naM;
-  const bellM = document.getElementById('bell-menu');
+  const bellM = bellEl();
   if(bellM && bellM.classList.contains('show')) return bellM;
   const qualityMenu = document.getElementById('quality-menu');
   if(qualityMenu && qualityMenu.classList.contains('show')) return qualityMenu;
@@ -4871,7 +4890,7 @@ function moveFocus0(dir){
       if(el === box && dir === 'down' && go(selTab)) return;
     }else{
       const sugEls = focusables.filter(f => f.closest && f.closest('#suggest-grid, #search-media'));
-      if(inSug && dir === 'up'){ const above = sugEls.some(f => cy(f) < cy(el) - 10); if(!above && go(box)) return; }
+      if(inSug && dir === 'up'){ const above = sugEls.some(f => cy(f) < cy(el) - 10); if(!above){ kbShow(); return; } }
       if(el === box && dir === 'down' && sugEls.length && go(sugEls[0])) return;
     }
   }
@@ -4927,6 +4946,10 @@ function moveFocus0(dir){
         }
       }
       if(target){ focusIndex = focusables.indexOf(target); applyFocus(); return; }
+      if(dir === 'down' && state.searchVal.trim() && state.screen === 'search'){
+        const res = focusables.find(f => f.closest && f.closest('#suggest-grid')) || focusables.find(f => f.closest && f.closest('#search-media'));
+        if(res){ kbHide(); refreshFocusables(res); return; }
+      }
     }
   }
   // v47: channel page header — Back and Follow are reachable by the remote.
@@ -5057,7 +5080,8 @@ function activate(el){
   if(el.id === 'chan-back'){ channelBack(); return; }
   if(el.id === 'chan-follow'){
     const ch = el.dataset.channelFollow;
-    if(favHas(ch)) removeFavorite(ch); else { addFavorite(ch); notifOffFollowToast(); }
+    if(favHas(ch)){ state.currentChannel = ch; openBellMenu(); return; }   // v183: already following -> the bell opens the options sheet
+    addFavorite(ch); notifOffFollowToast();
     const on = favHas(ch);
     el.classList.toggle('on', on);
     if(on) el.innerHTML = bellIcon(ch); else el.textContent = t('saveFav');
@@ -5075,6 +5099,10 @@ function activate(el){
     setScreen(el.dataset.screen, { keepFocus:true });
     return;
   }
+  if(el.id === 'set-sh-pause'){ setHistPaused('search', !histPaused('search')); renderSettings(); return; }
+  if(el.id === 'set-wh-pause'){ setHistPaused('watch', !histPaused('watch')); renderSettings(); return; }
+  if(el.id === 'set-sh-clear'){ if(confirm(LT('Clear search history?', 'حذف سجل البحث؟'))){ state.recentSearch = []; try{ localStorage.removeItem('livescreen_recent_search'); }catch(e){} } return; }
+  if(el.id === 'set-wh-clear'){ if(confirm(LT('Clear watch history?', 'حذف سجل المشاهدة؟'))){ state.watchHistory = []; try{ localStorage.removeItem('livescreen_watch_history'); }catch(e){} } return; }
   if(el.id === 'set-uilang'){ toggleLang(); return; }
   if(el.id === 'set-kick-clientid'){ editKickClientId(); return; }
   if(el.id === 'set-kick-login'){
@@ -5082,7 +5110,7 @@ function activate(el){
     else { startKickLogin(); }
     return;
   }
-  if(state.screen === 'search' && (el.dataset.channel || el.dataset.sug)) noteSearched(el.dataset.channel || el.dataset.sug);
+  if(state.screen === 'search' && (el.dataset.channel || el.dataset.sug)){ noteSearched(el.dataset.channel || el.dataset.sug); if(!el.classList.contains('key')) kbHide(); }
   if(el.classList.contains('key')){ pressKey(el.dataset.key); return; }
   if(el.id === 'set-clientid'){ editSetting('clientId', t('clientId')); return; }
   if(el.id === 'set-proxyworker'){ editProxyWorker(); return; }
@@ -5175,7 +5203,8 @@ function activate(el){
     if(el.dataset.remove){ removeFavorite(el.dataset.remove); return; }
     if(state.screen === 'search') state.searchLast = el.dataset.channel;
     // v50: followed channels open the channel page (live ones show a Watch-live card there)
-    if(el.closest('#fav-grid, #home-following')){ openChannelPage(el.dataset.channel); return; }
+    if(el.closest('#home-following')){ playChannel(el.dataset.channel); return; }   // v189: live followed stream opens the stream directly
+    if(el.closest('#fav-grid')){ openChannelPage(el.dataset.channel); return; }
     playChannel(el.dataset.channel);
     return;
   }
@@ -5301,7 +5330,22 @@ function wireRemoteTestPad(){
   hd.addEventListener('pointermove',function(e){if(!on)return;pad.style.insetInlineEnd='auto';pad.style.bottom='auto';pad.style.left=Math.max(0,Math.min(innerWidth-pad.offsetWidth,e.clientX-ox))+'px';pad.style.top=Math.max(0,Math.min(innerHeight-pad.offsetHeight,e.clientY-oy))+'px'});
   hd.addEventListener('pointerup',function(){on=false});
 })();
+/* v185: search keyboard hides when you go down to the results / pick a suggestion, and comes back on Up-from-top-card, 0-9 or Backspace */
+function kbIsOff(){ const sc = document.getElementById('screen-search'); return !!(sc && sc.classList.contains('kb-off')); }
+function kbHide(){ const sc = document.getElementById('screen-search'); if(sc) sc.classList.add('kb-off'); }
+function kbShow(){
+  const sc = document.getElementById('screen-search'); if(sc) sc.classList.remove('kb-off');
+  const k0 = document.querySelector('#keyboard .key:not([data-key^="__"]):not([data-key="_"])') || document.querySelector('#keyboard .key');
+  refreshFocusables(k0 || undefined);
+}
+function kbRemoteTyping(k){
+  if(state.screen !== 'search' || state.ttResults || activeModalRoot()) return false;
+  if(/^[0-9]$/.test(k)){ if(kbIsOff()) kbShow(); pressKey(k); return true; }
+  if(k === 'Backspace' && (kbIsOff() || state.searchVal)){ if(kbIsOff()) kbShow(); pressKey('__back'); return true; }
+  return false;
+}
 function handleRemoteKey(k, rtl, ev){
+  if(kbRemoteTyping(k)) return true;
   if(state.screen === 'multi' && window.multiKey && window.multiKey(k, ev)) return true;
   if(window.dlPanelKey && window.dlPanelKey(k)) return true;
   if((k === 'ContextMenu' || k === 'F1' || (ev && ev.keyCode === 82)) && state.screen !== 'player' && state.screen !== 'multi'){
@@ -5731,7 +5775,7 @@ function setScreen(name, opts){
   if(name === 'library') renderLibrary();
   if(name === 'playlists' && window.plRender) window.plRender();
   if(name !== 'player') state.returnScreen = null;
-  if(name === 'search') renderKeyboard();
+  if(name === 'search'){ const sc0 = document.getElementById('screen-search'); if(sc0) sc0.classList.remove('kb-off'); state.sugRoll = undefined; renderKeyboard(); }
   if(name === 'notifications'){ renderNotifPanel(); markAllNotifsRead(); startNotifTimeRefresh(); }
   else stopNotifTimeRefresh();
   if(name !== 'player'){
@@ -5755,7 +5799,7 @@ function setScreen(name, opts){
     // sidebar was visibly expanded over the search keyboard before any
     // input — focus was starting on the Search button by accident.
     const targetId = name === 'player' ? 'player-screen' : 'screen-'+name;
-    const firstContentEl = (name === 'search' && state.ttResults && document.querySelector('#sr-tabs .sr-tab.sel')) || (name === 'search' && document.querySelector('#keyboard .key')) || document.querySelector(`#${targetId} [data-nav], #${targetId} .card, #${targetId} .key`);
+    const firstContentEl = (name === 'search' && state.ttResults && document.querySelector('#sr-tabs .sr-tab.sel')) || (name === 'search' && (document.querySelector('#keyboard .key:not([data-key^="__"]):not([data-key="_"])') || document.querySelector('#keyboard .key'))) || document.querySelector(`#${targetId} [data-nav], #${targetId} .card, #${targetId} .key`);
     // The screen may have no content yet (e.g. Discover still loading its
     // first fetch) — fall back to THIS screen's own sidebar button, not
     // index 0, which is always Search regardless of which screen we're
@@ -5966,7 +6010,10 @@ function buildDiscoverRows(list){
   // v173: if you follow channels, the live ones come first, then their newest VODs; otherwise the general picks lead
   const hasFav = (state.favorites || []).length > 0;
   const lead = hasFav ? (followingLiveRow(pool) + followVodsRow() + recommendedRow(streams)) : (recommendedRow(streams) + followingLiveRow(pool));
-  return heroRow + lead + homeClips + continueWatchingRow() + gamingRow(pool) + mayLikeRow(pool);
+  // v189: the lower rows come in a random order (Recommended / Spotlight / Following stay on top)
+  const tail = [continueWatchingRow(), gamingRow(pool), mayLikeRow(pool)];
+  if(!state.homeTailOrder) state.homeTailOrder = [0, 1, 2].sort(() => Math.random() - .5);
+  return heroRow + lead + homeClips + state.homeTailOrder.map(i => tail[i]).join('');
 }
 
 // Home row: videos/clips you stopped in the middle (from the watch history)
@@ -6111,17 +6158,20 @@ function gamingRow(streams){
 /* ---------- v92: AI helpers (Gemini via Cloudflare Worker ai.js). Silent on any failure. ---------- */
 const AI_FN = '/api/ai';
 let AI_COOL = 0;
+let AI_ERR = '';
+function aiErrLT(en, ar){ return LT(en, ar) + (AI_ERR ? ' [' + AI_ERR + ']' : ''); }   // v191: shows WHY the AI call failed (nokey / upstream 404 / rate / ...)
 async function aiRequest(task, data){
-  if(Date.now() < AI_COOL) return null;
+  if(Date.now() < AI_COOL){ AI_ERR = 'cooldown'; return null; }
+  AI_ERR = '';
   try{
     const ctl = new AbortController(); const to = setTimeout(() => ctl.abort(), 20000);
     const r = await fetch(AI_FN, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ task, data }), signal: ctl.signal });
     clearTimeout(to);
-    if(!r.ok) return null;
+    if(!r.ok){ AI_ERR = 'http ' + r.status; return null; }
     const j = await r.json();
-    if(j && j.error){ if(j.error === 'rate') AI_COOL = Date.now() + 300000; else if(j.error === 'nokey') AI_COOL = Date.now() + 3600000; return null; }
+    if(j && j.error){ AI_ERR = j.error + (j.status ? ' ' + j.status : ''); if(j.error === 'rate') AI_COOL = Date.now() + 300000; else if(j.error === 'nokey') AI_COOL = Date.now() + 3600000; return null; }
     return j;
-  }catch(e){ return null; }
+  }catch(e){ AI_ERR = 'network'; return null; }
 }
 function aiCacheGet(k, ttl){
   try{ const o = JSON.parse(localStorage.getItem('ls_ai_' + k) || 'null'); if(o && (!ttl || Date.now() - o.t < ttl)) return o.v; }catch(e){}
@@ -6737,7 +6787,7 @@ function addFavorite(ch){
   if(!favHas(ch)){
     state.favorites.push(ch);
     localStorage.setItem('livescreen_favorites', JSON.stringify(state.favorites));
-    try{ if(!notifEnabled()) setBellLevel(ch, 'none'); }catch(e){}   // notifications are off: a new follow starts on None
+    try{ setBellLevel(ch, notifEnabled() ? 'custom' : 'none'); }catch(e){}   // v183: every new follow resets the bell (Personalized; None if notifications are off)
   }
 }
 function removeFavorite(ch){
@@ -7150,20 +7200,25 @@ const KB_SYM = ['_', '.', '-', '#'];
 const KB_NUM = '1234567890'.split('');
 const GLOBE_ICON = '<svg viewBox="0 0 24 24" width="1.7vw" height="1.7vw" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.7 3.9 5.7 3.9 9s-1.3 6.3-3.9 9c-2.6-2.7-3.9-5.7-3.9-9S9.4 5.7 12 3z"/></svg>';
 function kbLang(){ if(!state.kbLang){ try{ state.kbLang = localStorage.getItem('livescreen_kb') || 'en'; }catch(e){ state.kbLang = 'en'; } } return state.kbLang; }
+function buildKeys(){
+  const kb = document.getElementById('keyboard'); if(!kb) return;
+  const key = k => `<div class="key" data-nav tabindex="-1" data-key="${k}">${k}</div>`;
+  const sp = (k, label, aria) => `<div class="key sp" data-nav tabindex="-1" data-key="${k}" aria-label="${aria}">${label}</div>`;
+  const keys = state.kbSym ? KB_NUM.concat(KB_SYM, ["'"]) : (kbLang() === 'ar' ? KB_AR : KB_EN.concat(['-', "'"]));
+  const specials = [ sp('__back', '\u232B', t('del')), sp('__sym', state.kbSym ? 'ABC' : '&123', 'Symbols'), sp('__lang', GLOBE_ICON, 'Language') ];
+  let html = '';
+  for(let i = 0; i < keys.length; i += 7){
+    html += keys.slice(i, i + 7).join('\u0000').split('\u0000').map(key).join('');
+    html += specials[i / 7] || '<div class="key-gap"></div>';
+  }
+  html += `<div class="key act first" data-nav tabindex="-1" data-key="__space">${LT('SPACE', '\u0645\u0633\u0627\u0641\u0629')}</div>`;
+  html += `<div class="key act" data-nav tabindex="-1" data-key="__clear">${LT('CLEAR', '\u0645\u0633\u062d')}</div>`;
+  html += `<div class="key act" data-nav tabindex="-1" data-key="__go">${LT('SEARCH', '\u0628\u062d\u062b')}</div>`;
+  kb.innerHTML = html;
+}
 function renderKeyboard(){
   document.getElementById('search-val').textContent = state.searchVal || '\u00A0';
-  const kb = document.getElementById('keyboard');
-  const letters = kbLang() === 'ar' ? KB_AR : KB_EN;
-  const key = k => `<div class="key" data-nav tabindex="-1" data-key="${k}">${k}</div>`;
-  let html = '';
-  html += `<div class="key" data-nav tabindex="-1" data-key="__lang" aria-label="Language">${GLOBE_ICON}</div>`;
-  html += `<div class="key" style="grid-column:span 3" data-nav tabindex="-1" data-key="__space" aria-label="${t('space')}">\u2423</div>`;
-  html += `<div class="key" style="grid-column:span 2" data-nav tabindex="-1" data-key="__back" aria-label="${t('del')}">\u232B</div>`;
-  // letters, then ( _ . - # ), then the numbers
-  html += letters.map(key).join('') + KB_SYM.map(key).join('') + KB_NUM.map(key).join('');
-  html += `<div class="key wide act first" data-nav tabindex="-1" data-key="__go">${LT('Search', '\u0628\u062d\u062b')}</div>`;
-  html += `<div class="key wide act" data-nav tabindex="-1" data-key="__save">${t('saveFav')}</div>`;
-  kb.innerHTML = html;
+  buildKeys();
   updateSearchByUI();
   loadLiveListForSearch();
   ensureLangPools();
@@ -7192,7 +7247,10 @@ function keepFocusRefresh(){ refreshFocusables(focusables[focusIndex]); }
 
 // v47: channels you searched for / opened from search (newest first)
 function recentSearches(){ if(!state.recentSearch){ try{ state.recentSearch = JSON.parse(localStorage.getItem('livescreen_recent_search') || '[]') || []; }catch(e){ state.recentSearch = []; } } return state.recentSearch; }
+function histPaused(w){ try{ return localStorage.getItem('livescreen_pause_' + w) === '1'; }catch(e){ return false; } }
+function setHistPaused(w, v){ try{ localStorage.setItem('livescreen_pause_' + w, v ? '1' : '0'); }catch(e){} }
 function noteSearched(slug){
+  if(histPaused('search')) return;
   slug = String(slug || '').trim(); if(!slug) return;
   const r = recentSearches().filter(x => String(x).toLowerCase() !== slug.toLowerCase()); r.unshift(slug);
   state.recentSearch = r.slice(0, 30);
@@ -7346,6 +7404,33 @@ function smartPicks(){
   const cards = mineCards.map(m => liveBy[m.slug.toLowerCase()]).concat(mix(9 - mineCards.length, skipC));
   return { text, cards };
 }
+// v186: empty search = only what I really searched; with no history, SOMETIMES 2-3 channels I follow / watch most (even if not followed)
+function emptySearchList(){
+  const rs = histPaused('search') ? [] : recentSearches().filter(x => x && !isBlocked(x)).slice(0, 5);
+  if(rs.length) return rs.map(slug => ({ slug }));
+  if(state.sugRoll === undefined) state.sugRoll = Math.random() < 0.5;
+  if(!state.sugRoll) return [];
+  const cnt = {}, name = {};
+  (state.watchHistory || []).forEach(x => { if(x && x.channel){ const k = String(x.channel).toLowerCase(); cnt[k] = (cnt[k] || 0) + 1; name[k] = x.channel; } });
+  (state.favorites || []).forEach(f => { const k = String(f).toLowerCase(); cnt[k] = (cnt[k] || 0) + 2; name[k] = f; });   // followed channels weigh a bit more
+  const top = Object.keys(cnt).filter(k => !isBlocked(name[k])).sort((a, b) => cnt[b] - cnt[a]).slice(0, 6);
+  const n = 2 + Math.floor(Math.random() * 2);
+  const pick = top.slice(0, 3).concat(top.slice(3)).sort(() => Math.random() - .5).slice(0, n);
+  return pick.map(k => ({ slug: name[k], trend: true }));
+}
+// v188: second row on the empty search screen: Continue watching, else live channels I follow that are not already shown above
+function emptySearchExtraRow(pk){
+  let h = continueWatchingRow();
+  if(h) return h.replace('id="home-continue"', 'id="search-continue" class="row home-continue-like"');
+  try{
+    const shown = new Set((pk.cards || []).map(c => String(c.slug).toLowerCase()));
+    const favs = new Set((state.favorites || []).map(f => String(f).toLowerCase()));
+    const list = (state.liveList || []).filter(c => favs.has(String(c.slug).toLowerCase()) && !shown.has(String(c.slug).toLowerCase()) && !isBlocked(c.slug)).slice(0, 10);
+    if(!list.length) return '';
+    const cards = list.map(c => cardHtml({ channel:c.slug, cat:c.cat, viewers:c.viewers, thumb:c.thumb, live:true, hero:true })).join('');
+    return `<div class="row"><div class="row-title"><span>${t('followTitle')}</span></div><div class="hrow">${cards}</div></div>`;
+  }catch(e){ return ''; }
+}
 function renderSuggestions(){
   if(getSearchBy() === 'tt'){ renderTTSearch(); return; }
   const grid = document.getElementById('suggest-grid');
@@ -7361,9 +7446,9 @@ function renderSuggestions(){
     grid.innerHTML = pk.cards.map(mk).join('');
     title.style.display = 'block'; title.textContent = LT('From recommended searches', 'من عمليات البحث المقترحة');
     state.sMedia = null; state.sChan = null;
-    { const sm = document.getElementById('search-media'); if(sm) sm.innerHTML = ''; }
-    if(textlist) textlist.innerHTML = pk.text.map(x =>
-      `<div class="text-item sug-item" data-nav tabindex="-1" data-sug="${escapeHtml(x.slug)}">${escapeHtml(x.slug)}${x.tag ? `<span class="sug-tag">${x.tag}</span>` : ''}</div>`).join('');
+    { const sm = document.getElementById('search-media'); if(sm) sm.innerHTML = emptySearchExtraRow(pk); }   // v188: 2nd row under the recommended cards
+    if(textlist) textlist.innerHTML = emptySearchList().map(x =>
+      `<div class="text-item sug-item" data-nav tabindex="-1" data-sug="${escapeHtml(x.slug)}">${escapeHtml(x.slug)}</div>`.replace('text-item sug-item', x.trend ? 'text-item sug-item sug-trend' : 'text-item sug-item')).join('');
     keepFocusRefresh();
     return;
   }
@@ -7547,7 +7632,9 @@ function pressKey(k){
   if(k === '__lang'){ state.kbLang = kbLang() === 'ar' ? 'en' : 'ar'; try{ localStorage.setItem('livescreen_kb', state.kbLang); }catch(e){} renderKeyboard(); const g = document.querySelector('#keyboard [data-key="__lang"]'); if(g) refreshFocusables(g); return; }
   if(getSearchBy() === 'tt' && (k === '__go' || k === '__save')){ ttSearchKey(k); return; }
   if(getSearchBy() === 'tt') state.ttSearchUser = null;
-  if(k === '__space') state.searchVal += ' ';
+  if(k === '__sym'){ state.kbSym = !state.kbSym; buildKeys(); const g = document.querySelector('#keyboard [data-key="__sym"]'); if(g) refreshFocusables(g); return; }
+  if(k === '__clear') state.searchVal = '';
+  else if(k === '__space') state.searchVal += ' ';
   else if(k === '__back') state.searchVal = state.searchVal.slice(0,-1);
   else if(k === '__go'){ srEnter(); return; }               // v170: Search = hide the keyboard, show the result tabs
   else if(k === '__save'){ if(state.searchVal.trim()) addFavorite(state.searchVal.trim()); }
@@ -11660,7 +11747,7 @@ function liveDescHtml(title){
   let sum = '';
   if(R.status === 'ok') sum = R.bullets.map(b => `<div class=\"ld-b\" dir=\"auto\">\u2022 ${qmEsc(b)}</div>`).join('');
   else if(R.status === 'few') sum = `<div class=\"ld-b\">${LT('Not enough chat to summarize yet', 'ما فيه كليبات أو شات كافي للتلخيص الحين')}</div>`;
-  else if(R.status === 'err') sum = `<div class=\"ld-b\">${LT('Could not summarize right now', 'ما قدرت ألخّص الحين')}</div>`;
+  else if(R.status === 'err') sum = `<div class=\"ld-b\">${aiErrLT('Could not summarize right now', 'ما قدرت ألخّص الحين')}</div>`;
   else sum = `<div class=\"ld-b\">${LT('Summarizing…', 'جاري التلخيص…')}</div>`;
   return `<div class=\"qm-row ld\" data-nav tabindex=\"-1\" data-noop><div class=\"ld-card\">
     <div class=\"ld-top\"><span class=\"ld-badge\">${LT('LIVE', 'مباشر')}</span><span class=\"ld-cat\">${qmEsc(cat)}</span></div>
@@ -11729,7 +11816,7 @@ function buildQualityMenu(){
       html += R.bullets.map(b => note('\u2022 ' + b)).join('');
       html += `<div class="qm-row opt desc tagline" data-nav tabindex="-1" data-noop dir="auto"><span class="qm-t">${LT('From the title, clips and chat', 'من العنوان وكليبات البث والشات')}</span></div>`;
     } else if(R.status === 'few') html += note(LT('Not enough to summarize', 'ما فيه شي كافي للتلخيص'));
-    else if(R.status === 'err') html += note(LT('Could not summarize right now', 'ما قدرت ألخّص الحين، جرّب بعد شوي'));
+    else if(R.status === 'err') html += note(aiErrLT('Could not summarize right now', 'ما قدرت ألخّص الحين، جرّب بعد شوي'));
     else html += note(LT('Summarizing…', 'جاري التلخيص…'));
   } else if(view === 'volume'){
     head = LT('Volume', 'الصوت');
@@ -11924,9 +12011,17 @@ function bellLevel(ch){ return bellMap()[String(ch || '').toLowerCase()] || 'cus
 function setBellLevel(ch, v){ const m = bellMap(); m[String(ch || '').toLowerCase()] = v; try{ localStorage.setItem(BELL_KEY, JSON.stringify(m)); }catch(e){} }
 function bellIcon(ch){ const v = bellLevel(ch); return v === 'all' ? ICONS.bellRing : (v === 'none' ? ICONS.bellOff : ICONS.bellOutline); }
 function followBtnEl(){ return document.getElementById(isClipModeOn() ? 'clip-fav' : 'player-fav'); }
-function bellMenuOpen(){ const m = document.getElementById('bell-menu'); return !!(m && m.classList.contains('show')); }
+function bellEl(){   // v183: on the channel page the bell menu is a big blurred full-screen sheet (own container); in the player it stays the small popup
+  const c = document.getElementById('chan-bell-menu');
+  if(state.screen === 'channel' || (c && c.classList.contains('show'))){
+    if(!c){ const d = document.createElement('div'); d.id = 'chan-bell-menu'; document.body.appendChild(d); return d; }
+    return c;
+  }
+  return document.getElementById('bell-menu');
+}
+function bellMenuOpen(){ const m = bellEl(); return !!(m && m.classList.contains('show')); }
 function buildBellMenu(){
-  const m = document.getElementById('bell-menu'); if(!m) return;
+  const m = bellEl(); if(!m) return;
   m.dir = state.settings.lang === 'ar' ? 'rtl' : 'ltr';
   const cur = bellLevel(state.currentChannel);
   const off = !notifEnabled();
@@ -11938,18 +12033,19 @@ function buildBellMenu(){
     row('unfollow', ICONS.userX, LT('Unfollow', 'إلغاء الاشتراك'), 'danger');
 }
 function openBellMenu(){
-  const m = document.getElementById('bell-menu'); if(!m) return;
+  const m = bellEl(); if(!m) return;
   closeQualityMenu();
   buildBellMenu();
   m.classList.add('show');
-  showPlayerUI();
+  if(m.id !== 'chan-bell-menu') showPlayerUI();
   const first = m.querySelector('[data-bell="' + bellLevel(state.currentChannel) + '"]') || m.querySelector('[data-nav]');
   if(first) refreshFocusables(first);
 }
 function closeBellMenu(refocus){
-  const m = document.getElementById('bell-menu');
+  const m = bellEl();
   if(!m || !m.classList.contains('show')) return;
   m.classList.remove('show');
+  if(m.id === 'chan-bell-menu'){ const cf = document.getElementById('chan-follow'); if(cf){ cf.classList.toggle('on', favHas(state.currentChannel)); cf.innerHTML = favHas(state.currentChannel) ? bellIcon(state.currentChannel) : t('saveFav'); } refreshFocusables(cf || undefined); return; }
   const b = followBtnEl();
   if(state.screen === 'player' && b && isNavVisible(b)) refreshFocusables(b); else refreshFocusables();
 }
@@ -11958,8 +12054,7 @@ function bellChoose(v){
   if(v === 'unfollow'){
     removeFavorite(ch);
     closeBellMenu();
-    updateFavIcon();
-    const b = followBtnEl(); if(b) refreshFocusables(b);
+    if(!document.getElementById('chan-follow')){ updateFavIcon(); const b = followBtnEl(); if(b) refreshFocusables(b); }
     return;
   }
   if((v === 'all' || v === 'custom') && !notifEnabled()){ closeBellMenu(); openNotifAsk(v); return; }   // notifications are off: ask first, apply after
@@ -12481,6 +12576,13 @@ function renderSettings(){
   const kickIdEl = document.getElementById('set-kick-clientid');
   if(kickIdEl) kickIdEl.textContent = state.kickClientId ? '\u2022\u2022\u2022\u2022' + state.kickClientId.slice(-4) : t('tapEdit');
   renderKickAuthUI();
+  { const on = LT('On', 'مفعّل'), off = LT('Off', 'متوقف');
+    const set = (id, txt) => { const e = document.getElementById(id); if(e) e.textContent = txt; };
+    set('set-hist-title', LT('History', 'السجل'));
+    set('set-sh-pause-l', LT('Pause search history', 'إيقاف سجل البحث مؤقتًا')); set('set-sh-pause-v', histPaused('search') ? on : off);
+    set('set-sh-clear-l', LT('Clear search history', 'حذف سجل البحث'));
+    set('set-wh-pause-l', LT('Pause watch history', 'إيقاف سجل المشاهدة مؤقتًا')); set('set-wh-pause-v', histPaused('watch') ? on : off);
+    set('set-wh-clear-l', LT('Clear watch history', 'حذف سجل المشاهدة')); }
   Object.keys(OPTIONS).forEach(key => {
     const row = document.querySelector(`[data-setting="${key}"] .setting-val`);
     if(row) row.textContent = labelFor(key, state.settings[key]);
@@ -12502,7 +12604,7 @@ document.addEventListener('click', e=>{
   // Work out where the tap landed BEFORE anything re-renders: a menu row gets rebuilt
   // by its own handler, and a detached target would look like a click "outside" the menu.
   const inQM = !!e.target.closest('#quality-menu, #player-gear');
-  const inBell = !!e.target.closest('#bell-menu, #player-fav');
+  const inBell = !!e.target.closest('#bell-menu, #chan-bell-menu, #player-fav, #chan-follow');
   const onPad = !!e.target.closest('[id^="rtp-"]');   // on-screen remote test pad: never counts as an outside click
   const el = e.target.closest('[data-nav]');
   if(el && !el.closest('#sidebar')){
@@ -14151,5 +14253,33 @@ html[data-theme="light"] .chan-follow.focused, html[data-theme="mixed"] .chan-fo
 })();
 
 </script>
+
+<style id="v187-search">
+/* v187: search screen = YouTube TV reference: 7-letter keyboard + side keys, small history pills, one row of home-size cards */
+html body #screen-search .search-layout{ grid-template-columns:26vw 32vw; column-gap:2vw; row-gap:1vw; }
+html body #screen-search #keyboard.kbd{ grid-column:2; width:32vw; max-width:32vw; grid-template-columns:repeat(8,1fr); gap:.2vw; }
+html body #screen-search #keyboard.kbd .key{ height:3.4vw; font-size:1.5vw; border-radius:.7vw; display:flex; align-items:center; justify-content:center; grid-column:auto !important; }
+html body #screen-search #keyboard.kbd .key svg{ width:1.5vw; height:1.5vw; }
+html body #screen-search #keyboard.kbd .key-gap{ height:3.4vw; }
+html body #screen-search #keyboard.kbd .key.act{ height:3vw; font-size:1.05vw; font-weight:700; letter-spacing:.03em; border-radius:.5vw; margin-top:.6vw; }
+html body #screen-search #keyboard.kbd .key[data-key="__space"]{ grid-column:span 3 !important; }
+html body #screen-search #keyboard.kbd .key[data-key="__clear"]{ grid-column:span 2 !important; }
+html body #screen-search #keyboard.kbd .key[data-key="__go"]{ grid-column:span 3 !important; }
+html body #screen-search .search-textlist .text-item{ font-size:1.2vw; padding:.5vw 1.3vw .5vw 1vw; gap:.7vw; }
+html body #screen-search .search-textlist .text-item::before{ width:1.3vw; height:1.3vw; }
+html body #screen-search #suggest-title{ font-size:1.2vw; margin:1.4vw 0 0; }
+/* cards: nothing clipped on top when focused/scaled */
+html body #screen-search #suggest-grid{ padding:1.6vw 1.4vw 2.6vw; margin:0 -1.4vw; overflow-y:visible; }
+html body #screen-search .search-textlist .text-item.sug-trend::before{ opacity:.9; -webkit-mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linejoin='round'><path d='M12 2.5c.9 3.3-1.1 5-2.6 6.9C8 11.2 7 12.8 7 15a5 5 0 0010 0c0-2.1-1-3.6-2.1-4.7-.3 1.3-1 2.1-2.1 2.2.9-3 .6-7-.8-10z'/></svg>") center/contain no-repeat; mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linejoin='round'><path d='M12 2.5c.9 3.3-1.1 5-2.6 6.9C8 11.2 7 12.8 7 15a5 5 0 0010 0c0-2.1-1-3.6-2.1-4.7-.3 1.3-1 2.1-2.1 2.2.9-3 .6-7-.8-10z'/></svg>") center/contain no-repeat; background:currentColor; }
+html body #screen-search #search-media{ padding-top:.5vw; }
+html body #screen-search #search-media .row-title{ font-size:1.2vw; margin:.6vw 0 0; }
+#search-continue .lib-prog > i{ background:linear-gradient(90deg,#ff3b4a,#ff9a5a); }
+</style>
+<style id="v190-live-icon">
+/* v190: no "LIVE" word on cards: a red round badge with a pulsing white dot */
+html body #app .card .badge.dot.live{ width:1.7vw; height:1.7vw; padding:0; border-radius:50%; }
+html body #app .card .badge.dot.live::before{ inset-inline-start:50%; margin-inline-start:-.3vw; width:.6vw; height:.6vw; margin-top:-.3vw; }
+html body #app .card .badge.dot.live::after{ content:''; }
+</style>
 </body>
 </html>
