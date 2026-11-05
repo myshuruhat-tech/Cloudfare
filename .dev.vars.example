@@ -1,0 +1,12 @@
+# انسخ هذا الملف باسم .dev.vars للتشغيل المحلي (wrangler dev). لا ترفع .dev.vars إلى GitHub.
+# في Cloudflare: Settings > Variables and Secrets
+KICK_CLIENT_ID=
+KICK_CLIENT_SECRET=
+# يجب أن يطابق حرفيا الـ Redirect URL المحفوظ في تطبيق Kick (مثلا https://دومينك/)
+KICK_REDIRECT_URI=
+GEMINI_API_KEY=
+GEMINI_MODEL=gemini-2.5-flash-lite
+UPSTASH_REDIS_REST_URL=
+UPSTASH_REDIS_REST_TOKEN=
+# اختياري: أصول إضافية مسموح لها باستدعاء /api/ai (مفصولة بفاصلة)
+ALLOWED_ORIGINS=
