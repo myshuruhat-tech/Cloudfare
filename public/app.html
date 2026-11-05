@@ -1449,17 +1449,36 @@ main{ margin-inline-start:0; padding:var(--nf-bar) 3.3vw 0 3.3vw; }
 #player-screen.clip-mode #clip-info{ max-width:36vw; }
 </style>
 <style id="intro-css">
-/* ===== Intro animation (cold start only) ===== */
-#intro{position:fixed;inset:0;z-index:2147483647;background:#0a0a0a;display:flex;align-items:center;justify-content:center;overflow:hidden;direction:ltr;opacity:1;transition:opacity .5s ease;will-change:opacity;}
-#intro.out{opacity:0;pointer-events:none;}
-#intro .i-box{position:relative;isolation:isolate;width:min(56vh,80vw);aspect-ratio:1/1;}
-#intro .i-glow{position:absolute;left:50%;top:30%;width:120%;aspect-ratio:1/1;margin:-60% 0 0 -60%;border-radius:50%;background:radial-gradient(circle,rgba(240,15,25,.55) 0%,rgba(240,15,25,.18) 32%,rgba(240,15,25,0) 62%);opacity:0;transform:scale(.6);animation:iGlow 2.05s ease-out .1s forwards;will-change:transform,opacity;}
-#intro img{position:absolute;inset:0;width:100%;height:100%;display:block;user-select:none;-webkit-user-drag:none;mix-blend-mode:lighten;}
-#intro .i-bolt{clip-path:inset(0 0 40% 0);opacity:0;transform:scale(.55);transform-origin:50% 30%;animation:iBolt .55s cubic-bezier(.34,1.56,.64,1) .1s forwards;will-change:transform,opacity;}
-#intro .i-text{clip-path:inset(60% 0 0 0);opacity:0;transform:translateY(5.5%);animation:iText .5s cubic-bezier(.22,.8,.3,1) .75s forwards;will-change:transform,opacity;}
-@keyframes iBolt{0%{opacity:0;transform:scale(.55)}30%{opacity:1}100%{opacity:1;transform:scale(1)}}
-@keyframes iText{0%{opacity:0;transform:translateY(5.5%)}100%{opacity:1;transform:translateY(0)}}
-@keyframes iGlow{0%{opacity:0;transform:scale(.6)}30%{opacity:1;transform:scale(1.05)}55%{opacity:.7;transform:scale(.95)}75%{opacity:.95;transform:scale(1.03)}100%{opacity:.8;transform:scale(1)}}
+/* ===== Intro animation (cold start only) — v194: bolt strikes, shockwave, sparks, then "5AL" wipes in ===== */
+#intro{position:fixed;top:0;left:0;right:0;bottom:0;z-index:2147483647;background:#0a0a0a;display:flex;align-items:center;justify-content:center;overflow:hidden;direction:ltr;opacity:1;transition:opacity .5s ease;will-change:opacity;touch-action:none;-webkit-tap-highlight-color:transparent;}
+#intro.out{opacity:0;}   /* keeps swallowing touches while it fades: a tap can never reach the screen underneath */
+#intro .i-box{position:relative;isolation:isolate;width:min(56vh,80vw);aspect-ratio:1/1;animation:iShake .38s linear .5s both;}
+#intro .i-glow{position:absolute;left:50%;top:36%;width:120%;aspect-ratio:1/1;margin:-60% 0 0 -60%;border-radius:50%;background:radial-gradient(circle,rgba(240,15,25,.55) 0%,rgba(240,15,25,.18) 32%,rgba(240,15,25,0) 62%);opacity:0;transform:scale(.5);animation:iGlow 2.2s ease-out .45s forwards;will-change:transform,opacity;}
+#intro .i-ring{position:absolute;left:50%;top:36%;width:60%;height:60%;margin:-30% 0 0 -30%;border-radius:50%;border:.55vh solid rgba(255,60,60,.9);opacity:0;transform:scale(.1);animation:iRing .95s cubic-bezier(.1,.7,.3,1) .5s forwards;will-change:transform,opacity;}
+#intro .i-ring.r2{border-width:.25vh;animation-delay:.66s;border-color:rgba(255,255,255,.55);}
+#intro .i-sparks i{position:absolute;left:50%;top:36%;width:1vh;height:1vh;margin:-.5vh 0 0 -.5vh;border-radius:50%;background:#ff4a4a;box-shadow:0 0 1.4vh rgba(255,40,40,.95);opacity:0;animation:iSpark .85s cubic-bezier(.1,.7,.3,1) .5s forwards;will-change:transform,opacity;}
+#intro .i-sparks i:nth-child(1){--x:-26vh;--y:-12vh}
+#intro .i-sparks i:nth-child(2){--x:24vh;--y:-16vh}
+#intro .i-sparks i:nth-child(3){--x:-14vh;--y:-24vh;width:.7vh;height:.7vh}
+#intro .i-sparks i:nth-child(4){--x:15vh;--y:-26vh;width:.7vh;height:.7vh}
+#intro .i-sparks i:nth-child(5){--x:-30vh;--y:6vh;width:.6vh;height:.6vh}
+#intro .i-sparks i:nth-child(6){--x:31vh;--y:4vh;width:.6vh;height:.6vh}
+#intro .i-sparks i:nth-child(7){--x:-18vh;--y:16vh}
+#intro .i-sparks i:nth-child(8){--x:19vh;--y:17vh}
+#intro .i-sparks i:nth-child(9){--x:-6vh;--y:-30vh;width:.55vh;height:.55vh}
+#intro .i-sparks i:nth-child(10){--x:7vh;--y:22vh;width:.55vh;height:.55vh}
+#intro img{position:absolute;top:0;left:0;right:0;bottom:0;width:100%;height:100%;display:block;user-select:none;-webkit-user-drag:none;mix-blend-mode:lighten;}
+#intro .i-bolt{clip-path:inset(0 0 40% 0);opacity:0;transform:translateY(-38%) scale(1.3);transform-origin:50% 36%;animation:iBolt .62s cubic-bezier(.55,0,.8,.45) .12s forwards;will-change:transform,opacity;}
+#intro .i-text{clip-path:inset(60% 100% 0 0);opacity:1;transform:translateX(-2.5%);animation:iText .6s cubic-bezier(.2,.7,.2,1) .85s forwards;will-change:transform,clip-path;}
+#intro .i-flash{position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(circle at 50% 42%,rgba(255,255,255,.5),rgba(255,70,70,.22) 38%,rgba(0,0,0,0) 68%);opacity:0;animation:iFlash .5s ease-out .5s forwards;pointer-events:none;}
+@keyframes iBolt{0%{opacity:0;transform:translateY(-38%) scale(1.3)}18%{opacity:1}72%{opacity:1;transform:translateY(1.5%) scale(.97)}86%{transform:translateY(-.8%) scale(1.02)}100%{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes iText{0%{clip-path:inset(60% 100% 0 0);transform:translateX(-2.5%)}100%{clip-path:inset(60% 0 0 0);transform:translateX(0)}}
+@keyframes iGlow{0%{opacity:0;transform:scale(.5)}22%{opacity:1;transform:scale(1.12)}40%{opacity:.55;transform:scale(.96)}58%{opacity:.95;transform:scale(1.04)}100%{opacity:.8;transform:scale(1)}}
+@keyframes iRing{0%{opacity:.95;transform:scale(.1)}100%{opacity:0;transform:scale(2.3)}}
+@keyframes iSpark{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--x),var(--y)) scale(.2)}}
+@keyframes iFlash{0%{opacity:0}18%{opacity:1}100%{opacity:0}}
+@keyframes iShake{0%{transform:translate(0,0)}15%{transform:translate(-.9vh,.5vh)}30%{transform:translate(.8vh,-.6vh)}45%{transform:translate(-.5vh,.4vh)}60%{transform:translate(.4vh,-.3vh)}80%{transform:translate(-.2vh,.1vh)}100%{transform:translate(0,0)}}
+@media (prefers-reduced-motion:reduce){#intro .i-box{animation:none}#intro .i-sparks,#intro .i-ring,#intro .i-flash{display:none}}
 
   /* ===== Login gate: activation (QR) + "Who's watching?" ===== */
   #ls-gate{ position:fixed; inset:0; z-index:9000; background:#060608; color:#fff; display:none; overflow:hidden; font-family:inherit; }
@@ -1517,7 +1536,8 @@ main{ margin-inline-start:0; padding:var(--nf-bar) 3.3vw 0 3.3vw; }
 /* ===== v39: profile loading screen ===== */
 #ls-loader{ position:fixed; inset:0; z-index:2147483646; background:#060608; color:#fff; display:none; flex-direction:column; align-items:center; justify-content:center; opacity:1; transition:opacity .45s ease; direction:ltr; }
 #ls-loader.show{ display:flex; }
-#ls-loader.out{ opacity:0; pointer-events:none; }
+#ls-loader.out{ opacity:0; }
+#ls-loader{ touch-action:none; }
 #ls-loader .ll-av{ position:relative; width:30vh; height:30vh; }
 #ls-loader .ll-ring{ position:absolute; inset:0; width:100%; height:100%; animation:llSpin 1.2s linear infinite; will-change:transform; }
 #ls-loader .ll-track{ fill:none; stroke:rgba(255,255,255,.12); stroke-width:2.4; }
@@ -1964,6 +1984,23 @@ html #app[data-screen="channel"] #sidebar, html #app[data-screen="multi"] #sideb
 </style>
 </head>
 <body>
+<script id="input-shield">
+/* v194 INPUT SHIELD. While the intro or the profile loading screen is up (and for ~0.45 s after), every tap, touch,
+   mouse and key event is stopped at the window BEFORE any other handler sees it. This is registered first, so
+   nothing can reach "Who's watching?" or the home screen underneath. Touch listeners are non-passive on purpose,
+   otherwise some Android WebViews ignore preventDefault and the finger "falls through" as a click. */
+(function(){
+  window.__lsShieldUntil=0;
+  function guarding(){ return !!(window.__lsLoaderOn || document.getElementById('intro')); }
+  function tail(){ return Date.now()<window.__lsShieldUntil; }
+  function kill(e){ if(e.cancelable) e.preventDefault(); e.stopPropagation(); if(e.stopImmediatePropagation) e.stopImmediatePropagation(); }
+  var ptr=['pointerdown','pointerup','pointermove','pointercancel','mousedown','mouseup','click','dblclick','auxclick','contextmenu','touchstart','touchmove','touchend','touchcancel','wheel'];
+  var opt={capture:true,passive:false};
+  for(var i=0;i<ptr.length;i++){ try{ window.addEventListener(ptr[i],function(e){ if(guarding()||tail()) kill(e); },opt); }catch(x){ window.addEventListener(ptr[i],function(e){ if(guarding()||tail()) kill(e); },true); } }
+  var keys=['keydown','keyup','keypress'];
+  for(var k=0;k<keys.length;k++) window.addEventListener(keys[k],function(e){ if(document.getElementById('intro')) kill(e); },true);   // the loading screen already swallows its own keys
+})();
+</script>
 <div id="ls-loader" aria-hidden="true"><div class="ll-av"><svg class="ll-ring" viewBox="0 0 100 100"><circle class="ll-track" cx="50" cy="50" r="46"/><circle class="ll-arc" cx="50" cy="50" r="46"/></svg><div class="ll-pic" id="ll-pic"></div></div><div class="ll-name" id="ll-name"></div></div>
 <script>
 /* Profile loading screen: avatar alone in the middle, name under it, a ring turning around the avatar.
@@ -2000,6 +2037,7 @@ html #app[data-screen="channel"] #sidebar, html #app[data-screen="multi"] #sideb
     if(cached) putImg(cached, url, false); else putImg(url, url, true);
   };
   window.lsLoaderHide=function(){
+    window.__lsShieldUntil=Date.now()+480+450;
     L.classList.add('out');
     setTimeout(function(){ L.classList.remove('show','out'); L.setAttribute('aria-hidden','true'); window.__lsLoaderOn=false; },480);
   };
@@ -2356,34 +2394,26 @@ html #app[data-screen="channel"] #sidebar, html #app[data-screen="multi"] #sideb
   el.classList.add('show'); el.setAttribute('aria-hidden','false'); render();
 })();
 </script>
-<div id="intro" aria-hidden="true"><div class="i-box"><div class="i-glow"></div><img class="i-bolt" src="./logo-art.png" alt=""><img class="i-text" src="./logo-art.png" alt=""></div></div>
+<div id="intro" aria-hidden="true"><div class="i-box"><div class="i-glow"></div><div class="i-ring"></div><div class="i-ring r2"></div><div class="i-sparks"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><img class="i-bolt" src="./logo-art.png" alt=""><img class="i-text" src="./logo-art.png" alt=""></div><div class="i-flash"></div></div>
 <script>
-/* Intro: runs once per cold start of the page. Coming back from the background does not
-   reload the page, so it never replays. Any key / tap skips it (and is swallowed). */
+/* Intro: runs once per cold start of the page (coming back from the background never replays it).
+   v194: it can NOT be skipped or touched. Every tap / key is swallowed by the input shield (see #input-shield),
+   so nothing reaches the "Who's watching?" screen underneath while it plays. It ends by itself (~3 s). */
 (function(){
   var el=document.getElementById('intro'); if(!el) return;
   if(window.__lsLoaderOn){ if(el.parentNode) el.parentNode.removeChild(el); return; }   // profile switch: loading screen instead of the intro
-  var done=false, tFade, tEnd;
+  var done=false, tFade;
   function finish(fast){
     if(done) return; done=true;
-    clearTimeout(tFade); clearTimeout(tEnd);
-    window.removeEventListener('keydown',skip,true);
-    el.removeEventListener('click',skip,true);
-    el.removeEventListener('touchstart',skip,true);
+    clearTimeout(tFade);
+    window.__lsShieldUntil=Date.now()+(fast?260:560)+450;      // keep eating the tail of a gesture after the fade
     if(fast) el.style.transitionDuration='.2s';
     el.classList.add('out');
     setTimeout(function(){ if(el.parentNode) el.parentNode.removeChild(el); },fast?260:560);
   }
-  var t0=Date.now();
-  function skip(e){ if(e && (Date.now()-t0<800 || e.repeat)){ e.preventDefault(); e.stopPropagation(); return; } var wasKey=e&&e.type==='keydown'; if(e){ e.preventDefault(); e.stopPropagation(); if(e.stopImmediatePropagation) e.stopImmediatePropagation(); } if(wasKey){ window.addEventListener('keyup',swallow,true); setTimeout(function(){ window.removeEventListener('keyup',swallow,true); },1500); } finish(true); }
-  // swallow the matching keyup of the key that skipped, so the app never sees half a key press
-  function swallow(e){ e.stopPropagation(); e.preventDefault(); window.removeEventListener('keyup',swallow,true); }
-  window.addEventListener('keydown',skip,true);
-  el.addEventListener('click',skip,true);
-  el.addEventListener('touchstart',skip,true);
   // If the logo image can't load, don't hold the app back
   var im=new Image(); im.onerror=function(){ finish(true); }; im.src='./logo-art.png';
-  tFade=setTimeout(function(){ finish(false); },2050); // fade-out starts here (≈2.6s total)
+  tFade=setTimeout(function(){ finish(false); },2500); // fade-out starts here (≈3 s total)
 })();
 </script>
 
