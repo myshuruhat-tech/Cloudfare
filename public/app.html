@@ -8437,7 +8437,16 @@ async function sendChatMessage(text){
       if(res.ok && ks >= 200 && ks < 300) return { ok:true };
       let why = 'HTTP ' + ks;
       if(ks === 401) why += ' - login expired, log in again';
-      else if(ks === 403) why += ' - missing chat:write permission, log out and log in again';
+      else if(ks === 403){
+        why += ' - forbidden';
+        try{
+          const ir = await fetch(KICK_FN + '?action=introspect', { method:'POST', headers:{ 'Authorization':'Bearer ' + auth.access_token } });
+          const id = await ir.json();
+          let info = {}; try{ info = JSON.parse(id.detail).data || {}; }catch(e){}
+          if(info.scope !== undefined) why += ' | token scope: ' + info.scope + ' | active: ' + info.active;
+          else why += ' | introspect: ' + String(id.detail || '').slice(0,100);
+        }catch(e){}
+      }
       if(d.detail) why += ' ' + String(d.detail).slice(0,120);
       else if(d.message) why += ' ' + d.message;
       return { ok:false, reason: why };
