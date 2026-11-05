@@ -1900,7 +1900,7 @@ html[data-theme="light"] .sr-chan.focused, html[data-theme="light"] .sr-tab.focu
 html .hrow .card .thumb:not(.thumb-avatar), html .hrow .vod-card .thumb, html .hrow .lib-card .thumb,
 html .grid .card .thumb:not(.thumb-avatar), html .grid .vod-card .thumb, html .grid .lib-card .thumb,
 html #suggest-grid .card .thumb:not(.thumb-avatar), html #lib-grid .vod-card .thumb, html #lib-grid .lib-card .thumb, html #lib-grid .card .thumb:not(.thumb-avatar),
-html #dl-grid .vod-card .thumb, html #fav-grid .card .thumb:not(.thumb-avatar){ aspect-ratio:21/9 !important; }
+html #dl-grid .vod-card .thumb, html #fav-grid .card .thumb:not(.thumb-avatar){ aspect-ratio:16/9 !important; }
 html .hrow .card .thumb img, html .hrow .vod-card .thumb img, html .hrow .lib-card .thumb img,
 html .grid .card .thumb img, html .grid .vod-card .thumb img, html .grid .lib-card .thumb img,
 html #lib-grid .thumb img, html #dl-grid .thumb img, html #fav-grid .thumb img{ object-fit:cover; object-position:center top; }
@@ -2016,7 +2016,7 @@ html #app[data-screen="channel"] #sidebar, html #app[data-screen="multi"] #sideb
    If that login was started from /activate, hand the result back to that page instead of opening the app. */
 (function(){ try{
   var q=new URLSearchParams(location.search), st=q.get('state');
-  if(q.get('code') && st && st===sessionStorage.getItem('tvState')) location.replace('/activate'+location.search);
+  if(q.get('code') && st && st===sessionStorage.getItem('tvState')) (function(){ var w=window; try{ if(window.top && window.top.location.origin===location.origin) w=window.top; }catch(e){} w.location.replace('/activate'+location.search); })();
 }catch(e){} })();
 </script>
 <style id="welcome-css">
@@ -2101,7 +2101,7 @@ html #app[data-screen="channel"] #sidebar, html #app[data-screen="multi"] #sideb
 #ls-welcome .pv-h1{left:6.9%;top:46.7%;width:28.1%;height:2.78%;border-radius:1vh;background:var(--hero-ink)}
 #ls-welcome .pv-h2{left:6.9%;top:50.6%;width:14%;height:2.2%;border-radius:1vh;background:var(--hero-sub)}
 #ls-welcome .pv-c{top:61.1%;width:29.2%;height:50%;border-radius:1.6vh;background:var(--card);border:.15vh solid var(--cardline)}
-#ls-welcome .pv-c:nth-of-type(1){left:4.375%}
+#ls-welcome .pv-c{left:4.375%}
 #ls-welcome .pv-c.c2{left:35.3%}
 #ls-welcome .pv-c.c3{left:66.4%}
 #ls-welcome .pv-c u{left:7.5%;top:6.7%;width:85%;height:33%;border-radius:1vh;background:var(--thumb)}
@@ -2111,6 +2111,25 @@ html #app[data-screen="channel"] #sidebar, html #app[data-screen="multi"] #sideb
 #ls-welcome .t-dark{--bg:#0F0F10;--bar:#18181A;--barline:#282829;--dot:#55555C;--ink:#EDEDED;--sub:#62626A;--hero:#232326;--hero-ink:#F0F0F0;--hero-sub:#78787F;--card:#18181A;--cardline:#2C2C30;--thumb:#2C2C32;--frame:#34343A}
 #ls-welcome .t-mixed{--bg:#F3F2EE;--bar:#111;--barline:#111;--dot:#7F7F7F;--ink:#1A1A1A;--sub:#999;--hero:#2A2A2A;--hero-ink:#F5F5F0;--hero-sub:#9A9A9A;--card:#fff;--cardline:#DCDCD8;--thumb:#DED8D0;--frame:#EBEBEB}
 @media (prefers-reduced-motion:reduce){#ls-welcome *{animation-duration:.01s !important;animation-delay:0s !important}}
+/* Old-WebView fallback: Android TV / older System WebView has no support for inset or aspect-ratio */
+#ls-welcome,#intro,#ls-loader,#dl-panel{top:0;left:0;right:0;bottom:0}
+#ls-welcome{width:100%;height:100%}
+#ls-welcome .w-step,#ls-welcome .w-pv,#ls-welcome .w-art img{top:0;left:0;right:0;bottom:0}
+#ls-welcome .w-glow{top:-14%;left:-14%;right:-14%;bottom:-14%}
+#ls-welcome .w-opt i::after{top:.45vh;left:.45vh;right:.45vh;bottom:.45vh}
+#ls-welcome .w-pv::after{top:0;left:0;right:0;bottom:0}
+@supports not (aspect-ratio:1/1){
+#ls-welcome .w-art::before,#ls-welcome .w-pad::before,#ls-welcome .w-bell::before,#ls-welcome .w-pad b::before{content:"";display:block;width:0;padding-top:100%;float:left}
+#ls-welcome .w-steps-ap .w-art::before{padding-top:56.25%}
+#ls-welcome .w-pad{height:0;padding-top:100%}
+#ls-welcome .w-pad::before{display:none}
+#ls-welcome .w-bell{height:0;padding-top:100%;position:relative}
+#ls-welcome .w-bell::before{display:none}
+#ls-welcome .w-bell svg{position:absolute;left:28%;top:28%}
+#ls-welcome .w-pad b{height:0;padding-top:36%}
+#ls-welcome .w-pad b::before{display:none}
+#ls-welcome .pv-bar b{height:0;padding-top:2.5%}
+}
 </style>
 <div id="ls-welcome" aria-hidden="true">
   <div class="w-step on w-steps-lang">
@@ -7240,7 +7259,7 @@ async function loadLiveListForSearch(){
     state.liveList.forEach(x => noteLang(x.slug, x.lang));
   }catch(err){ state.liveList = []; }
   state.liveListLoading = false;
-  renderSuggestions();
+  renderSuggestionsSoon();
 }
 
 function keepFocusRefresh(){ refreshFocusables(focusables[focusIndex]); }
@@ -7363,7 +7382,7 @@ async function ensureLangPools(){
       pool.list.forEach(x => noteLang(x.slug, l));
     }catch(e){}
     pool.loading = false; pool.ts = Date.now();
-    if(state.screen === 'search' && !state.searchVal.trim()) renderSuggestions();
+    if(state.screen === 'search' && !state.searchVal.trim()) renderSuggestionsSoon();
   }
 }
 function smartPicks(){
@@ -7431,8 +7450,12 @@ function emptySearchExtraRow(pk){
     return `<div class="row"><div class="row-title"><span>${t('followTitle')}</span></div><div class="hrow">${cards}</div></div>`;
   }catch(e){ return ''; }
 }
+function renderSuggestionsSoon(){   // background data arrivals (live list, language pools) are merged into ONE re-render
+  clearTimeout(state._rsT);
+  state._rsT = setTimeout(() => { if(state.screen === 'search') renderSuggestions(); }, 350);
+}
 function renderSuggestions(){
-  if(getSearchBy() === 'tt'){ renderTTSearch(); return; }
+  if(getSearchBy() === 'tt'){ state._emptySig = null; renderTTSearch(); return; }
   const grid = document.getElementById('suggest-grid');
   const title = document.getElementById('suggest-title');
   const textlist = document.getElementById('search-textlist');
@@ -7443,15 +7466,23 @@ function renderSuggestions(){
   if(!q){
     const pk = smartPicks();
     const mk = c => cardHtml({ channel:c.slug, cat:c.cat, viewers:c.viewers, thumb:c.thumb, live:true, hero:true });
-    grid.innerHTML = pk.cards.map(mk).join('');
+    const gridHtml = pk.cards.map(mk).join('');
+    const extraHtml = emptySearchExtraRow(pk);
+    const listHtml = emptySearchList().map(x =>
+      `<div class="text-item sug-item" data-nav tabindex="-1" data-sug="${escapeHtml(x.slug)}">${escapeHtml(x.slug)}</div>`.replace('text-item sug-item', x.trend ? 'text-item sug-item sug-trend' : 'text-item sug-item')).join('');
+    const sig = gridHtml + '\u0001' + extraHtml + '\u0001' + listHtml;
+    // same content as what is already on screen: do not rebuild (a rebuild replays the card entrance animation = "updates again")
+    if(state._emptySig === sig && grid.firstElementChild && grid.firstElementChild === state._emptyFirst) return;
+    grid.innerHTML = gridHtml;
+    state._emptySig = sig; state._emptyFirst = grid.firstElementChild;
     title.style.display = 'block'; title.textContent = LT('From recommended searches', 'من عمليات البحث المقترحة');
     state.sMedia = null; state.sChan = null;
-    { const sm = document.getElementById('search-media'); if(sm) sm.innerHTML = emptySearchExtraRow(pk); }   // v188: 2nd row under the recommended cards
-    if(textlist) textlist.innerHTML = emptySearchList().map(x =>
-      `<div class="text-item sug-item" data-nav tabindex="-1" data-sug="${escapeHtml(x.slug)}">${escapeHtml(x.slug)}</div>`.replace('text-item sug-item', x.trend ? 'text-item sug-item sug-trend' : 'text-item sug-item')).join('');
+    { const sm = document.getElementById('search-media'); if(sm) sm.innerHTML = extraHtml; }   // v188: 2nd row under the recommended cards
+    if(textlist) textlist.innerHTML = listHtml;
     keepFocusRefresh();
     return;
   }
+  state._emptySig = null;
   const cand = searchCandidates(q).slice(0, 12);
   const mk = c => cardHtml({ channel:c.slug, cat:[c.tag, c.cat].filter(Boolean).join(' \u00B7 '), viewers:c.viewers, live:c.live, offline:!c.live, avatar:c.avatar || state.avatarCache[c.slug.toLowerCase()] || null, hero:true });
   state.sChan = cand.map(mk); mixRender();
@@ -13902,7 +13933,7 @@ html body #app :is(.card, .vod-card, .clip-card:not(.tt-card), .lib-card).focuse
 html body #app :is(.card, .vod-card, .clip-card:not(.tt-card), .lib-card) .thumb::before{
   content:''; position:absolute; top:0; bottom:0; left:0; width:28%; z-index:3; pointer-events:none; opacity:0;
   background:linear-gradient(100deg, transparent, rgba(255,255,255,.34), transparent); transform:translateX(-130%) skewX(-18deg); }
-html body #app :is(.card, .vod-card, .clip-card:not(.tt-card), .lib-card).focused .thumb::before{ opacity:1; animation:c178Sweep .9s .12s var(--c-ease) 1 both; }
+html body #app :is(.card, .vod-card, .clip-card:not(.tt-card), .lib-card).focused .thumb::before{ opacity:0; animation:none; }
 
 /* readable bottom shade on every thumbnail */
 html body #app :is(.card, .vod-card, .clip-card:not(.tt-card), .lib-card) .thumb::after{
@@ -14256,7 +14287,7 @@ html[data-theme="light"] .chan-follow.focused, html[data-theme="mixed"] .chan-fo
 
 <style id="v187-search">
 /* v187: search screen = YouTube TV reference: 7-letter keyboard + side keys, small history pills, one row of home-size cards */
-html body #screen-search .search-layout{ grid-template-columns:26vw 32vw; column-gap:2vw; row-gap:1vw; }
+html body #screen-search .search-layout{ grid-template-columns:26vw 32vw minmax(0,1fr); column-gap:2vw; row-gap:1vw; }
 html body #screen-search #keyboard.kbd{ grid-column:2; width:32vw; max-width:32vw; grid-template-columns:repeat(8,1fr); gap:.2vw; }
 html body #screen-search #keyboard.kbd .key{ height:3.4vw; font-size:1.5vw; border-radius:.7vw; display:flex; align-items:center; justify-content:center; grid-column:auto !important; }
 html body #screen-search #keyboard.kbd .key svg{ width:1.5vw; height:1.5vw; }
@@ -14274,6 +14305,12 @@ html body #screen-search .search-textlist .text-item.sug-trend::before{ opacity:
 html body #screen-search #search-media{ padding-top:.5vw; }
 html body #screen-search #search-media .row-title{ font-size:1.2vw; margin:.6vw 0 0; }
 #search-continue .lib-prog > i{ background:linear-gradient(90deg,#ff3b4a,#ff9a5a); }
+</style>
+<style id="v192-search-results">
+/* v192: when the keyboard hides (results / suggestion picked) the suggestion pills go with it and the results use the whole screen: only the search bar stays on top */
+html body #screen-search.kb-off #search-textlist{ display:none !important; }
+html body #screen-search.kb-off #suggest-grid{ flex-wrap:wrap !important; overflow:visible !important; gap:1.6vw !important; }
+html body #screen-search.kb-off #suggest-grid .card, html body #screen-search.kb-off #suggest-grid .vod-card, html body #screen-search.kb-off #suggest-grid .clip-card{ flex:0 0 calc((100% - 3.2vw)/3 - 2px) !important; width:calc((100% - 3.2vw)/3 - 2px) !important; }
 </style>
 <style id="v190-live-icon">
 /* v190: no "LIVE" word on cards: a red round badge with a pulsing white dot */

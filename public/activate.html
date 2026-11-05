@@ -52,7 +52,7 @@
   };
   var $ = function(i){ return document.getElementById(i); };
   $('t-title').textContent = T.title; $('t-sub').textContent = T.sub; $('go').textContent = T.go; $('t-tt').textContent = T.tt;
-  var FN = '/api/', REDIRECT = location.origin + '/index.html';  // default; override with the KICK_REDIRECT_URI env var on Cloudflare = the exact Redirect URL saved in the Kick app
+  var FN = '/api/', REDIRECT = location.origin + '/';  // default; override with the KICK_REDIRECT_URI env var on Cloudflare = the exact Redirect URL saved in the Kick app
   function msg(t, cls){ $('msg').className = 'msg ' + (cls || ''); $('msg').textContent = t || ''; }
   function b64url(buf){ var s=''; new Uint8Array(buf).forEach(function(b){ s += String.fromCharCode(b); }); return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); }
   function fmt(v){ v = v.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,8); return v.length > 4 ? v.slice(0,4) + '-' + v.slice(4) : v; }
