@@ -1450,13 +1450,13 @@ main{ margin-inline-start:0; padding:var(--nf-bar) 3.3vw 0 3.3vw; }
 </style>
 <style id="intro-css">
 /* ===== Intro animation (cold start only) — v194: bolt strikes, shockwave, sparks, then "5AL" wipes in ===== */
-#intro{position:fixed;top:0;left:0;right:0;bottom:0;z-index:2147483647;background:#0a0a0a;display:flex;align-items:center;justify-content:center;overflow:hidden;direction:ltr;opacity:1;transition:opacity .5s ease;will-change:opacity;touch-action:none;-webkit-tap-highlight-color:transparent;}
+#intro{--t0:1s;position:fixed;top:0;left:0;right:0;bottom:0;z-index:2147483647;background:#0a0a0a;display:flex;align-items:center;justify-content:center;overflow:hidden;direction:ltr;opacity:1;transition:opacity .5s ease;will-change:opacity;touch-action:none;-webkit-tap-highlight-color:transparent;}
 #intro.out{opacity:0;}   /* keeps swallowing touches while it fades: a tap can never reach the screen underneath */
-#intro .i-box{position:relative;isolation:isolate;width:min(56vh,80vw);aspect-ratio:1/1;animation:iShake .38s linear .5s both;}
-#intro .i-glow{position:absolute;left:50%;top:36%;width:120%;aspect-ratio:1/1;margin:-60% 0 0 -60%;border-radius:50%;background:radial-gradient(circle,rgba(240,15,25,.55) 0%,rgba(240,15,25,.18) 32%,rgba(240,15,25,0) 62%);opacity:0;transform:scale(.5);animation:iGlow 2.2s ease-out .45s forwards;will-change:transform,opacity;}
-#intro .i-ring{position:absolute;left:50%;top:36%;width:60%;height:60%;margin:-30% 0 0 -30%;border-radius:50%;border:.55vh solid rgba(255,60,60,.9);opacity:0;transform:scale(.1);animation:iRing .95s cubic-bezier(.1,.7,.3,1) .5s forwards;will-change:transform,opacity;}
-#intro .i-ring.r2{border-width:.25vh;animation-delay:.66s;border-color:rgba(255,255,255,.55);}
-#intro .i-sparks i{position:absolute;left:50%;top:36%;width:1vh;height:1vh;margin:-.5vh 0 0 -.5vh;border-radius:50%;background:#ff4a4a;box-shadow:0 0 1.4vh rgba(255,40,40,.95);opacity:0;animation:iSpark .85s cubic-bezier(.1,.7,.3,1) .5s forwards;will-change:transform,opacity;}
+#intro .i-box{position:relative;isolation:isolate;width:min(56vh,80vw);aspect-ratio:1/1;animation:iShake .38s linear calc(var(--t0) + .3s) both;}
+#intro .i-glow{position:absolute;left:50%;top:36%;width:120%;aspect-ratio:1/1;margin:-60% 0 0 -60%;border-radius:50%;background:radial-gradient(circle,rgba(240,15,25,.55) 0%,rgba(240,15,25,.18) 32%,rgba(240,15,25,0) 62%);opacity:0;transform:scale(.5);animation:iGlow 2.2s ease-out calc(var(--t0) + .25s) forwards;will-change:transform,opacity;}
+#intro .i-ring{position:absolute;left:50%;top:36%;width:60%;height:60%;margin:-30% 0 0 -30%;border-radius:50%;border:.55vh solid rgba(255,60,60,.9);opacity:0;transform:scale(.1);animation:iRing .95s cubic-bezier(.1,.7,.3,1) calc(var(--t0) + .3s) forwards;will-change:transform,opacity;}
+#intro .i-ring.r2{border-width:.25vh;animation-delay:calc(var(--t0) + .46s);border-color:rgba(255,255,255,.55);}
+#intro .i-sparks i{position:absolute;left:50%;top:36%;width:1vh;height:1vh;margin:-.5vh 0 0 -.5vh;border-radius:50%;background:#ff4a4a;box-shadow:0 0 1.4vh rgba(255,40,40,.95);opacity:0;animation:iSpark .85s cubic-bezier(.1,.7,.3,1) calc(var(--t0) + .3s) forwards;will-change:transform,opacity;}
 #intro .i-sparks i:nth-child(1){--x:-26vh;--y:-12vh}
 #intro .i-sparks i:nth-child(2){--x:24vh;--y:-16vh}
 #intro .i-sparks i:nth-child(3){--x:-14vh;--y:-24vh;width:.7vh;height:.7vh}
@@ -1468,9 +1468,9 @@ main{ margin-inline-start:0; padding:var(--nf-bar) 3.3vw 0 3.3vw; }
 #intro .i-sparks i:nth-child(9){--x:-6vh;--y:-30vh;width:.55vh;height:.55vh}
 #intro .i-sparks i:nth-child(10){--x:7vh;--y:22vh;width:.55vh;height:.55vh}
 #intro img{position:absolute;top:0;left:0;right:0;bottom:0;width:100%;height:100%;display:block;user-select:none;-webkit-user-drag:none;mix-blend-mode:lighten;}
-#intro .i-bolt{clip-path:inset(0 0 40% 0);opacity:0;transform:translateY(-38%) scale(1.3);transform-origin:50% 36%;animation:iBolt .62s cubic-bezier(.55,0,.8,.45) .12s forwards;will-change:transform,opacity;}
-#intro .i-text{clip-path:inset(60% 100% 0 0);opacity:1;transform:translateX(-2.5%);animation:iText .6s cubic-bezier(.2,.7,.2,1) .85s forwards;will-change:transform,clip-path;}
-#intro .i-flash{position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(circle at 50% 42%,rgba(255,255,255,.5),rgba(255,70,70,.22) 38%,rgba(0,0,0,0) 68%);opacity:0;animation:iFlash .5s ease-out .5s forwards;pointer-events:none;}
+#intro .i-bolt{clip-path:inset(0 0 40% 0);opacity:0;transform:translateY(-38%) scale(1.3);transform-origin:50% 36%;animation:iPre .6s linear .25s,iBolt .4s cubic-bezier(.55,0,.8,.45) var(--t0) forwards;will-change:transform,opacity;}
+#intro .i-text{clip-path:inset(60% 100% 0 0);opacity:1;transform:translateX(-2.5%);animation:iText .5s cubic-bezier(.2,.7,.2,1) calc(var(--t0) + .55s) forwards;will-change:transform,clip-path;}
+#intro .i-flash{position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(circle at 50% 42%,rgba(255,255,255,.5),rgba(255,70,70,.22) 38%,rgba(0,0,0,0) 68%);opacity:0;animation:iFlash .5s ease-out calc(var(--t0) + .3s) forwards;pointer-events:none;}
 @keyframes iBolt{0%{opacity:0;transform:translateY(-38%) scale(1.3)}18%{opacity:1}72%{opacity:1;transform:translateY(1.5%) scale(.97)}86%{transform:translateY(-.8%) scale(1.02)}100%{opacity:1;transform:translateY(0) scale(1)}}
 @keyframes iText{0%{clip-path:inset(60% 100% 0 0);transform:translateX(-2.5%)}100%{clip-path:inset(60% 0 0 0);transform:translateX(0)}}
 @keyframes iGlow{0%{opacity:0;transform:scale(.5)}22%{opacity:1;transform:scale(1.12)}40%{opacity:.55;transform:scale(.96)}58%{opacity:.95;transform:scale(1.04)}100%{opacity:.8;transform:scale(1)}}
@@ -1478,7 +1478,14 @@ main{ margin-inline-start:0; padding:var(--nf-bar) 3.3vw 0 3.3vw; }
 @keyframes iSpark{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--x),var(--y)) scale(.2)}}
 @keyframes iFlash{0%{opacity:0}18%{opacity:1}100%{opacity:0}}
 @keyframes iShake{0%{transform:translate(0,0)}15%{transform:translate(-.9vh,.5vh)}30%{transform:translate(.8vh,-.6vh)}45%{transform:translate(-.5vh,.4vh)}60%{transform:translate(.4vh,-.3vh)}80%{transform:translate(-.2vh,.1vh)}100%{transform:translate(0,0)}}
-@media (prefers-reduced-motion:reduce){#intro .i-box{animation:none}#intro .i-sparks,#intro .i-ring,#intro .i-flash{display:none}}
+/* v195: full intro on first launch = CRT power-on line + bolt charge flickers + strike. Later launches = short version (.short). */
+#intro.short{--t0:.1s}
+#intro.short .i-bolt{animation:iBolt .4s cubic-bezier(.55,0,.8,.45) var(--t0) forwards;}
+#intro .i-crt{position:absolute;left:0;right:0;top:50%;height:.4vh;margin-top:-.2vh;background:#fff;box-shadow:0 0 2vh rgba(255,60,60,.9);opacity:0;transform:scaleX(0);animation:iCrt .55s ease-out forwards;pointer-events:none;will-change:transform,opacity;}
+#intro.short .i-crt{display:none}
+@keyframes iPre{0%{transform:translateY(0) scale(1);opacity:0}10%{opacity:.3}20%{opacity:0}40%{opacity:.5}50%{opacity:0}75%{opacity:.8}85%{opacity:0}100%{transform:translateY(0) scale(1);opacity:0}}
+@keyframes iCrt{0%{opacity:1;transform:scaleX(0) scaleY(1)}45%{opacity:1;transform:scaleX(1) scaleY(1)}75%{opacity:.16;transform:scaleX(1) scaleY(40)}100%{opacity:0;transform:scaleX(1) scaleY(60)}}
+@media (prefers-reduced-motion:reduce){#intro .i-box{animation:none}#intro .i-sparks,#intro .i-ring,#intro .i-flash,#intro .i-crt{display:none}}
 
   /* ===== Login gate: activation (QR) + "Who's watching?" ===== */
   #ls-gate{ position:fixed; inset:0; z-index:9000; background:#060608; color:#fff; display:none; overflow:hidden; font-family:inherit; }
@@ -2394,7 +2401,7 @@ html #app[data-screen="channel"] #sidebar, html #app[data-screen="multi"] #sideb
   el.classList.add('show'); el.setAttribute('aria-hidden','false'); render();
 })();
 </script>
-<div id="intro" aria-hidden="true"><div class="i-box"><div class="i-glow"></div><div class="i-ring"></div><div class="i-ring r2"></div><div class="i-sparks"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><img class="i-bolt" src="./logo-art.png" alt=""><img class="i-text" src="./logo-art.png" alt=""></div><div class="i-flash"></div></div>
+<div id="intro" aria-hidden="true"><div class="i-crt"></div><div class="i-box"><div class="i-glow"></div><div class="i-ring"></div><div class="i-ring r2"></div><div class="i-sparks"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><img class="i-bolt" src="./logo-art.png" alt=""><img class="i-text" src="./logo-art.png" alt=""></div><div class="i-flash"></div></div>
 <script>
 /* Intro: runs once per cold start of the page (coming back from the background never replays it).
    v194: it can NOT be skipped or touched. Every tap / key is swallowed by the input shield (see #input-shield),
@@ -2402,7 +2409,8 @@ html #app[data-screen="channel"] #sidebar, html #app[data-screen="multi"] #sideb
 (function(){
   var el=document.getElementById('intro'); if(!el) return;
   if(window.__lsLoaderOn){ if(el.parentNode) el.parentNode.removeChild(el); return; }   // profile switch: loading screen instead of the intro
-  var done=false, tFade;
+  var done=false, tFade, seen=false;
+  try{ seen=localStorage.getItem('ls_intro_seen')==='1'; if(seen) el.classList.add('short'); else localStorage.setItem('ls_intro_seen','1'); }catch(e){}
   function finish(fast){
     if(done) return; done=true;
     clearTimeout(tFade);
@@ -2413,7 +2421,7 @@ html #app[data-screen="channel"] #sidebar, html #app[data-screen="multi"] #sideb
   }
   // If the logo image can't load, don't hold the app back
   var im=new Image(); im.onerror=function(){ finish(true); }; im.src='./logo-art.png';
-  tFade=setTimeout(function(){ finish(false); },2500); // fade-out starts here (≈3 s total)
+  tFade=setTimeout(function(){ finish(false); },seen?1400:2800); // full intro on first launch (~3.4 s), short one afterwards (~2 s)
 })();
 </script>
 
@@ -8411,19 +8419,31 @@ async function getBroadcasterUserId(channel){
 
 async function sendChatMessage(text){
   const content = (text || '').trim();
-  if(!content || !state.chatChannel) return false;
-  const auth = loadKickAuth();
-  if(!auth || !auth.access_token){ alert(t('chatLoginRequired')); return false; }
+  if(!content || !state.chatChannel) return { ok:false, reason:'no channel' };
+  if(!loadKickAuth() || !loadKickAuth().access_token){ alert(t('chatLoginRequired')); return { ok:false, reason:'', silent:true }; }
   const broadcasterId = await getBroadcasterUserId(state.chatChannel);
-  if(!broadcasterId) return false;
+  if(!broadcasterId) return { ok:false, reason:'channel id not found' };
   try{
-    const res = await fetch('https://api.kick.com/public/v1/chat', {
-      method:'POST',
-      headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer ' + auth.access_token },
-      body: JSON.stringify({ broadcaster_user_id: broadcasterId, content, type:'user' })
-    });
-    return res.ok;
-  }catch(e){ return false; }
+    for(let attempt = 0; attempt < 2; attempt++){
+      const auth = loadKickAuth();
+      const res = await fetch(KICK_FN + '?action=chat', {
+        method:'POST',
+        headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer ' + auth.access_token },
+        body: JSON.stringify({ broadcaster_user_id: broadcasterId, content })
+      });
+      let d = {}; try{ d = await res.json(); }catch(e){}
+      const ks = d.kickStatus || res.status;
+      if(ks === 401 && attempt === 0 && auth.refresh_token && await syncRefreshToken(auth)) continue;
+      if(res.ok && ks >= 200 && ks < 300) return { ok:true };
+      let why = 'HTTP ' + ks;
+      if(ks === 401) why += ' - login expired, log in again';
+      else if(ks === 403) why += ' - missing chat:write permission, log out and log in again';
+      if(d.detail) why += ' ' + String(d.detail).slice(0,120);
+      else if(d.message) why += ' ' + d.message;
+      return { ok:false, reason: why };
+    }
+  }catch(e){ return { ok:false, reason:'network: ' + (e && e.message || e) }; }
+  return { ok:false, reason:'failed' };
 }
 
 /* Compose modal: a small on-screen keyboard (reusing the same key layout as
@@ -8479,9 +8499,9 @@ function pressChatKey(k){
 async function sendChatDraft(){
   const text = state.chatDraft;
   if(!text || !text.trim()) return;
-  const ok = await sendChatMessage(text);
-  if(ok) closeChatCompose();
-  else alert(t('chatSendFailed'));
+  const r = await sendChatMessage(text);
+  if(r.ok) closeChatCompose();
+  else if(!r.silent) alert(t('chatSendFailed') + (r.reason ? '\n(' + r.reason + ')' : ''));
 }
 
 /* ---------- Player: past broadcasts (VODs) ----------
