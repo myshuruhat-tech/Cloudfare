@@ -1449,43 +1449,36 @@ main{ margin-inline-start:0; padding:var(--nf-bar) 3.3vw 0 3.3vw; }
 #player-screen.clip-mode #clip-info{ max-width:36vw; }
 </style>
 <style id="intro-css">
-/* ===== Intro animation (cold start only) — v194: bolt strikes, shockwave, sparks, then "5AL" wipes in ===== */
-#intro{--t0:1s;position:fixed;top:0;left:0;right:0;bottom:0;z-index:2147483647;background:#0a0a0a;display:flex;align-items:center;justify-content:center;overflow:hidden;direction:ltr;opacity:1;transition:opacity .5s ease;will-change:opacity;touch-action:none;-webkit-tap-highlight-color:transparent;}
+/* ===== Intro (v198): small bolt + loading line -> big bolt merges over it -> "5AL" slides out of the bolt. Full on first launch, short afterwards. ===== */
+#intro{position:fixed;top:0;left:0;right:0;bottom:0;z-index:2147483647;background:#0f0f0f;display:grid;place-items:center;overflow:hidden;direction:ltr;opacity:1;transition:opacity .5s ease;touch-action:none;-webkit-tap-highlight-color:transparent;}
 #intro.out{opacity:0;}   /* keeps swallowing touches while it fades: a tap can never reach the screen underneath */
-#intro .i-box{position:relative;isolation:isolate;width:min(56vh,80vw);aspect-ratio:1/1;animation:iShake .38s linear calc(var(--t0) + .3s) both;}
-#intro .i-glow{position:absolute;left:50%;top:36%;width:120%;aspect-ratio:1/1;margin:-60% 0 0 -60%;border-radius:50%;background:radial-gradient(circle,rgba(240,15,25,.55) 0%,rgba(240,15,25,.18) 32%,rgba(240,15,25,0) 62%);opacity:0;transform:scale(.5);animation:iGlow 2.2s ease-out calc(var(--t0) + .25s) forwards;will-change:transform,opacity;}
-#intro .i-ring{position:absolute;left:50%;top:36%;width:60%;height:60%;margin:-30% 0 0 -30%;border-radius:50%;border:.55vh solid rgba(255,60,60,.9);opacity:0;transform:scale(.1);animation:iRing .95s cubic-bezier(.1,.7,.3,1) calc(var(--t0) + .3s) forwards;will-change:transform,opacity;}
-#intro .i-ring.r2{border-width:.25vh;animation-delay:calc(var(--t0) + .46s);border-color:rgba(255,255,255,.55);}
-#intro .i-sparks i{position:absolute;left:50%;top:36%;width:1vh;height:1vh;margin:-.5vh 0 0 -.5vh;border-radius:50%;background:#ff4a4a;box-shadow:0 0 1.4vh rgba(255,40,40,.95);opacity:0;animation:iSpark .85s cubic-bezier(.1,.7,.3,1) calc(var(--t0) + .3s) forwards;will-change:transform,opacity;}
-#intro .i-sparks i:nth-child(1){--x:-26vh;--y:-12vh}
-#intro .i-sparks i:nth-child(2){--x:24vh;--y:-16vh}
-#intro .i-sparks i:nth-child(3){--x:-14vh;--y:-24vh;width:.7vh;height:.7vh}
-#intro .i-sparks i:nth-child(4){--x:15vh;--y:-26vh;width:.7vh;height:.7vh}
-#intro .i-sparks i:nth-child(5){--x:-30vh;--y:6vh;width:.6vh;height:.6vh}
-#intro .i-sparks i:nth-child(6){--x:31vh;--y:4vh;width:.6vh;height:.6vh}
-#intro .i-sparks i:nth-child(7){--x:-18vh;--y:16vh}
-#intro .i-sparks i:nth-child(8){--x:19vh;--y:17vh}
-#intro .i-sparks i:nth-child(9){--x:-6vh;--y:-30vh;width:.55vh;height:.55vh}
-#intro .i-sparks i:nth-child(10){--x:7vh;--y:22vh;width:.55vh;height:.55vh}
-#intro img{position:absolute;top:0;left:0;right:0;bottom:0;width:100%;height:100%;display:block;user-select:none;-webkit-user-drag:none;mix-blend-mode:lighten;}
-#intro .i-bolt{clip-path:inset(0 0 40% 0);opacity:0;transform:translateY(-38%) scale(1.3);transform-origin:50% 36%;animation:iPre .6s linear .25s,iBolt .4s cubic-bezier(.55,0,.8,.45) var(--t0) forwards;will-change:transform,opacity;}
-#intro .i-text{clip-path:inset(60% 100% 0 0);opacity:1;transform:translateX(-2.5%);animation:iText .5s cubic-bezier(.2,.7,.2,1) calc(var(--t0) + .55s) forwards;will-change:transform,clip-path;}
-#intro .i-flash{position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(circle at 50% 42%,rgba(255,255,255,.5),rgba(255,70,70,.22) 38%,rgba(0,0,0,0) 68%);opacity:0;animation:iFlash .5s ease-out calc(var(--t0) + .3s) forwards;pointer-events:none;}
-@keyframes iBolt{0%{opacity:0;transform:translateY(-38%) scale(1.3)}18%{opacity:1}72%{opacity:1;transform:translateY(1.5%) scale(.97)}86%{transform:translateY(-.8%) scale(1.02)}100%{opacity:1;transform:translateY(0) scale(1)}}
-@keyframes iText{0%{clip-path:inset(60% 100% 0 0);transform:translateX(-2.5%)}100%{clip-path:inset(60% 0 0 0);transform:translateX(0)}}
-@keyframes iGlow{0%{opacity:0;transform:scale(.5)}22%{opacity:1;transform:scale(1.12)}40%{opacity:.55;transform:scale(.96)}58%{opacity:.95;transform:scale(1.04)}100%{opacity:.8;transform:scale(1)}}
-@keyframes iRing{0%{opacity:.95;transform:scale(.1)}100%{opacity:0;transform:scale(2.3)}}
-@keyframes iSpark{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--x),var(--y)) scale(.2)}}
-@keyframes iFlash{0%{opacity:0}18%{opacity:1}100%{opacity:0}}
-@keyframes iShake{0%{transform:translate(0,0)}15%{transform:translate(-.9vh,.5vh)}30%{transform:translate(.8vh,-.6vh)}45%{transform:translate(-.5vh,.4vh)}60%{transform:translate(.4vh,-.3vh)}80%{transform:translate(-.2vh,.1vh)}100%{transform:translate(0,0)}}
-/* v195: full intro on first launch = CRT power-on line + bolt charge flickers + strike. Later launches = short version (.short). */
-#intro.short{--t0:.1s}
-#intro.short .i-bolt{animation:iBolt .4s cubic-bezier(.55,0,.8,.45) var(--t0) forwards;}
-#intro .i-crt{position:absolute;left:0;right:0;top:50%;height:.4vh;margin-top:-.2vh;background:#fff;box-shadow:0 0 2vh rgba(255,60,60,.9);opacity:0;transform:scaleX(0);animation:iCrt .55s ease-out forwards;pointer-events:none;will-change:transform,opacity;}
-#intro.short .i-crt{display:none}
-@keyframes iPre{0%{transform:translateY(0) scale(1);opacity:0}10%{opacity:.3}20%{opacity:0}40%{opacity:.5}50%{opacity:0}75%{opacity:.8}85%{opacity:0}100%{transform:translateY(0) scale(1);opacity:0}}
-@keyframes iCrt{0%{opacity:1;transform:scaleX(0) scaleY(1)}45%{opacity:1;transform:scaleX(1) scaleY(1)}75%{opacity:.16;transform:scaleX(1) scaleY(40)}100%{opacity:0;transform:scaleX(1) scaleY(60)}}
-@media (prefers-reduced-motion:reduce){#intro .i-box{animation:none}#intro .i-sparks,#intro .i-ring,#intro .i-flash,#intro .i-crt{display:none}}
+#intro .ia,#intro .ib{grid-area:1/1;display:flex;align-items:center;opacity:0;}
+#intro .ia{gap:2vmin;}
+#intro .ia svg{height:5.5vmin;fill:#e50914;filter:drop-shadow(0 0 1vmin rgba(229,9,20,.5));}
+#intro .itr{width:44vmin;height:.5vmin;min-height:3px;background:#383838;border-radius:9px;overflow:hidden;transform-origin:left;}
+#intro .ifl{height:100%;background:#fff;transform:scaleX(0);transform-origin:left;box-shadow:0 0 10px rgba(255,255,255,.45);}
+#intro .ib{gap:1.6vmin;}
+#intro .ib svg{height:15vmin;fill:#e50914;opacity:0;position:relative;z-index:2;transform:translate(var(--dx,0px),var(--dy,0px)) scale(var(--s,.5));filter:drop-shadow(0 0 2vmin rgba(229,9,20,.4));}
+#intro .iw{font:800 11.5vmin/1 Roboto,"Helvetica Neue",Arial,sans-serif;color:#f5f5f0;letter-spacing:.04em;display:flex;opacity:0;transform:translateX(-10vmin);}
+#intro.play .ia{animation:iaIn .5s .1s ease-out forwards,iaOut .15s 2.5s ease-out forwards;}
+#intro.play .ifl{animation:iFill 1.9s .4s cubic-bezier(.2,.6,.3,1) forwards;}
+#intro.play .itr{animation:iRetract .3s 2.25s cubic-bezier(.6,0,.4,1) forwards;}
+#intro.play .ib{animation:iShow .01s 2.5s forwards;}
+#intro.play .ib svg{animation:iBf .25s 2.5s ease-out forwards,iPop .8s 2.5s cubic-bezier(.25,.8,.3,1.05) forwards,iGl 2.2s 4s ease-in-out forwards;}
+#intro.play .iw{animation:iWord .8s 2.65s cubic-bezier(.2,.8,.2,1) forwards;}
+#intro.short.play .ia{display:none;}
+#intro.short.play .ib{animation:iShow .01s .1s forwards;}
+#intro.short.play .ib svg{animation:iBf .3s .1s ease-out forwards,iPop .6s .1s cubic-bezier(.25,.8,.3,1.05) forwards;}
+#intro.short.play .iw{animation:iWord .7s .3s cubic-bezier(.2,.8,.2,1) forwards;}
+@keyframes iaIn{to{opacity:1}}
+@keyframes iaOut{to{opacity:0}}
+@keyframes iFill{to{transform:scaleX(1)}}
+@keyframes iRetract{to{transform:scaleX(0)}}
+@keyframes iShow{to{opacity:1}}
+@keyframes iBf{to{opacity:1}}
+@keyframes iPop{to{transform:none}}
+@keyframes iGl{50%{filter:drop-shadow(0 0 4.5vmin rgba(229,9,20,.7))}100%{filter:drop-shadow(0 0 2vmin rgba(229,9,20,.4))}}
+@keyframes iWord{30%{opacity:1}to{opacity:1;transform:none}}
 
   /* ===== Login gate: activation (QR) + "Who's watching?" ===== */
   #ls-gate{ position:fixed; inset:0; z-index:9000; background:#060608; color:#fff; display:none; overflow:hidden; font-family:inherit; }
@@ -2401,16 +2394,21 @@ html #app[data-screen="channel"] #sidebar, html #app[data-screen="multi"] #sideb
   el.classList.add('show'); el.setAttribute('aria-hidden','false'); render();
 })();
 </script>
-<div id="intro" aria-hidden="true"><div class="i-crt"></div><div class="i-box"><div class="i-glow"></div><div class="i-ring"></div><div class="i-ring r2"></div><div class="i-sparks"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><img class="i-bolt" src="./logo-art.png" alt=""><img class="i-text" src="./logo-art.png" alt=""></div><div class="i-flash"></div></div>
+<div id="intro" aria-hidden="true"><div class="ia"><svg viewBox="160 75 190 220"><polygon points="272,82 264,145 344,143 232,286 240,205 168,205"/></svg><div class="itr"><div class="ifl"></div></div></div><div class="ib"><svg viewBox="160 75 190 220"><polygon points="272,82 264,145 344,143 232,286 240,205 168,205"/></svg><div class="iw">5AL</div></div></div>
 <script>
 /* Intro: runs once per cold start of the page (coming back from the background never replays it).
    v194: it can NOT be skipped or touched. Every tap / key is swallowed by the input shield (see #input-shield),
-   so nothing reaches the "Who's watching?" screen underneath while it plays. It ends by itself (~3 s). */
+   so nothing reaches the "Who's watching?" screen underneath while it plays. It ends by itself.
+   v198: new design (line fills -> bolt merges -> 5AL). First launch ~6 s with sound (intro.mp3), later launches ~2 s, silent. */
 (function(){
   var el=document.getElementById('intro'); if(!el) return;
   if(window.__lsLoaderOn){ if(el.parentNode) el.parentNode.removeChild(el); return; }   // profile switch: loading screen instead of the intro
   var done=false, tFade, seen=false;
-  try{ seen=localStorage.getItem('ls_intro_seen')==='1'; if(seen) el.classList.add('short'); else localStorage.setItem('ls_intro_seen','1'); }catch(e){}
+  /* v199: shown at most 2x per day (>= 3 h apart). 1st of the day = full with sound, 2nd = short and silent. Other launches skip it. */
+  window.lsDaily=function(key,max,gapH){ try{ var d=new Date(), day=d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(), o=JSON.parse(localStorage.getItem(key)||'null')||{}; if(o.day!==day) o={day:day,n:0,t:0}; var ok=o.n<max && (Date.now()-o.t)>=gapH*3600000; if(ok){ o.n++; o.t=Date.now(); localStorage.setItem(key,JSON.stringify(o)); } return {ok:ok,n:o.n}; }catch(e){ return {ok:true,n:1}; } };
+  var dly=window.lsDaily('ls_daily_intro',2,3);
+  if(!dly.ok){ if(el.parentNode) el.parentNode.removeChild(el); return; }
+  seen=dly.n>=2; if(seen) el.classList.add('short');
   function finish(fast){
     if(done) return; done=true;
     clearTimeout(tFade);
@@ -2419,9 +2417,22 @@ html #app[data-screen="channel"] #sidebar, html #app[data-screen="multi"] #sideb
     el.classList.add('out');
     setTimeout(function(){ if(el.parentNode) el.parentNode.removeChild(el); },fast?260:560);
   }
-  // If the logo image can't load, don't hold the app back
-  var im=new Image(); im.onerror=function(){ finish(true); }; im.src='./logo-art.png';
-  tFade=setTimeout(function(){ finish(false); },seen?1400:2800); // full intro on first launch (~3.4 s), short one afterwards (~2 s)
+  try{   // the big bolt starts exactly on top of the small one (same spot, same size) and grows into place
+    if(!seen){
+      var sa=el.querySelector('.ia svg'), sb=el.querySelector('.ib svg');
+      sb.style.transform='none';
+      var ra=sa.getBoundingClientRect(), rb=sb.getBoundingClientRect();
+      sb.style.transform='';
+      if(ra.width>0 && rb.width>0){
+        sb.style.setProperty('--dx',(ra.left+ra.width/2-rb.left-rb.width/2)+'px');
+        sb.style.setProperty('--dy',(ra.top+ra.height/2-rb.top-rb.height/2)+'px');
+        sb.style.setProperty('--s',ra.width/rb.width);
+      }
+    }
+  }catch(e){}
+  el.classList.add('play');
+  if(!seen){ try{ var au=new Audio('./intro.mp3'); au.volume=.9; var pr=au.play(); if(pr&&pr.catch) pr.catch(function(){}); }catch(e){} }   // may be blocked by the WebView: then it just runs silent
+  tFade=setTimeout(function(){ finish(false); },seen?2000:6100);
 })();
 </script>
 
@@ -4542,19 +4553,49 @@ function claimDailyStreak(){
   renderAccountCard();
 }
 
+/* v200: the top-left avatar must always show. It now (1) appears at once from the picture saved with the active profile (no waiting for the network),
+   (2) is cached on the device as a data-URL so it also shows offline / on a slow link, (3) retries a failed picture 3x and again when the network returns. */
+function lsStoredAcct(){ try{ const id = localStorage.getItem('ls_active'); if(!id || id === 'guest') return null; const a = JSON.parse(localStorage.getItem('ls_accounts') || '[]'); return (Array.isArray(a) ? a : []).find(x => x.id === id) || null; }catch(e){ return null; } }
+function lsAvCached(src){ try{ const c = JSON.parse(localStorage.getItem('ls_av_cache') || 'null'); return c && c.src === src ? c.data : null; }catch(e){ return null; } }
+async function lsAvCacheSave(src){
+  try{
+    if(!/^https?:/.test(src) || lsAvCached(src)) return;
+    const r = await fetch(src, { mode:'cors' }); if(!r.ok) return;
+    const bl = await r.blob(); if(bl.size > 150000) return;
+    const d = await new Promise((ok, no) => { const f = new FileReader(); f.onload = () => ok(f.result); f.onerror = no; f.readAsDataURL(bl); });
+    localStorage.setItem('ls_av_cache', JSON.stringify({ src, data:d }));
+  }catch(e){}
+}
 function renderNavAccount(){
   try{
     const av = document.getElementById('na-av'), nm = document.getElementById('na-name');
     if(!av) return;
-    const ku = state.kickUser, name = (ku && (ku.username || ku.name)) || t('acctGuestName');
-    const pic = ku && (ku.profile_picture || ku.profile_pic || ku.profilepic);
+    const ku = state.kickUser, sa = ku ? null : lsStoredAcct();
+    const name = (ku && (ku.username || ku.name)) || (sa && sa.name) || t('acctGuestName');
+    const pic = (ku && (ku.profile_picture || ku.profile_pic || ku.profilepic)) || (sa && sa.avatar) || '';
+    const has = !!(ku || sa);
     if(nm) nm.textContent = name;
-    const fallback = () => { if(ku){ av.innerHTML = ''; av.textContent = name.slice(0,1).toUpperCase(); } else av.innerHTML = '<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7z"/></svg>'; };
+    const fbHtml = has ? '' : '<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7z"/></svg>';
+    const fallback = () => { av.innerHTML = fbHtml; if(has) av.textContent = name.slice(0,1).toUpperCase(); };
     if(pic){
-      if(av.dataset.src !== pic){ av.dataset.src = pic; av.innerHTML = ''; const im = document.createElement('img'); im.src = pic; im.onerror = () => { fallback(); lsFillProfilePic(true); }; av.appendChild(im); }
-    } else { av.dataset.src = ''; fallback(); lsFillProfilePic(false); }
+      if(av.dataset.src !== pic || av.dataset.failed === '1'){
+        av.dataset.src = pic; av.dataset.failed = '';
+        fallback();                                       // letter / icon shows until the picture is there
+        const cached = lsAvCached(pic);
+        const im = new Image(); let tries = 0;
+        im.onload = () => { if(av.dataset.src !== pic) return; av.innerHTML = ''; av.appendChild(im); if(!cached) lsAvCacheSave(pic); };
+        im.onerror = () => {
+          if(av.dataset.src !== pic) return;
+          if(cached && im.src !== pic){ im.src = pic; return; }
+          if(tries < 3){ const n = ++tries; setTimeout(() => { if(av.dataset.src === pic) im.src = pic + (pic.indexOf('?') < 0 ? '?' : '&') + 'r=' + n; }, [2000, 6000, 15000][n - 1]); return; }
+          av.dataset.failed = '1'; lsFillProfilePic(true);
+        };
+        im.src = cached || pic;
+      }
+    } else { av.dataset.src = ''; av.dataset.failed = ''; fallback(); lsFillProfilePic(false); }
   }catch(e){}
 }
+window.addEventListener('online', () => { try{ _picTries = 0; const av = document.getElementById('na-av'); if(av && av.dataset.failed === '1') renderNavAccount(); }catch(e){} });
 /* v106: if Kick's profile call gave no picture (or the picture won't load), use the channel avatar from Kick's channel data. */
 let _picTries = 0;
 async function lsFillProfilePic(force){
@@ -5075,6 +5116,22 @@ function moveFocus0(dir){
     if(fromHrow && cand.closest('.hrow') === fromHrow && dist < bestInRowDist){ bestInRowDist = dist; bestInRow = i; }
   });
   if(bestInRow >= 0) best = bestInRow;
+  // v201: on Home, Up/Down go to the NEAREST row above/below (by vertical position). The old "closest by distance" rule let a wide
+  // element (the Spotlight) skip the narrow "Following live now" row and land on a lower row whose cards were centred closer.
+  if(vertical && state.screen === 'discover'){
+    const cands = [];
+    focusables.forEach((cand, i) => {
+      if(i === focusIndex || (cand.closest && cand.closest('#sidebar'))) return;
+      const r = cand.getBoundingClientRect(); if(!r.width || !r.height) return;
+      const dx = (r.left+r.width/2) - (rect.left+rect.width/2), dy = (r.top+r.height/2) - (rect.top+rect.height/2);
+      if(dir === 'down' ? dy > 10 : dy < -10) cands.push({ i, dx:Math.abs(dx), dy:Math.abs(dy) });
+    });
+    if(cands.length){
+      const m = Math.min.apply(null, cands.map(c => c.dy));
+      const rowC = cands.filter(c => c.dy <= m + 120).sort((a, b) => a.dx - b.dx);
+      best = rowC[0].i;
+    }
+  }
   if(best < 0){
     if(dir === (document.getElementById('html-root').getAttribute('dir') === 'rtl' ? 'right' : 'left')){ // nothing further toward the rail edge: enter the rail on the current screen's button
       const activeNav = navBtnFor(state.screen) || document.querySelector('#sidebar .navbtn');
@@ -8055,7 +8112,7 @@ async function startLiveChatPolling(channel, infoIn){
     if(!m){ dripping = false; return; }
     got++; state.chatGotMsg = true; chatStatus('');
     lastNew = Date.now();
-    try{ appendChatMessage({ content: m.content, sender: m.sender }); }catch(e){ /* one bad message must never stop the queue */ }
+    try{ appendChatMessage({ content: m.content, sender: m.sender, metadata: m.metadata }); }catch(e){ /* one bad message must never stop the queue */ }
     // spread what is waiting over about one poll interval; speed up if a backlog builds
     const d = Math.max(25, Math.min(450, lastPoll / (queue.length + 1)));
     setTimeout(drip, d);
@@ -8260,9 +8317,18 @@ function appendChatMessage(payload){
   const color = identity.color || '#E50914';
   const badges = Array.isArray(identity.badges) ? identity.badges : [];
   const badgeHtml = badges.slice(0,3).map(chatBadgeHtml).join('');
+  let replyHtml = '';
+  try{   // v198: a reply shows a small quote line (arrow + @name + the original message) above the text
+    let md = payload.metadata;
+    if(typeof md === 'string'){ try{ md = JSON.parse(md); }catch(e){ md = null; } }
+    const os = md && md.original_sender, om = md && md.original_message;
+    if(os && om && (os.username || om.content)){
+      replyHtml = '<div class="chat-reply"><svg viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 6 6v3"/></svg><b>@' + escapeHtml(os.username || '?') + '</b><span>' + renderChatContent(om.content || '') + '</span></div>';
+    }
+  }catch(e){}
   const el = document.createElement('div');
   el.className = 'chat-msg';
-  el.innerHTML = `${badgeHtml}<span class="chat-author" style="color:${color}">${escapeHtml(sender.username || '?')}</span><span class="chat-text">${renderChatContent(payload.content)}</span>`;
+  el.innerHTML = `${replyHtml}${badgeHtml}<span class="chat-author" style="color:${color}">${escapeHtml(sender.username || '?')}</span><span class="chat-text">${renderChatContent(payload.content)}</span>`;
   bumpHypeMeter();
   chatStatus('');
   const wasNearBottom = chatIsNearBottom();
@@ -8358,7 +8424,7 @@ async function startVodChatReplay(channel){
     if(!video.paused){
       while(VOD_CHAT.buf.length && VOD_CHAT.buf[0].t <= abs){
         const { m } = VOD_CHAT.buf.shift();
-        appendChatMessage({ content: m.content, sender: m.sender });
+        appendChatMessage({ content: m.content, sender: m.sender, metadata: m.metadata });
       }
     }
     if(VOD_CHAT.fetchedUntil < abs + 10000) refill(Math.max(abs, VOD_CHAT.fetchedUntil));
@@ -13337,9 +13403,19 @@ async function lsPreloadAccount(){
     if(window.__lsLoaderOn) lsPreloadAccount().catch(() => {}).then(done); else done();
     return;
   }
+  /* v199: "Who's watching?" shows at most 2x per day (>= 3 h apart); other launches continue as the last profile.
+     Never skipped on first run (activation screen) or when the last profile no longer exists. */
+  const firstRun = !accs.length && !localStorage.getItem(LS_DONE);
+  const lastId = localStorage.getItem(LS_ACTIVE);
+  const lastOk = lastId === 'guest' || accs.some(a => a.id === lastId);
+  if(!firstRun && lastOk && window.lsDaily && !window.lsDaily('ls_daily_who', 2, 3).ok){
+    const done2 = () => { try{ refreshFocusables(); }catch(e){} if(window.lsLoaderHide) window.lsLoaderHide(); if(window.__lsGateResolve) window.__lsGateResolve(); };
+    if(window.__lsLoaderOn) lsPreloadAccount().catch(() => {}).then(done2); else done2();
+    return;
+  }
   window.__lsGateOpen = true;
   gate.classList.add('show'); gate.setAttribute('aria-hidden', 'false');
-  if(!accs.length && !localStorage.getItem(LS_DONE)) showLink(false); else showWho();
+  if(firstRun) showLink(false); else showWho();
 })();
 
 window.__lsAcctReady = handleKickCallback().then(() => { if(!state.kickUser) return fetchKickProfile(); }).then(() => { const p = syncNow(); syncStart(); return p; }).catch(() => {});
@@ -14365,6 +14441,14 @@ html body #screen-search #search-media{ padding-top:.5vw; }
 html body #screen-search #search-media .row-title{ font-size:1.2vw; margin:.6vw 0 0; }
 #search-continue .lib-prog > i{ background:linear-gradient(90deg,#ff3b4a,#ff9a5a); }
 </style>
+<style id="v198-chat-reply">
+/* v198: reply line inside a chat bubble */
+.chat-reply{ display:flex; align-items:center; gap:.45em; margin-bottom:.35em; padding-inline-start:.6em; border-inline-start:.18em solid #5a5f66; font-size:.82em; line-height:1.35; color:#9aa0a6; white-space:nowrap; overflow:hidden; }
+.chat-reply svg{ flex:none; width:1em; height:1em; fill:none; stroke:#9aa0a6; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round; }
+.chat-reply b{ flex:none; color:#c4c8cc; font-weight:700; }
+.chat-reply span{ min-width:0; overflow:hidden; text-overflow:ellipsis; }
+.chat-reply .chat-emote{ height:1.2em; }
+</style>
 <style id="v192-search-results">
 /* v192: when the keyboard hides (results / suggestion picked) the suggestion pills go with it and the results use the whole screen: only the search bar stays on top */
 html body #screen-search.kb-off #search-textlist{ display:none !important; }
@@ -14376,6 +14460,12 @@ html body #screen-search.kb-off #suggest-grid .card, html body #screen-search.kb
 html body #app .card .badge.dot.live{ width:1.7vw; height:1.7vw; padding:0; border-radius:50%; }
 html body #app .card .badge.dot.live::before{ inset-inline-start:50%; margin-inline-start:-.3vw; width:.6vw; height:.6vw; margin-top:-.3vw; }
 html body #app .card .badge.dot.live::after{ content:''; }
+</style>
+<style id="v201-no-thumb-shadow">
+/* v201: no shadow / glow on thumbnails: no dark shade inside the bottom of the picture, no coloured glow around the focused card (white ring stays) */
+html body #app :is(.card, .vod-card, .clip-card:not(.tt-card), .lib-card) .thumb{ box-shadow:none !important; }
+html body #app :is(.card, .vod-card, .clip-card:not(.tt-card), .lib-card).focused .thumb{ box-shadow:0 0 0 .2vw #fff !important; }
+html body #app :is(.card, .vod-card, .clip-card:not(.tt-card), .lib-card) .thumb::after{ background:none !important; }
 </style>
 </body>
 </html>

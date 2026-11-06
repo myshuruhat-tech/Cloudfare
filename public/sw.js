@@ -1,5 +1,5 @@
-const CACHE_NAME = 'live-screen-v197';
-const APP_SHELL = ['./', './index.html', './app.html', './manifest.json', './icon-192.png', './icon-512.png', './logo-art.png', './cairo.woff'];
+const CACHE_NAME = 'live-screen-v201';
+const APP_SHELL = ['./', './index.html', './app.html', './manifest.json', './icon-192.png', './icon-512.png', './logo-art.png', './intro.mp3', './cairo.woff'];
 // Third-party assets cached on first load so the app still works when the CDN
 // is blocked or the TV's connection is weak.
 const CDN_ASSETS = [
