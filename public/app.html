@@ -3741,7 +3741,11 @@ window.__lsGateOpen = false;
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5.5 10v9a1 1 0 0 0 1 1H10v-5.5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1V20h3.5a1 1 0 0 0 1-1v-9"></path></svg>
         <span class="label" data-i18n="navLive"></span>
       </button>
-      <button class="navbtn" id="nav-lib" data-screen="favorites" data-nav tabindex="-1">
+      <button class="navbtn" id="nav-follow" data-screen="favorites" data-nav tabindex="-1">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 6h14M7 3h10"></path><rect x="3" y="9" width="18" height="12" rx="2"></rect><path d="M10 12.5v5l4.5-2.5z"></path></svg>
+        <span class="label" data-i18n="tabFav"></span>
+      </button>
+      <button class="navbtn" id="nav-lib" data-screen="library" data-nav tabindex="-1">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h4v14H4zM10 5h4v14h-4zM16 6l4 1-3 12-4-1z"></path></svg>
         <span class="label" data-i18n="navLibrary"></span>
         <span class="notif-badge" id="notif-badge">0</span>
@@ -3854,15 +3858,15 @@ window.__lsGateOpen = false;
     </section>
 
     <section class="screen" id="screen-favorites">
-      <div class="lib-tabs"><div class="libtab" data-nav tabindex="-1" data-screen="favorites" data-i18n="tabFav"></div><div class="libtab" data-nav tabindex="-1" data-screen="library" data-i18n="tabHistory"></div><div class="libtab" data-nav tabindex="-1" data-screen="downloads" data-i18n="tabDownloads"></div><div class="libtab" data-nav tabindex="-1" data-screen="playlists" data-i18n="tabPlaylists"></div><div class="libtab" data-nav tabindex="-1" data-screen="notifications"><span data-i18n="notifSection"></span><span class="notif-badge notif-badge-tab">0</span></div></div>
-      <div class="lgrid" id="fav-grid"></div>
+      <div class="fw-wrap"><div class="fw-list" id="fw-list"></div><div class="fw-main" id="fw-main"></div></div>
+      <div class="lgrid" id="fav-grid" style="display:none;"></div>
       <div class="empty" id="fav-empty" style="display:none;"></div>
     </section>
 
     <div id="ctx-menu"><div id="ctx-box"><div id="ctx-title"></div><div id="ctx-list"></div></div></div>
     <div id="dl-panel"><div id="dl-panel-box"><div class="dlp-title">Download video</div><div class="dlp-sub" id="dlp-sub"></div><div class="dlp-label">Choose quality</div><div id="dlp-list"></div><div class="dlp-store" id="dlp-store"><div class="dl-bar"><i></i></div><div class="dlp-free"><span>Free space on device</span><b id="dlp-free"></b></div><div class="dlp-note">Download resumes where it stopped if the connection drops or the app closes.</div></div></div></div>
     <section class="screen" id="screen-library">
-      <div class="lib-tabs"><div class="libtab" data-nav tabindex="-1" data-screen="favorites" data-i18n="tabFav"></div><div class="libtab" data-nav tabindex="-1" data-screen="library" data-i18n="tabHistory"></div><div class="libtab" data-nav tabindex="-1" data-screen="downloads" data-i18n="tabDownloads"></div><div class="libtab" data-nav tabindex="-1" data-screen="playlists" data-i18n="tabPlaylists"></div><div class="libtab" data-nav tabindex="-1" data-screen="notifications"><span data-i18n="notifSection"></span><span class="notif-badge notif-badge-tab">0</span></div></div>
+      <div class="lib-tabs"><div class="libtab" data-nav tabindex="-1" data-screen="library" data-i18n="tabHistory"></div><div class="libtab" data-nav tabindex="-1" data-screen="watchlater" data-i18n="tabWatchLater"></div><div class="libtab" data-nav tabindex="-1" data-screen="downloads" data-i18n="tabDownloads"></div><div class="libtab" data-nav tabindex="-1" data-screen="playlists" data-i18n="tabPlaylists"></div><div class="libtab" data-nav tabindex="-1" data-screen="notifications"><span data-i18n="notifSection"></span><span class="notif-badge notif-badge-tab">0</span></div></div>
       <div class="lib-head">
         <div class="row-title" data-i18n="libTitle"></div>
         <div class="lib-trash" id="lib-clear" data-nav tabindex="-1" style="display:none;"><svg viewBox="0 0 24 24" width="100%" height="100%" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 10v7M14 10v7"/></svg><span class="lbl" id="lib-clear-label"></span></div>
@@ -3872,7 +3876,7 @@ window.__lsGateOpen = false;
     </section>
 
     <section class="screen" id="screen-downloads">
-      <div class="lib-tabs"><div class="libtab" data-nav tabindex="-1" data-screen="favorites" data-i18n="tabFav"></div><div class="libtab" data-nav tabindex="-1" data-screen="library" data-i18n="tabHistory"></div><div class="libtab" data-nav tabindex="-1" data-screen="downloads" data-i18n="tabDownloads"></div><div class="libtab" data-nav tabindex="-1" data-screen="playlists" data-i18n="tabPlaylists"></div><div class="libtab" data-nav tabindex="-1" data-screen="notifications"><span data-i18n="notifSection"></span><span class="notif-badge notif-badge-tab">0</span></div></div>
+      <div class="lib-tabs"><div class="libtab" data-nav tabindex="-1" data-screen="library" data-i18n="tabHistory"></div><div class="libtab" data-nav tabindex="-1" data-screen="watchlater" data-i18n="tabWatchLater"></div><div class="libtab" data-nav tabindex="-1" data-screen="downloads" data-i18n="tabDownloads"></div><div class="libtab" data-nav tabindex="-1" data-screen="playlists" data-i18n="tabPlaylists"></div><div class="libtab" data-nav tabindex="-1" data-screen="notifications"><span data-i18n="notifSection"></span><span class="notif-badge notif-badge-tab">0</span></div></div>
       <div id="dl-sub"></div>
       <div class="dl-bar" id="dl-storebar" style="display:none;max-width:30vw;margin:-.6vh 0 2vh;"><i></i></div>
       <div class="lgrid" id="dl-grid"></div>
@@ -3880,13 +3884,19 @@ window.__lsGateOpen = false;
     </section>
 
     <section class="screen" id="screen-playlists">
-      <div class="lib-tabs"><div class="libtab" data-nav tabindex="-1" data-screen="favorites" data-i18n="tabFav"></div><div class="libtab" data-nav tabindex="-1" data-screen="library" data-i18n="tabHistory"></div><div class="libtab" data-nav tabindex="-1" data-screen="downloads" data-i18n="tabDownloads"></div><div class="libtab" data-nav tabindex="-1" data-screen="playlists" data-i18n="tabPlaylists"></div><div class="libtab" data-nav tabindex="-1" data-screen="notifications"><span data-i18n="notifSection"></span><span class="notif-badge notif-badge-tab">0</span></div></div>
+      <div class="lib-tabs"><div class="libtab" data-nav tabindex="-1" data-screen="library" data-i18n="tabHistory"></div><div class="libtab" data-nav tabindex="-1" data-screen="watchlater" data-i18n="tabWatchLater"></div><div class="libtab" data-nav tabindex="-1" data-screen="downloads" data-i18n="tabDownloads"></div><div class="libtab" data-nav tabindex="-1" data-screen="playlists" data-i18n="tabPlaylists"></div><div class="libtab" data-nav tabindex="-1" data-screen="notifications"><span data-i18n="notifSection"></span><span class="notif-badge notif-badge-tab">0</span></div></div>
       <div class="lib-head pl-head">
         <div class="pl-title" id="pl-title"></div>
         <div class="pl-actions" id="pl-actions"></div>
       </div>
       <div class="lgrid" id="pl-grid"></div>
       <div class="empty" id="pl-empty" style="display:none;"></div>
+    </section>
+
+    <section class="screen" id="screen-watchlater">
+      <div class="lib-tabs"><div class="libtab" data-nav tabindex="-1" data-screen="library" data-i18n="tabHistory"></div><div class="libtab" data-nav tabindex="-1" data-screen="watchlater" data-i18n="tabWatchLater"></div><div class="libtab" data-nav tabindex="-1" data-screen="downloads" data-i18n="tabDownloads"></div><div class="libtab" data-nav tabindex="-1" data-screen="playlists" data-i18n="tabPlaylists"></div><div class="libtab" data-nav tabindex="-1" data-screen="notifications"><span data-i18n="notifSection"></span><span class="notif-badge notif-badge-tab">0</span></div></div>
+      <div class="lgrid" id="wl-grid"></div>
+      <div class="empty" id="wl-empty" style="display:none;"></div>
     </section>
 
     <section class="screen" id="screen-stats"></section>
@@ -4121,7 +4131,7 @@ window.__lsGateOpen = false;
 </style>
 <section class="screen" id="screen-multi"><div id="mv" data-nav tabindex="-1"><div id="mv-grid"></div><div id="mv-menu"></div><div id="mv-pick"></div></div></section>
     <section class="screen" id="screen-notifications">
-      <div class="lib-tabs"><div class="libtab" data-nav tabindex="-1" data-screen="favorites" data-i18n="tabFav"></div><div class="libtab" data-nav tabindex="-1" data-screen="library" data-i18n="tabHistory"></div><div class="libtab" data-nav tabindex="-1" data-screen="downloads" data-i18n="tabDownloads"></div><div class="libtab" data-nav tabindex="-1" data-screen="playlists" data-i18n="tabPlaylists"></div><div class="libtab" data-nav tabindex="-1" data-screen="notifications"><span data-i18n="notifSection"></span><span class="notif-badge notif-badge-tab">0</span></div></div>
+      <div class="lib-tabs"><div class="libtab" data-nav tabindex="-1" data-screen="library" data-i18n="tabHistory"></div><div class="libtab" data-nav tabindex="-1" data-screen="watchlater" data-i18n="tabWatchLater"></div><div class="libtab" data-nav tabindex="-1" data-screen="downloads" data-i18n="tabDownloads"></div><div class="libtab" data-nav tabindex="-1" data-screen="playlists" data-i18n="tabPlaylists"></div><div class="libtab" data-nav tabindex="-1" data-screen="notifications"><span data-i18n="notifSection"></span><span class="notif-badge notif-badge-tab">0</span></div></div>
       <div class="screen-notif-header">
         <span class="row-title" data-i18n="notifSection"></span>
         <button class="notif-clear" id="notif-clear" data-nav tabindex="-1" data-i18n="notifClearAll"></button>
@@ -4337,7 +4347,7 @@ const STRINGS = {
     otherCategory:'أخرى', suggestedTitle:'قد يعجبك أيضاً', suggestedVodsTitle:'بثوث سابقة أخرى', otherLiveTitle:'بث مباشر الآن',
     unsaveFav:'إلغاء المتابعة', isLiveNow:'يبث مباشر الآن',
     liveBadge:'مباشر', streamedFor:'مدة البث',
-    navDownloads:'التنزيلات', navLibrary:'المكتبة', tabFav:'المتابعة', tabPlaylists:'القوائم', tabHistory:'السجل', tabDownloads:'التنزيلات', chanBack:'رجوع', libTitle:'السجل — آخر ما شاهدته', libEmpty:'لا توجد فيديوهات', libClear:'مسح السجل', libClearConfirm:'تمسح كل السجل؟', libLive:'بث مباشر', libVod:'VODs', followersSuffix:'متابع', viewsSuffix:'مشاهدة', libClip:'مقطع', dlTitle:'التنزيلات — تشاهدها بدون إنترنت', dlEmpty:'لا توجد فيديوهات',
+    navDownloads:'التنزيلات', navLibrary:'المكتبة', tabFav:'المتابعة', tabWatchLater:'مشاهدة لاحقاً', tabPlaylists:'القوائم', tabHistory:'السجل', tabDownloads:'التنزيلات', chanBack:'رجوع', libTitle:'السجل — آخر ما شاهدته', libEmpty:'لا توجد فيديوهات', libClear:'مسح السجل', libClearConfirm:'تمسح كل السجل؟', libLive:'بث مباشر', libVod:'VODs', followersSuffix:'متابع', viewsSuffix:'مشاهدة', libClip:'مقطع', dlTitle:'التنزيلات — تشاهدها بدون إنترنت', dlEmpty:'لا توجد فيديوهات',
     dlDownload:'تنزيل', dlCancel:'إلغاء التنزيل', dlCancelConfirm:'إلغاء التنزيل الحالي؟', dlFree:'متاح', dlOtherDevice:'على جهاز آخر · اضغط للمشاهدة', dlRemoveFromList:'إزالة من القائمة', dlDelete:'حذف', dlDeleteConfirm:'حذف هذا التنزيل من الجهاز؟',
     dlPreparing:'جارٍ التحضير…', dlDownloading:'جارٍ التنزيل', dlSaved:'تم التنزيل — تجده في «التنزيلات»', dlCancelled:'تم إلغاء التنزيل',
     dlExists:'منزّل مسبقاً — تجده في «التنزيلات»', dlFail:'فشل التنزيل', dlEncrypted:'هذا المحتوى محمي ولا يمكن تنزيله',
@@ -4398,7 +4408,7 @@ const STRINGS = {
     otherCategory:'Other', suggestedTitle:'You might also like', suggestedVodsTitle:'More past broadcasts', otherLiveTitle:'Live now',
     unsaveFav:'Unfollow', isLiveNow:'is Live Now',
     liveBadge:'LIVE', streamedFor:'Streaming for',
-    navDownloads:'Downloads', navLibrary:'Library', tabFav:'Following', tabPlaylists:'Playlists', tabHistory:'History', tabDownloads:'Downloads', chanBack:'Back', libTitle:'History — what you watched recently', libEmpty:'No videos', libClear:'Clear history', libClearConfirm:'Clear all history?', libLive:'Live', libVod:'VODs', followersSuffix:'followers', viewsSuffix:'views', libClip:'Clip', dlTitle:'Downloads — watch offline', dlEmpty:'No videos',
+    navDownloads:'Downloads', navLibrary:'Library', tabFav:'Following', tabWatchLater:'Watch later', tabPlaylists:'Playlists', tabHistory:'History', tabDownloads:'Downloads', chanBack:'Back', libTitle:'History — what you watched recently', libEmpty:'No videos', libClear:'Clear history', libClearConfirm:'Clear all history?', libLive:'Live', libVod:'VODs', followersSuffix:'followers', viewsSuffix:'views', libClip:'Clip', dlTitle:'Downloads — watch offline', dlEmpty:'No videos',
     dlDownload:'Download', dlCancel:'Cancel download', dlCancelConfirm:'Cancel the current download?', dlFree:'free', dlOtherDevice:'On another device · tap to watch', dlRemoveFromList:'Remove from list', dlDelete:'Delete', dlDeleteConfirm:'Delete this download from the device?',
     dlPreparing:'Preparing…', dlDownloading:'Downloading', dlSaved:'Downloaded — find it in Downloads', dlCancelled:'Download cancelled',
     dlExists:'Already downloaded — find it in Downloads', dlFail:'Download failed', dlEncrypted:'This content is protected and can\'t be downloaded',
@@ -4710,7 +4720,7 @@ function activeModalRoot(){
   return null;
 }
 
-function isLibScreen(n){ return n === 'favorites' || n === 'library' || n === 'downloads' || n === 'playlists' || n === 'notifications'; }
+function isLibScreen(n){ return n === 'watchlater' || n === 'library' || n === 'downloads' || n === 'playlists' || n === 'notifications'; }
 function navBtnFor(n){ return isLibScreen(n) ? document.getElementById('nav-lib') : document.querySelector(`.navbtn[data-screen="${n}"]`); }
 function refreshFocusables(preserveEl){
   const prevEl = focusables[focusIndex];
@@ -5187,7 +5197,7 @@ function activate(el){
   if(el.classList && el.classList.contains('libtab')){
     document.querySelectorAll('.lib-dd.open').forEach(d => d.classList.remove('open'));
     setScreen(el.dataset.screen);
-    const t2 = document.querySelector('#screen-' + el.dataset.screen + ' .lib-dd-btn') || document.querySelector('#screen-' + el.dataset.screen + ' .libtab.active');
+    const t2 = document.querySelector('#screen-' + el.dataset.screen + ' .libtab.active') || document.querySelector('#screen-' + el.dataset.screen + ' .lib-dd-btn');
     if(t2) refreshFocusables(t2);
     return;
   }
@@ -5287,6 +5297,8 @@ function activate(el){
   if(el.id === 'player-mute'){ toggleMute(); return; }
   if(el.id === 'player-download'){ dlToggleCurrent(); return; }
   if(el.dataset && el.dataset.pl !== undefined && window.plActivate){ window.plActivate(el); return; }
+  if(el.dataset && el.dataset.wl !== undefined && window.wlActivate){ window.wlActivate(el); return; }
+  if(el.dataset && el.dataset.fw !== undefined && window.fwActivate){ window.fwActivate(el); return; }
   if(el.dataset && el.dataset.lib){ openLibraryItem(el.dataset.lib); return; }
   if(el.id === 'lib-clear'){ if(confirm(t('libClearConfirm'))){ state.library = []; libSave(); renderLibrary(); } return; }
   if(el.id === 'player-quality'){ toggleQualityMenu(); return; }
@@ -5764,6 +5776,7 @@ function ctxInfo(el){
 function openCtxMenu(el){
   const m = document.getElementById('ctx-menu'); if(!m) return;
   if(el && el.dataset && el.dataset.pl && window.plCtx){ if(window.plCtx(el)) return; }   // v176: playlist cards have their own menu
+  if(el && el.dataset && el.dataset.wl && window.wlCtx){ if(window.wlCtx(el)) return; }   // v202: Watch later cards
   const I = ctxInfo(el); if(!I.channel) return;
   CTX.from = el; CTX.info = I;
   const T = I.ar ? {
@@ -5784,6 +5797,7 @@ function openCtxMenu(el){
   items.push([isFollowing ? 'favdel' : 'favadd', isFollowing ? T.unfollow : T.follow]);
   items.push([isBlocked(I.channel) ? 'unblock' : 'block', isBlocked(I.channel) ? T.unblock : T.block, 'sep']);
   if(I.kind === 'vod' || I.kind === 'clip') items.splice(1, 0, ['pladd', I.ar ? 'إضافة إلى قائمة' : 'Add to playlist']);
+  if(I.kind === 'vod' || I.kind === 'clip'){ const _in = !!(window.wlHas && window.wlHas(I)); items.splice(1, 0, [_in ? 'wldel' : 'wladd', _in ? (I.ar ? 'إزالة من المشاهدة لاحقاً' : 'Remove from Watch later') : (I.ar ? 'مشاهدة لاحقاً' : 'Watch later')]); }   // v202
   if(I.inLib) items.push(['rm', T.rm, 'danger']);
   const IC = {
     play:'<path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z" fill="currentColor"/>',
@@ -5793,6 +5807,8 @@ function openCtxMenu(el){
     favdel:'<path d="M12 20.5s-8-4.7-8-11a4.6 4.6 0 0 1 8-3 4.6 4.6 0 0 1 8 3c0 6.3-8 11-8 11z" fill="currentColor"/>',
     block:'<circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
     unblock:'<path d="M4 12a8 8 0 0 1 14-5.3M20 12a8 8 0 0 1-14 5.3M18 3v4h-4M6 21v-4h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
+    wladd:'<circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7.5V12l3 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
+    wldel:'<circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8.5 12.2l2.5 2.5 4.5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
     pladd:'<path d="M4 7h11M4 12h7M4 17h7M17 12v8M13 16h8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
     rm:'<path d="M5 7h14M10 7V4h4v3M7 7l1 13h8l1-13M10 11v5M14 11v5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>'
   };
@@ -5837,6 +5853,8 @@ function ctxAction(act){
   const I = CTX.info; if(!I) return;
   const ar = I.ar;
   closeCtxMenu();
+  if(act === 'wladd' || act === 'wldel'){ if(window.wlToggle) window.wlToggle(I); return; }
+  if(act.indexOf('wl:') === 0){ if(window.wlAct) window.wlAct(act, I); return; }
   if(act.indexOf('pl:') === 0){ if(window.plAct) window.plAct(act, I); return; }
   if(act === 'pladd'){ if(window.plPick) window.plPick(I); return; }
   if(act === 'kick'){ window.open('https://kick.com/' + encodeURIComponent(I.channel), '_blank', 'noopener'); return; }
@@ -5888,6 +5906,7 @@ function setScreen(name, opts){
   if(name === 'downloads') renderDownloads();
   if(name === 'library') renderLibrary();
   if(name === 'playlists' && window.plRender) window.plRender();
+  if(name === 'watchlater' && window.wlRender) window.wlRender();
   if(name !== 'player') state.returnScreen = null;
   if(name === 'search'){ const sc0 = document.getElementById('screen-search'); if(sc0) sc0.classList.remove('kb-off'); state.sugRoll = undefined; renderKeyboard(); }
   if(name === 'notifications'){ renderNotifPanel(); markAllNotifsRead(); startNotifTimeRefresh(); }
@@ -13581,9 +13600,9 @@ window.lsGateReady.then(() => { try{
 <script>
 /* v108: Library drop-down. The four tab elements stay (same focus / click logic); they now live inside a menu under one button. */
 (function(){
-  var KEY = 'ls_lib_tab', ORDER = ['favorites','library','playlists','downloads','notifications'], busy = false;
+  var KEY = 'ls_lib_tab', ORDER = ['library','watchlater','playlists','downloads','notifications'], busy = false;
   var CHEV = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
-  function saved(){ try{ var v = localStorage.getItem(KEY); return ORDER.indexOf(v) >= 0 ? v : 'favorites'; }catch(e){ return 'favorites'; } }
+  function saved(){ try{ var v = localStorage.getItem(KEY); return ORDER.indexOf(v) >= 0 ? v : 'library'; }catch(e){ return 'library'; } }
   function labelOf(tab){ var sp = tab.querySelector('[data-i18n]'); return ((sp || tab).textContent || '').trim(); }
   window.lsLibDdSync = function(){
     if(busy) return; busy = true;
@@ -13593,7 +13612,6 @@ window.lsGateReady.then(() => { try{
         var menu = dd.querySelector('.lib-dd-menu'), btn = dd.querySelector('.lib-dd-btn'); if(!menu || !btn) return;
         var tabs = Array.prototype.slice.call(menu.children).sort(function(a, b){ return ORDER.indexOf(a.dataset.screen) - ORDER.indexOf(b.dataset.screen); });
         var first = tabs.filter(function(t){ return t.dataset.screen === cur; })[0];
-        if(first) tabs = [first].concat(tabs.filter(function(t){ return t !== first; }));
         tabs.forEach(function(t, i){ if(menu.children[i] !== t) menu.insertBefore(t, menu.children[i] || null); });
         var lab = btn.querySelector('.lib-dd-label'); if(lab && first) lab.textContent = labelOf(first);
       });
@@ -13677,14 +13695,19 @@ html body #screen-favorites .hrow > .vod-card,
 html body #screen-favorites .hrow > .lib-card,
 html body #screen-favorites .hrow > .card.hero,
 html body #screen-favorites .hrow > .dl-item,
+html body #screen-watchlater .hrow > .card,
 html body #screen-library .hrow > .card,
 html body #screen-playlists .hrow > .card,
+html body #screen-watchlater .hrow > .vod-card,
 html body #screen-library .hrow > .vod-card,
 html body #screen-playlists .hrow > .vod-card,
+html body #screen-watchlater .hrow > .lib-card,
 html body #screen-library .hrow > .lib-card,
 html body #screen-playlists .hrow > .lib-card,
+html body #screen-watchlater .hrow > .card.hero,
 html body #screen-library .hrow > .card.hero,
 html body #screen-playlists .hrow > .card.hero,
+html body #screen-watchlater .hrow > .dl-item,
 html body #screen-library .hrow > .dl-item,
 html body #screen-playlists .hrow > .dl-item,
 html body #screen-downloads .hrow > .card,
@@ -13711,6 +13734,7 @@ html body #screen-search .hrow > .clip-card:not(.tt-card),
 html body #screen-channel .hrow > .clip-card:not(.tt-card){ flex:0 0 var(--yt-w) !important; width:var(--yt-w) !important; max-width:var(--yt-w); padding:0 !important; background:transparent !important; border:0 !important; border-radius:0 !important; box-shadow:none !important; }
 html body #screen-discover .row:not(#home-clips) > .hrow,
 html body #screen-favorites .row:not(#home-clips) > .hrow,
+html body #screen-watchlater .row:not(#home-clips) > .hrow,
 html body #screen-library .row:not(#home-clips) > .hrow,
 html body #screen-playlists .row:not(#home-clips) > .hrow,
 html body #screen-downloads .row:not(#home-clips) > .hrow,
@@ -13722,8 +13746,10 @@ html body #screen-discover .grid,
 html body #screen-discover .lgrid,
 html body #screen-favorites .grid,
 html body #screen-favorites .lgrid,
+html body #screen-watchlater .grid,
 html body #screen-library .grid,
 html body #screen-playlists .grid,
+html body #screen-watchlater .lgrid,
 html body #screen-library .lgrid,
 html body #screen-playlists .lgrid,
 html body #screen-downloads .grid,
@@ -13758,24 +13784,34 @@ html body #screen-favorites .lgrid > .card.hero,
 html body #screen-favorites .lgrid > .vod-card,
 html body #screen-favorites .lgrid > .lib-card,
 html body #screen-favorites .lgrid > .dl-item,
+html body #screen-watchlater .grid > .card,
 html body #screen-library .grid > .card,
 html body #screen-playlists .grid > .card,
+html body #screen-watchlater .grid > .card.hero,
 html body #screen-library .grid > .card.hero,
 html body #screen-playlists .grid > .card.hero,
+html body #screen-watchlater .grid > .vod-card,
 html body #screen-library .grid > .vod-card,
 html body #screen-playlists .grid > .vod-card,
+html body #screen-watchlater .grid > .lib-card,
 html body #screen-library .grid > .lib-card,
 html body #screen-playlists .grid > .lib-card,
+html body #screen-watchlater .grid > .dl-item,
 html body #screen-library .grid > .dl-item,
 html body #screen-playlists .grid > .dl-item,
+html body #screen-watchlater .lgrid > .card,
 html body #screen-library .lgrid > .card,
 html body #screen-playlists .lgrid > .card,
+html body #screen-watchlater .lgrid > .card.hero,
 html body #screen-library .lgrid > .card.hero,
 html body #screen-playlists .lgrid > .card.hero,
+html body #screen-watchlater .lgrid > .vod-card,
 html body #screen-library .lgrid > .vod-card,
 html body #screen-playlists .lgrid > .vod-card,
+html body #screen-watchlater .lgrid > .lib-card,
 html body #screen-library .lgrid > .lib-card,
 html body #screen-playlists .lgrid > .lib-card,
+html body #screen-watchlater .lgrid > .dl-item,
 html body #screen-library .lgrid > .dl-item,
 html body #screen-playlists .lgrid > .dl-item,
 html body #screen-downloads .grid > .card,
@@ -13827,10 +13863,13 @@ html body #screen-discover .lib-card .thumb,
 html body #screen-favorites .card .thumb,
 html body #screen-favorites .vod-card .thumb,
 html body #screen-favorites .lib-card .thumb,
+html body #screen-watchlater .card .thumb,
 html body #screen-library .card .thumb,
 html body #screen-playlists .card .thumb,
+html body #screen-watchlater .vod-card .thumb,
 html body #screen-library .vod-card .thumb,
 html body #screen-playlists .vod-card .thumb,
+html body #screen-watchlater .lib-card .thumb,
 html body #screen-library .lib-card .thumb,
 html body #screen-playlists .lib-card .thumb,
 html body #screen-downloads .card .thumb,
@@ -13853,10 +13892,13 @@ html body #screen-discover .lib-card .thumb img,
 html body #screen-favorites .card .thumb img,
 html body #screen-favorites .vod-card .thumb img,
 html body #screen-favorites .lib-card .thumb img,
+html body #screen-watchlater .card .thumb img,
 html body #screen-library .card .thumb img,
 html body #screen-playlists .card .thumb img,
+html body #screen-watchlater .vod-card .thumb img,
 html body #screen-library .vod-card .thumb img,
 html body #screen-playlists .vod-card .thumb img,
+html body #screen-watchlater .lib-card .thumb img,
 html body #screen-library .lib-card .thumb img,
 html body #screen-playlists .lib-card .thumb img,
 html body #screen-downloads .card .thumb img,
@@ -13879,10 +13921,13 @@ html body #screen-discover .lib-card.focused .thumb,
 html body #screen-favorites .card.focused .thumb,
 html body #screen-favorites .vod-card.focused .thumb,
 html body #screen-favorites .lib-card.focused .thumb,
+html body #screen-watchlater .card.focused .thumb,
 html body #screen-library .card.focused .thumb,
 html body #screen-playlists .card.focused .thumb,
+html body #screen-watchlater .vod-card.focused .thumb,
 html body #screen-library .vod-card.focused .thumb,
 html body #screen-playlists .vod-card.focused .thumb,
+html body #screen-watchlater .lib-card.focused .thumb,
 html body #screen-library .lib-card.focused .thumb,
 html body #screen-playlists .lib-card.focused .thumb,
 html body #screen-downloads .card.focused .thumb,
@@ -13906,10 +13951,13 @@ html body #screen-discover .lib-card.focused,
 html body #screen-favorites .card.focused,
 html body #screen-favorites .vod-card.focused,
 html body #screen-favorites .lib-card.focused,
+html body #screen-watchlater .card.focused,
 html body #screen-library .card.focused,
 html body #screen-playlists .card.focused,
+html body #screen-watchlater .vod-card.focused,
 html body #screen-library .vod-card.focused,
 html body #screen-playlists .vod-card.focused,
+html body #screen-watchlater .lib-card.focused,
 html body #screen-library .lib-card.focused,
 html body #screen-playlists .lib-card.focused,
 html body #screen-downloads .card.focused,
@@ -13932,10 +13980,13 @@ html body #screen-discover .lib-card .lib-title,
 html body #screen-favorites .card-info .ci-title,
 html body #screen-favorites .vod-card .vod-title,
 html body #screen-favorites .lib-card .lib-title,
+html body #screen-watchlater .card-info .ci-title,
 html body #screen-library .card-info .ci-title,
 html body #screen-playlists .card-info .ci-title,
+html body #screen-watchlater .vod-card .vod-title,
 html body #screen-library .vod-card .vod-title,
 html body #screen-playlists .vod-card .vod-title,
+html body #screen-watchlater .lib-card .lib-title,
 html body #screen-library .lib-card .lib-title,
 html body #screen-playlists .lib-card .lib-title,
 html body #screen-downloads .card-info .ci-title,
@@ -13956,10 +14007,13 @@ html body #screen-discover .lib-card.focused .lib-title,
 html body #screen-favorites .card.focused .ci-title,
 html body #screen-favorites .vod-card.focused .vod-title,
 html body #screen-favorites .lib-card.focused .lib-title,
+html body #screen-watchlater .card.focused .ci-title,
 html body #screen-library .card.focused .ci-title,
 html body #screen-playlists .card.focused .ci-title,
+html body #screen-watchlater .vod-card.focused .vod-title,
 html body #screen-library .vod-card.focused .vod-title,
 html body #screen-playlists .vod-card.focused .vod-title,
+html body #screen-watchlater .lib-card.focused .lib-title,
 html body #screen-library .lib-card.focused .lib-title,
 html body #screen-playlists .lib-card.focused .lib-title,
 html body #screen-downloads .card.focused .ci-title,
@@ -13982,12 +14036,16 @@ html body #screen-favorites .card-info .ci-name,
 html body #screen-favorites .card-info .ci-cat,
 html body #screen-favorites .vod-card .vod-meta,
 html body #screen-favorites .lib-card .lib-meta,
+html body #screen-watchlater .card-info .ci-name,
 html body #screen-library .card-info .ci-name,
 html body #screen-playlists .card-info .ci-name,
+html body #screen-watchlater .card-info .ci-cat,
 html body #screen-library .card-info .ci-cat,
 html body #screen-playlists .card-info .ci-cat,
+html body #screen-watchlater .vod-card .vod-meta,
 html body #screen-library .vod-card .vod-meta,
 html body #screen-playlists .vod-card .vod-meta,
+html body #screen-watchlater .lib-card .lib-meta,
 html body #screen-library .lib-card .lib-meta,
 html body #screen-playlists .lib-card .lib-meta,
 html body #screen-downloads .card-info .ci-name,
@@ -14466,6 +14524,387 @@ html body #app .card .badge.dot.live::after{ content:''; }
 html body #app :is(.card, .vod-card, .clip-card:not(.tt-card), .lib-card) .thumb{ box-shadow:none !important; }
 html body #app :is(.card, .vod-card, .clip-card:not(.tt-card), .lib-card).focused .thumb{ box-shadow:0 0 0 .2vw #fff !important; }
 html body #app :is(.card, .vod-card, .clip-card:not(.tt-card), .lib-card) .thumb::after{ background:none !important; }
+
+/* ===== v202: clips cards at YouTube Shorts size (about 4.8 cards across, 3:5 ratio) ===== */
+#home-clips .hrow .clip-card, #home-clips .hrow .sk-card,
+#offline-clips .hrow .clip-card, #offline-clips .hrow .sk-card,
+#foryou-rows .hrow .clip-card, #foryou-rows .hrow .sk-card{
+  flex:0 0 calc((100% - 4 * var(--gap14))/4.8); width:calc((100% - 4 * var(--gap14))/4.8); }
+#home-clips .hrow .clip-card .thumb, #home-clips .hrow .sk-thumb,
+#offline-clips .hrow .clip-card .thumb, #offline-clips .hrow .sk-thumb,
+#foryou-rows .hrow .clip-card .thumb, #foryou-rows .hrow .sk-thumb{ aspect-ratio:3/5; border-radius:1.1vw; }
+#home-clips .clip-card .short-title, #offline-clips .clip-card .short-title, #foryou-rows .clip-card .short-title{ font-size:1.3vw; }
+/* ===== v202: Library capsules, Following in the sidebar, Watch later ===== */
+html #app #sidebar #nav-follow{ order:4; }
+html #app #sidebar #nav-lib{ order:5; }
+html #app #sidebar #nav-stats{ order:6; }
+
+/* Library: big coloured capsules (YouTube TV style) */
+.lib-tabs.lib-dd{ margin:0 0 2vw; }
+.lib-tabs.lib-dd .lib-dd-btn{ display:none !important; }
+html body .lib-tabs.lib-dd .lib-dd-menu{ display:flex !important; position:static; width:auto; flex-direction:row; flex-wrap:nowrap; gap:1.2vw; padding:.5vw .5vw 1vw; background:transparent; border:0; box-shadow:none; }
+html body .lib-tabs.lib-dd .lib-dd-menu .libtab{ --c1:#3a1fe0; --c2:#6a1bef; flex:0 0 14vw; width:14vw; height:7.6vw; box-sizing:border-box; padding:0 0 .9vw 1.2vw; display:flex; align-items:flex-end; justify-content:flex-start; border-radius:1.1vw; font-size:1.65vw; font-weight:800; color:#fff; background:linear-gradient(135deg,var(--c1),var(--c2)); position:relative; box-shadow:none; transition:transform .15s ease, box-shadow .15s ease; }
+html body .lib-tabs.lib-dd .lib-dd-menu .libtab[data-screen="watchlater"]{ --c1:#2f86d6; --c2:#4fb0f2; }
+html body .lib-tabs.lib-dd .lib-dd-menu .libtab[data-screen="playlists"]{ --c1:#2a9a7f; --c2:#4cb89d; }
+html body .lib-tabs.lib-dd .lib-dd-menu .libtab[data-screen="downloads"]{ --c1:#e0481a; --c2:#f26b1d; }
+html body .lib-tabs.lib-dd .lib-dd-menu .libtab[data-screen="notifications"]{ --c1:#d8960f; --c2:#f2bd1d; }
+html body .lib-tabs.lib-dd .lib-dd-menu .libtab.active{ box-shadow:inset 0 0 0 .18vw rgba(255,255,255,.55); }
+html body .lib-tabs.lib-dd .lib-dd-menu .libtab.focused{ background:linear-gradient(135deg,var(--c1),var(--c2)); color:#fff; transform:scale(1.05); box-shadow:0 0 0 .28vw #fff, 0 1.2vh 3vh rgba(0,0,0,.5); z-index:2; }
+html body .lib-tabs.lib-dd .lib-dd-menu .libtab .notif-badge{ position:absolute; top:.7vw; inset-inline-end:.8vw; margin:0; }
+html[data-theme="light"] body .lib-tabs.lib-dd .lib-dd-menu .libtab, html[data-theme="mixed"] body .lib-tabs.lib-dd .lib-dd-menu .libtab{ color:#fff; }
+html[data-theme="light"] body .lib-tabs.lib-dd .lib-dd-menu .libtab.focused, html[data-theme="mixed"] body .lib-tabs.lib-dd .lib-dd-menu .libtab.focused{ color:#fff; box-shadow:0 0 0 .28vw #12161C, 0 1.2vh 3vh rgba(20,30,50,.3); }
+
+/* Following screen: channel list on the left, content on the right */
+#screen-favorites{ padding-top:0; }
+.fw-wrap{ display:flex; gap:2vw; height:calc(100vh - 3.4vw); }
+.fw-list{ flex:0 0 25vw; overflow-y:auto; padding:.8vw .5vw 8vw .5vw; scrollbar-width:none; }
+.fw-list::-webkit-scrollbar, .fw-main::-webkit-scrollbar{ display:none; }
+.fw-main{ flex:1 1 0; min-width:0; overflow-y:auto; overflow-x:hidden; padding:.8vw .6vw 9vw .6vw; scrollbar-width:none; --yt-w:25vw; }
+.fw-item{ display:flex; align-items:center; gap:1.1vw; padding:.65vw 1.1vw; margin-bottom:.35vw; border-radius:1.1vw; color:#e8e8ec; font-size:1.55vw; font-weight:600; }
+.fw-item .fw-name{ flex:0 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.fw-item.sel{ background:rgba(255,255,255,.10); }
+.fw-item.focused{ background:#fff; color:#000; }
+.fw-av, .fw-ic{ position:relative; flex:0 0 3.3vw; width:3.3vw; height:3.3vw; border-radius:50%; background:#2b2b31; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:1.35vw; }
+.fw-ic{ background:transparent; }
+.fw-ic svg{ width:2.2vw; height:2.2vw; }
+.fw-av img{ position:absolute; inset:0; width:100%; height:100%; border-radius:50%; object-fit:cover; }
+.fw-live{ position:absolute; inset-inline-end:-.1vw; bottom:-.1vw; width:1.05vw; height:1.05vw; border-radius:50%; background:#ff2b2b; box-shadow:0 0 0 .22vw #141418; }
+.fw-item.focused .fw-live{ box-shadow:0 0 0 .22vw #fff; }
+.fw-new{ flex:0 0 auto; width:.85vw; height:.85vw; border-radius:50%; background:#3ea6ff; }
+.fw-live[hidden], .fw-new[hidden]{ display:none; }
+html[data-theme="light"] .fw-item, html[data-theme="mixed"] .fw-item{ color:#12161C; }
+html[data-theme="light"] .fw-item.sel, html[data-theme="mixed"] .fw-item.sel{ background:rgba(18,22,28,.08); }
+html[data-theme="light"] .fw-item.focused, html[data-theme="mixed"] .fw-item.focused{ background:#12161C; color:#fff; }
+html[data-theme="light"] .fw-live, html[data-theme="mixed"] .fw-live{ box-shadow:0 0 0 .22vw #fff; }
+.fw-main .row{ margin-bottom:2.4vw; }
+.fw-empty{ padding:6vh 2vw; color:#9a9aa3; font-size:1.5vw; }
+
+/* clips inside the Following pane */
+#screen-favorites .fw-clips .hrow .clip-card, #screen-favorites .fw-clips .hrow .sk-card{ flex:0 0 calc((100% - 3 * var(--gap14))/3.4); width:calc((100% - 3 * var(--gap14))/3.4); }
+#screen-favorites .fw-clips .hrow .clip-card .thumb, #screen-favorites .fw-clips .hrow .sk-thumb{ aspect-ratio:3/5; border-radius:1vw; }
+#screen-favorites .fw-clips .hrow .clip-card .thumb img{ width:100%; height:100%; object-fit:cover; }
+#screen-favorites .fw-clips .hrow .clip-card .thumb::after{ display:none; }
+#screen-favorites .fw-clips .hrow .clip-card.focused .thumb{ box-shadow:0 0 0 .26vw #fff, 0 1.4vh 3vh rgba(0,0,0,.55); }
+#screen-favorites .fw-clips .clip-card .short-title{ margin:0; position:absolute; inset-inline:0; bottom:0; z-index:2; padding:5vh .8vw .9vh; color:#fff; font-size:1.2vw; font-weight:700; line-height:1.3;
+  background:linear-gradient(to top, rgba(0,0,0,.82), rgba(0,0,0,0)); display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; text-align:start; }
+#screen-favorites .fw-clips .clip-card .clip-title .ci-tags, .clip-card .clip-cat{ color:#a8a8a8; }
+.clip-card .clip-cat{ font-weight:600; font-size:.92em; }
+#screen-favorites .fw-clips .clip-card .clip-meta{ font-size:1vw; margin-top:.9vh; padding:0 .2vw; }
 </style>
+<script id="v202-follow">
+/* v202: Following (sidebar list + live/VODs/clips pane) and Watch later */
+(function(){
+  'use strict';
+  var $ = function(id){ return document.getElementById(id); };
+  var L = function(en, ar){ return (state.settings && state.settings.lang === 'ar') ? ar : en; };
+  var esc = function(x){ return String(x == null ? '' : x).replace(/[&<>"]/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]; }); };
+  var lc = function(c){ return String(c || '').toLowerCase(); };
+  var TTL = 10 * 60 * 1000, MAXV = 30, MAXC = 6;
+  var FW = { sel:'__all__', info:{}, vods:{}, clips:{}, pend:{}, seen:{}, tm:0, rt:0, q:[], run:0 };
+  try{ FW.seen = JSON.parse(localStorage.getItem('ls_fw_seen') || '{}') || {}; }catch(e){}
+  function saveSeen(){ try{ localStorage.setItem('ls_fw_seen', JSON.stringify(FW.seen)); }catch(e){} }
+
+  /* ---------- helpers ---------- */
+  function isLive(c){
+    var i = FW.info[lc(c)];
+    if(i) return !!i.live;
+    return !!(state.knownLiveStatus && state.knownLiveStatus[lc(c)]);
+  }
+  function avOf(c){ return (state.avatarCache && state.avatarCache[lc(c)]) || ''; }
+  function vodTs(v){
+    var str = v && (v.createdAt || v.startTime); if(!str) return 0;
+    var d = new Date(String(str).replace(' ', 'T') + (String(str).indexOf('Z') >= 0 ? '' : 'Z'));
+    return isNaN(d.getTime()) ? 0 : d.getTime();
+  }
+  function freshList(map, c){ var e = map[lc(c)]; return (e && Date.now() - e.t < TTL) ? e.list : null; }
+  function hasNew(c){
+    if(isLive(c)) return false;
+    var e = FW.vods[lc(c)]; if(!e || !e.list || !e.list.length) return false;
+    var ts = vodTs(e.list[0]);
+    return ts > (FW.seen[lc(c)] || 0) && (Date.now() - ts) < 3 * 86400000;
+  }
+  function limited(fn){            // at most 3 network jobs at a time
+    return new Promise(function(res){
+      FW.q.push(function(){ return Promise.resolve().then(fn).then(res, function(){ res([]); }); });
+      pump();
+    });
+  }
+  function pump(){
+    while(FW.run < 3 && FW.q.length){
+      var job = FW.q.shift(); FW.run++;
+      job().then(function(){ FW.run--; pump(); }, function(){ FW.run--; pump(); });
+    }
+  }
+  function need(map, kind, c, fetcher){
+    var l = freshList(map, c); if(l) return l;
+    var k = kind + ':' + lc(c);
+    if(!FW.pend[k]){
+      FW.pend[k] = limited(function(){ return fetcher(c); }).then(function(list){
+        map[lc(c)] = { t: Date.now(), list: Array.isArray(list) ? list : [] };
+        delete FW.pend[k]; schedule();
+      });
+    }
+    return null;
+  }
+  function schedule(){
+    clearTimeout(FW.rt);
+    FW.rt = setTimeout(function(){
+      if(state.screen !== 'favorites') return;
+      paintMain(false); updateDots();
+    }, 250);
+  }
+  function sig(el){
+    if(!el || !el.dataset) return '';
+    var d = el.dataset;
+    return d.fw !== undefined ? 'fw:' + d.fw : d.vod ? 'vod:' + d.vod : d.clip ? 'clip:' + d.clip : d.channel ? 'ch:' + d.channel : (el.id || '');
+  }
+  function keepFocus(fn){
+    var cur = null; try{ cur = focusables[focusIndex]; }catch(e){}
+    var s = sig(cur), main = $('fw-main'), inside = !!(cur && main && main.contains(cur));
+    fn();
+    var next = null;
+    if(inside && s){
+      var all = main.querySelectorAll('[data-nav]');
+      for(var i = 0; i < all.length; i++){ if(sig(all[i]) === s){ next = all[i]; break; } }
+      if(!next) next = main.querySelector('[data-nav]') || document.querySelector('.fw-item.sel');
+    } else if(cur && document.body.contains(cur)) next = cur;
+    try{ refreshFocusables(next || undefined); }catch(e){}
+  }
+
+  /* ---------- data ---------- */
+  async function loadInfo(){
+    try{
+      if(!state.favorites || !state.favorites.length) return;
+      var token = await getToken(); if(!token) return;
+      var qs = state.favorites.map(function(c){ return 'slug=' + encodeURIComponent(c); }).join('&');
+      var res = await kickApi('channels', qs); if(!res.ok) return;
+      var data = await res.json();
+      (data.data || []).forEach(function(ch){
+        if(!ch.slug) return;
+        var st = ch.stream || {};
+        FW.info[lc(ch.slug)] = { live: !!st.is_live, viewers: st.viewer_count, cat: (ch.category && ch.category.name) || '', title: ch.stream_title || '', thumb: st.thumbnail || '' };
+      });
+      if(state.screen === 'favorites'){ updateDots(); if(FW.sel === '__all__' || lc(FW.sel) in FW.info) paintMain(false); }
+    }catch(e){}
+  }
+  function loadAvatars(){
+    (state.favorites || []).forEach(function(c){
+      if(avOf(c)) return;
+      try{
+        getChannelAvatar(c).then(function(u){
+          if(!u) return;
+          document.querySelectorAll('.fw-item[data-fw="' + c + '"] .fw-av').forEach(function(av){
+            if(av.querySelector('img')) return;
+            var im = document.createElement('img'); im.src = u; im.alt = ''; im.onerror = function(){ im.remove(); }; av.appendChild(im);
+          });
+        }).catch(function(){});
+      }catch(e){}
+    });
+  }
+  function warm(){
+    var order = favSorted(isLive).slice(0, MAXV);
+    order.forEach(function(c){ need(FW.vods, 'v', c, fetchChannelVods); });
+  }
+
+  /* ---------- list ---------- */
+  var ALLIC = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg>';
+  function listHtml(){
+    var h = '<div class="fw-item fw-all' + (FW.sel === '__all__' ? ' sel' : '') + '" data-nav tabindex="-1" data-fw="__all__"><span class="fw-ic">' + ALLIC + '</span><span class="fw-name">' + L('All', 'الكل') + '</span></div>';
+    favSorted(isLive).forEach(function(c){
+      var u = avOf(c);
+      h += '<div class="fw-item' + (FW.sel === c ? ' sel' : '') + '" data-nav tabindex="-1" data-fw="' + esc(c) + '">' +
+        '<span class="fw-av"><b>' + esc(c.slice(0, 1).toUpperCase()) + '</b>' + (u ? '<img src="' + esc(u) + '" alt="" onerror="this.remove()">' : '') + '<i class="fw-live"' + (isLive(c) ? '' : ' hidden') + '></i></span>' +
+        '<span class="fw-name">' + esc(c) + '</span><i class="fw-new"' + (hasNew(c) ? '' : ' hidden') + '></i></div>';
+    });
+    return h;
+  }
+  function updateDots(){
+    document.querySelectorAll('#fw-list .fw-item').forEach(function(it){
+      var c = it.dataset.fw; if(c === '__all__') return;
+      var lv = it.querySelector('.fw-live'), nw = it.querySelector('.fw-new');
+      if(lv) lv.hidden = !isLive(c);
+      if(nw) nw.hidden = !hasNew(c);
+    });
+  }
+
+  /* ---------- right pane ---------- */
+  var SK = '<div class="sk-card"><div class="sk-thumb sk-shimmer"></div><div class="sk-line sk-shimmer"></div></div>';
+  function row(title, inner, cls){ return '<div class="row' + (cls ? ' ' + cls : '') + '"><div class="row-title">' + title + '</div>' + inner + '</div>'; }
+  function hrow(list, make, emptyTxt){
+    if(list === null) return '<div class="hrow" aria-hidden="true">' + SK + SK + SK + '</div>';
+    if(!list.length) return '<div class="hrow"><div class="empty">' + emptyTxt + '</div></div>';
+    return '<div class="hrow">' + list.map(make).join('') + '</div>';
+  }
+  function liveCard(c){
+    var i = FW.info[lc(c)] || {};
+    return cardHtml({ channel: c, title: i.title || '', cat: i.cat || '', viewers: i.viewers != null ? i.viewers : null, thumb: i.thumb || null, live: true, avatar: avOf(c) || null });
+  }
+  function chanHtml(c){
+    var out = '';
+    if(isLive(c)) out += row(t('liveTitle'), '<div class="hrow">' + liveCard(c) + '</div>');            // 1) live (only when live)
+    var v = need(FW.vods, 'v', c, fetchChannelVods);
+    out += row(t('vodsTitle'), hrow(v === null ? null : v.slice(0, 20), function(x){ return vodCardHtml(x, c); }, t('noVods')));          // 2) recorded
+    var k = need(FW.clips, 'c', c, fetchChannelClips);
+    out += row((typeof CLIPS_LOGO !== 'undefined' ? CLIPS_LOGO : '') + t('clipsTitle'), hrow(k === null ? null : k.slice(0, 20), function(x){ return clipCardHtml(x, c); }, t('noClips')), 'fw-clips');   // 3) clips
+    return out;
+  }
+  function allHtml(){
+    var favs = favSorted(isLive), out = '';
+    var live = favs.filter(isLive);
+    if(live.length) out += row(t('liveTitle'), '<div class="hrow">' + live.map(liveCard).join('') + '</div>');
+    var vods = [];
+    var pending = false;
+    favs.slice(0, MAXV).forEach(function(c){
+      var l = need(FW.vods, 'v', c, fetchChannelVods);
+      if(l === null){ pending = true; return; }
+      if(l.length) vods.push({ v: l[0], c: c, ts: vodTs(l[0]) });
+    });
+    vods.sort(function(a, b){ return b.ts - a.ts; });
+    if(vods.length) out += row(t('vodsTitle'), '<div class="hrow">' + vods.slice(0, 20).map(function(x){ return vodCardHtml(x.v, x.c); }).join('') + '</div>');
+    else if(pending) out += row(t('vodsTitle'), hrow(null));
+    var clips = [], cpend = false;
+    favs.slice(0, MAXC).forEach(function(c){
+      var l = need(FW.clips, 'c', c, fetchChannelClips);
+      if(l === null){ cpend = true; return; }
+      l.slice(0, 3).forEach(function(x){ clips.push({ c: x, ch: c }); });
+    });
+    var CL = (typeof CLIPS_LOGO !== 'undefined' ? CLIPS_LOGO : '') + t('clipsTitle');
+    if(clips.length) out += row(CL, '<div class="hrow">' + clips.map(function(x){ return clipCardHtml(x.c, x.ch); }).join('') + '</div>', 'fw-clips');
+    else if(cpend) out += row(CL, hrow(null), 'fw-clips');
+    if(!out) out = '<div class="fw-empty">' + L('Nothing new from the channels you follow', 'لا يوجد جديد من القنوات التي تتابعها') + '</div>';
+    return out;
+  }
+  function paintMain(reset){
+    var main = $('fw-main'); if(!main) return;
+    var sel = FW.sel;
+    if(sel !== '__all__' && (state.favorites || []).indexOf(sel) < 0){ sel = FW.sel = '__all__'; }
+    var html = sel === '__all__' ? allHtml() : chanHtml(sel);
+    keepFocus(function(){ main.innerHTML = html; if(reset) main.scrollTop = 0; });
+    if(sel !== '__all__'){
+      var e = FW.vods[lc(sel)];
+      if(e && e.list && e.list.length){ var ts = vodTs(e.list[0]); if(ts > (FW.seen[lc(sel)] || 0)){ FW.seen[lc(sel)] = ts; saveSeen(); updateDots(); } }
+    }
+  }
+  function select(v){
+    FW.sel = v;
+    document.querySelectorAll('#fw-list .fw-item').forEach(function(it){ it.classList.toggle('sel', it.dataset.fw === v); });
+    paintMain(true);
+  }
+
+  /* ---------- screen entry ---------- */
+  function renderFavorites(){
+    var list = $('fw-list'), main = $('fw-main'); if(!list || !main) return;
+    var empty = $('fav-empty'), favs = state.favorites || [];
+    if(!favs.length){
+      list.innerHTML = ''; main.innerHTML = '';
+      if(empty){ empty.textContent = t('noFav'); empty.style.display = 'block'; }
+      try{ refreshFocusables(); }catch(e){}
+      return;
+    }
+    if(empty) empty.style.display = 'none';
+    if(FW.sel !== '__all__' && favs.indexOf(FW.sel) < 0) FW.sel = '__all__';
+    var cur = null; try{ cur = focusables[focusIndex]; }catch(e){}
+    var keep = (cur && cur.dataset && cur.dataset.fw !== undefined) ? cur.dataset.fw : null;
+    list.innerHTML = listHtml();
+    paintMain(true);
+    if(keep !== null){
+      var again = list.querySelector('.fw-item[data-fw="' + keep + '"]');
+      try{ refreshFocusables(again || undefined); }catch(e){}
+    } else { try{ refreshFocusables(cur && document.body.contains(cur) ? cur : undefined); }catch(e){} }
+    loadAvatars(); warm(); loadInfo();
+  }
+  window.renderFavorites = renderFavorites;
+  try{ renderFavorites = window.renderFavorites; }catch(e){}
+
+  var _af = applyFocus;
+  applyFocus = function(){
+    var r = _af.apply(this, arguments);
+    try{
+      if(state.screen === 'favorites'){
+        var el = focusables[focusIndex];
+        if(el && el.dataset && el.dataset.fw !== undefined && el.dataset.fw !== FW.sel){
+          clearTimeout(FW.tm); var v = el.dataset.fw;
+          FW.tm = setTimeout(function(){ select(v); }, 300);
+        } else { clearTimeout(FW.tm); }
+      }
+    }catch(e){}
+    return r;
+  };
+  window.fwActivate = function(el){
+    var v = el.dataset.fw;
+    if(v === '__all__'){ var f = document.querySelector('#fw-main [data-nav]'); if(f) refreshFocusables(f); return; }
+    openChannelPage(v);
+  };
+
+  /* ---------- Watch later ---------- */
+  var WL = { list: [] }, WKEY = 'ls_watch_later', WMAX = 200;
+  function wlLoad(){ try{ var a = JSON.parse(localStorage.getItem(WKEY) || '[]'); WL.list = Array.isArray(a) ? a : []; }catch(e){ WL.list = []; } }
+  function wlSave(){ try{ localStorage.setItem(WKEY, JSON.stringify(WL.list)); }catch(e){} try{ if(window.lsSyncTouch) window.lsSyncTouch('watchlater'); }catch(e){} }
+  function keyOf(I){ return (I.kind || I.type) + ':' + I.id; }
+  function thumbOf(I){
+    var u = '';
+    try{ var im = I.el && I.el.querySelector('.thumb img, img'); if(im) u = im.currentSrc || im.getAttribute('src') || ''; }catch(e){}
+    if(!u){ try{ var m = (state.mediaMeta || {})[keyOf(I)]; u = (m && m.thumb) || ''; }catch(e){} }
+    return u.indexOf('data:') === 0 ? '' : u;
+  }
+  window.wlHas = function(I){ var k = keyOf(I); return WL.list.some(function(x){ return x.key === k; }); };
+  window.wlToggle = function(I){
+    var k = keyOf(I), i = -1;
+    WL.list.forEach(function(x, n){ if(x.key === k) i = n; });
+    if(i >= 0){ WL.list.splice(i, 1); wlSave(); dlToast(L('Removed from Watch later', 'أزيل من المشاهدة لاحقاً'), { hide:2500 }); if(state.screen === 'watchlater') wlRender(); return; }
+    if(WL.list.length >= WMAX) WL.list.pop();
+    WL.list.unshift({ key:k, type:I.kind, id:I.id, channel:I.channel, source:I.source || '', title:I.title || '', thumb:thumbOf(I), ts:Date.now() });
+    wlSave();
+    dlToast(L('Added to Watch later', 'أضيف إلى المشاهدة لاحقاً'), { hide:2500 });
+  };
+  function wlRender(){
+    var grid = $('wl-grid'), empty = $('wl-empty'); if(!grid) return;
+    if(!WL.list.length){
+      grid.innerHTML = ''; empty.textContent = L('Nothing saved for later. Long-press a video or clip and choose Watch later.', 'ما في شيء محفوظ. اضغط مطولاً على فيديو أو مقطع واختر مشاهدة لاحقاً.'); empty.style.display = 'block';
+      try{ refreshFocusables(); }catch(e){} return;
+    }
+    empty.style.display = 'none';
+    grid.innerHTML = WL.list.map(function(it){
+      var th = ''; try{ th = libThumb(it); }catch(e){}
+      var letter = esc((it.channel || '?').slice(0, 1).toUpperCase());
+      var when = ''; try{ when = formatVodDate(new Date(it.ts).toISOString()); }catch(e){}
+      return '<div class="lib-card" data-nav tabindex="-1" data-wl="' + esc(it.key) + '"><div class="thumb"><span class="lib-tag">' + esc(it.type === 'clip' ? t('libClip') : t('libVod')) + '</span>' +
+        (th ? '<img src="' + esc(th) + '" loading="lazy" onerror="this.style.display=\'none\'">' : '<div class="fallback-tile">' + letter + '</div>') +
+        '</div><div class="lib-title">' + esc(it.title || it.channel) + '</div><div class="lib-meta">' + esc(it.channel) + ' \u00B7 ' + esc(when) + '</div></div>';
+    }).join('');
+    try{ refreshFocusables(); }catch(e){}
+  }
+  window.wlRender = wlRender;
+  function wlFind(key){ for(var i = 0; i < WL.list.length; i++) if(WL.list[i].key === key) return WL.list[i]; return null; }
+  window.wlActivate = function(el){
+    var it = wlFind(el.dataset.wl); if(!it) return;
+    var src = encodeURIComponent(it.source || '');
+    if(it.type === 'clip'){
+      state.clipQueueMeta = null;
+      state.clipQueue = WL.list.filter(function(x){ return x.type === 'clip'; }).map(function(x){ return { id:x.id, channel:x.channel, source:x.source || '' }; });
+      playClip(it.id, it.channel, src);
+    } else playVod(it.id, it.channel, src);
+    state.returnScreen = 'watchlater';
+  };
+  window.wlCtx = function(el){
+    var it = wlFind(el.dataset.wl); if(!it) return false;
+    var m = $('ctx-menu'), tt = $('ctx-title'), l = $('ctx-list'); if(!m || !tt || !l) return false;
+    CTX.from = el; CTX.info = { wl:true, key:it.key };
+    tt.style.backgroundImage = '';
+    tt.innerHTML = '<span class="ctx-tt"><span class="ctx-ch">' + esc(it.channel) + '</span>' + (it.title ? '<span class="ctx-sub">' + esc(it.title) + '</span>' : '') + '</span>';
+    var items = [['wl:play', L('Play', 'تشغيل'), 'primary'], ['wl:remove', L('Remove from Watch later', 'إزالة من المشاهدة لاحقاً'), 'danger sep']];
+    l.innerHTML = items.map(function(x){ return '<div class="ctx-item ' + x[2] + '" data-nav tabindex="-1" data-act="' + x[0] + '"><span>' + esc(x[1]) + '</span></div>'; }).join('');
+    m.classList.add('show');
+    try{ refreshFocusables(l.querySelector('.ctx-item')); }catch(e){}
+    return true;
+  };
+  window.wlAct = function(act, I){
+    var it = wlFind(I.key); if(!it) return;
+    if(act === 'wl:play'){ var el = document.querySelector('[data-wl="' + I.key + '"]'); if(el) window.wlActivate(el); return; }
+    if(act === 'wl:remove'){ WL.list = WL.list.filter(function(x){ return x.key !== I.key; }); wlSave(); wlRender(); dlToast(L('Removed from Watch later', 'أزيل من المشاهدة لاحقاً'), { hide:2500 }); }
+  };
+  wlLoad();
+})();
+</script>
 </body>
 </html>
