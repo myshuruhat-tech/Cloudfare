@@ -3818,12 +3818,36 @@ window.__lsGateOpen = false;
   <div id="chat-compose-overlay">
     <div id="chat-compose-card">
       <div class="cc-header">
-        <span data-i18n="chatComposeTitle"></span>
+        <span id="chat-compose-title"></span>
+        <span id="chat-compose-count"></span>
         <div class="mini-btn" id="chat-compose-close" data-nav tabindex="-1">&#10005;</div>
       </div>
-      <div class="search-box" id="chat-compose-val"><span class="val" id="chat-compose-text">&nbsp;</span><span class="cursor">|</span></div>
-      <div class="kbd" id="chat-compose-keyboard"></div>
-      <button class="ss-watch" id="chat-compose-send" data-nav tabindex="-1" data-i18n="chatSend"></button>
+      <div class="search-box" id="chat-compose-val"><span class="val" id="chat-compose-text" dir="auto">&nbsp;</span><span class="cursor">|</span></div>
+      <div class="kbd lskb-grid" id="chat-compose-keyboard"></div>
+      <div class="lskb-bottom" id="chat-compose-bottom">
+        <div class="lskb-bottomkeys" id="chat-compose-bottomkeys"></div>
+        <button class="key lskb-send" id="chat-compose-send" data-nav tabindex="-1"></button>
+      </div>
+      <div class="lskb-hints" id="chat-compose-hints"></div>
+    </div>
+  </div>
+
+  <div id="lskb-overlay">
+    <div id="lskb-card">
+      <div class="lskb-side" id="lskb-side">
+        <div class="lskb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h13M3 12h13M3 18h8M18 14v6M15 17h6"/></svg></div>
+        <div class="lskb-title" id="lskb-title"></div>
+        <div class="lskb-sub" id="lskb-sub"></div>
+        <div class="lskb-field"><div class="lskb-label" id="lskb-label"></div><div class="lskb-val"><span id="lskb-text" dir="auto">&nbsp;</span><span class="cursor">|</span></div></div>
+        <div class="lskb-count" id="lskb-count"></div>
+        <button class="lskb-btn ok" id="lskb-ok" data-nav tabindex="-1"></button>
+        <button class="lskb-btn" id="lskb-cancel" data-nav tabindex="-1"></button>
+      </div>
+      <div class="lskb-main">
+        <div class="kbd lskb-grid" id="lskb-grid"></div>
+        <div class="lskb-bottomkeys" id="lskb-bottom"></div>
+        <div class="lskb-hints" id="lskb-hints"></div>
+      </div>
     </div>
   </div>
 
@@ -4715,6 +4739,8 @@ function activeModalRoot(){
   if(bellM && bellM.classList.contains('show')) return bellM;
   const qualityMenu = document.getElementById('quality-menu');
   if(qualityMenu && qualityMenu.classList.contains('show')) return qualityMenu;
+  const lskCard = document.getElementById('lskb-overlay');
+  if(lskCard && lskCard.classList.contains('show')) return lskCard;
   const composeOverlay = document.getElementById('chat-compose-overlay');
   if(composeOverlay && composeOverlay.classList.contains('show')) return composeOverlay;
   return null;
@@ -5018,6 +5044,19 @@ function moveFocus0(dir){
     if(nxt){ focusIndex = focusables.indexOf(nxt); applyFocus(); return; }
     if((dir === 'right') !== rtlT) return;
   }
+  // v205: text card - Create/Cancel column <-> keyboard
+  if(el.classList && el.classList.contains('lskb-btn')){
+    const btns = Array.from(document.querySelectorAll('#lskb-side .lskb-btn')), bi = btns.indexOf(el), br = el.getBoundingClientRect();
+    if(dir === 'down' || dir === 'up'){ const nb = btns[bi + (dir === 'down' ? 1 : -1)]; if(nb){ focusIndex = focusables.indexOf(nb); applyFocus(); } return; }
+    const ks = Array.from(document.querySelectorAll('#lskb-grid .chat-key')); if(!ks.length) return;
+    const k0 = ks[0].getBoundingClientRect();
+    if((dir === 'right' && k0.left > br.left) || (dir === 'left' && k0.left < br.left)){
+      const toward = dir === 'right' ? 1 : -1, cy = br.top + br.height/2;
+      ks.sort((x, y) => { const rx = x.getBoundingClientRect(), ry = y.getBoundingClientRect(); const dyx = Math.abs(rx.top + rx.height/2 - cy), dyy = Math.abs(ry.top + ry.height/2 - cy); if(Math.abs(dyx - dyy) > 4) return dyx - dyy; return (rx.left - ry.left) * toward; });
+      focusIndex = focusables.indexOf(ks[0]); applyFocus();
+    }
+    return;
+  }
   // On-screen keyboard: step through the key grid row by row (stable, no jumps).
   if(el.classList && el.classList.contains('key')){
     const keys = focusables.filter(f => f.classList && f.classList.contains('key'));
@@ -5036,6 +5075,11 @@ function moveFocus0(dir){
       let target = null;
       if(dir === 'left' || dir === 'right'){
         target = row.items[ci + (dir === 'right' ? 1 : -1)];
+        if(!target && LSK.on && LSK.mode === 'card'){
+          const okb = document.getElementById('lskb-ok'), orc = okb.getBoundingClientRect(), er0 = el.getBoundingClientRect();
+          if((dir === 'left' && orc.left < er0.left) || (dir === 'right' && orc.left > er0.left)){ focusIndex = focusables.indexOf(okb); applyFocus(); }
+          return;
+        }
         if(!target){
           if(dir === 'right'){                                    // end of the keyboard row: go to the results
             const res = focusables.find(f => f.closest && f.closest('#suggest-grid')) || focusables.find(f => f.closest && f.closest('#search-media'));
@@ -5273,6 +5317,8 @@ function activate(el){
   if(el.id === 'chat-compose-btn'){ openChatCompose(); return; }
   if(el.id === 'chat-compose-send'){ sendChatDraft(); return; }
   if(el.id === 'chat-compose-close'){ closeChatCompose(); return; }
+  if(el.id === 'lskb-ok'){ lskCardDone(true); return; }
+  if(el.id === 'lskb-cancel'){ lskCardDone(false); return; }
   if(el.classList.contains('chat-key')){ pressChatKey(el.dataset.key); return; }
   if(el.dataset && el.dataset.noop !== undefined) return;
   if(el.dataset && el.dataset.na !== undefined){ notifAskAct(el.dataset.na); return; }
@@ -5471,6 +5517,7 @@ function kbRemoteTyping(k){
   return false;
 }
 function handleRemoteKey(k, rtl, ev){
+  if(lskRemoteKey(k, ev)) return true;
   if(kbRemoteTyping(k)) return true;
   if(state.screen === 'multi' && window.multiKey && window.multiKey(k, ev)) return true;
   if(window.dlPanelKey && window.dlPanelKey(k)) return true;
@@ -5488,6 +5535,7 @@ function handleRemoteKey(k, rtl, ev){
     if(window.plBack && window.plBack()) return true;   // v176: playlist -> list of playlists
     // Close whichever modal-like overlay is open first, instead of jumping
     // straight to exiting the player / leaving the screen.
+    if(LSK.on && LSK.mode === 'card'){ lskCardDone(false); return true; }
     if(document.getElementById('chat-compose-overlay').classList.contains('show')){ closeChatCompose(); return true; }
     if(document.getElementById('startup-suggestion-overlay').classList.contains('show')){ closeStartupSuggestion(); return true; }
     if(notifAskOpen()){ if(window.__offAskOpen) offlineLater(); else closeNotifAsk(); return true; }
@@ -8540,54 +8588,106 @@ async function sendChatMessage(text){
   return { ok:false, reason:'failed' };
 }
 
-/* Compose modal: a small on-screen keyboard (reusing the same key layout as
-   search) so a message can be typed and sent with just the remote. */
+/* ---------- v205: ONE on-screen keyboard for chat (bottom sheet) and text prompts (card) ---------- */
+const LSK_AR = ['ضصثقفغعهخحج','شسيبلاتنمكط','ئءؤرىةوزظذد'];
+const LSK_EN = ['qwertyuiop',"asdfghjkl'",'zxcvbnm-._'];
+const LSK_SYM_AR = ['1234567890\u061f',"_.-#'!?@,:;",'/()+=&%*"~\u060c'];
+const LSK_SYM_EN = ['1234567890',"_.-#'!?@:;",'/()+=&%*",'];
+const LSK_CHAT_MAX = 250;
+const LSK = { on:false, mode:'', text:'', max:250, sym:false, caps:false, cb:null };
+function lskIds(){ return LSK.mode === 'chat' ? { grid:'chat-compose-keyboard', bottom:'chat-compose-bottomkeys', val:'chat-compose-text', cnt:'chat-compose-count' } : { grid:'lskb-grid', bottom:'lskb-bottom', val:'lskb-text', cnt:'lskb-count' }; }
+function lskEsc(c){ return c === '"' ? '&quot;' : c === '&' ? '&amp;' : c === '<' ? '&lt;' : c; }
+function lskBuild(){
+  const ids = lskIds(), grid = document.getElementById(ids.grid), bot = document.getElementById(ids.bottom); if(!grid || !bot) return;
+  const ar = kbLang() === 'ar';
+  let rows = LSK.sym ? (ar ? LSK_SYM_AR : LSK_SYM_EN) : (ar ? LSK_AR : LSK_EN);
+  if(!ar && !LSK.sym && LSK.caps) rows = rows.map(r => r.toUpperCase());
+  grid.style.setProperty('--cols', Math.max.apply(null, rows.map(r => Array.from(r).length)));
+  const dirv = ar ? 'rtl' : 'ltr';
+  grid.dir = dirv; bot.dir = dirv; if(LSK.mode === 'chat' && bot.parentElement) bot.parentElement.dir = dirv;
+  let h = '';
+  rows.forEach(r => Array.from(r).forEach(c => { h += `<div class="key chat-key" data-nav tabindex="-1" data-key="${lskEsc(c)}">${lskEsc(c)}</div>`; }));
+  grid.innerHTML = h;
+  const sp = (k, cls, label) => `<div class="key chat-key ${cls}" data-nav tabindex="-1" data-key="${k}">${label}</div>`;
+  let b = sp('__lang', 'lk-lang', GLOBE_ICON + '<span>' + (ar ? '\u0639' : 'EN') + '</span>')
+        + sp('__sym', 'lk-sym', LSK.sym ? (ar ? '\u0623\u0628\u062c' : 'ABC') : '<span dir="ltr">&amp;123</span>');
+  if(!ar && !LSK.sym) b += sp('__caps', 'lk-caps', LSK.caps ? '\u21E9' : '\u21E7');
+  b += sp('__space', 'lk-space', LT('Space', '\u0645\u0633\u0627\u0641\u0629')) + sp('__back', 'lk-back', '\u232B');
+  if(LSK.mode === 'card') b += sp('__clear', 'lk-clear', LT('CLEAR', '\u0645\u0633\u062d'));
+  bot.innerHTML = b;
+}
+function lskShow(){
+  const ids = lskIds();
+  const v = document.getElementById(ids.val); if(v) v.textContent = LSK.text || '\u00A0';
+  const c = document.getElementById(ids.cnt); if(c) c.textContent = Array.from(LSK.text).length + ' / ' + LSK.max;
+  if(LSK.mode === 'chat') state.chatDraft = LSK.text;
+}
+function lskKeyEl(k){ const ids = lskIds(); return document.querySelector('#' + ids.bottom + ' [data-key="' + k + '"]'); }
+function lskHints(id, arr){ const el = document.getElementById(id); if(el) el.innerHTML = arr.map(x => '<span>' + x + '</span>').join(''); }
+
 function openChatCompose(){
   if(!state.chatChannel) return;
   if(!loadKickAuth()){ alert(t('chatLoginRequired')); return; }
   state.chatDraft = '';
-  const overlay = document.getElementById('chat-compose-overlay');
-  const kb = document.getElementById('chat-compose-keyboard');
-  let html = '';
-  const chatLetters = kbLang() === 'ar' ? KB_AR : KB_EN;
-  const chatKeys = chatLetters.concat(KB_SYM, KB_NUM);
-  chatKeys.forEach(k => html += `<div class="key chat-key" data-nav tabindex="-1" data-key="${k}">${k}</div>`);
-  html += `<div class="key wide chat-key" data-nav tabindex="-1" data-key="__lang">${GLOBE_ICON}</div>`;
-  html += `<div class="key wide chat-key" data-nav tabindex="-1" data-key="__space">${t('space')}</div>`;
-  html += `<div class="key wide chat-key" data-nav tabindex="-1" data-key="__back">${t('del')}</div>`;
-  kb.innerHTML = html;
-  document.getElementById('chat-compose-text').textContent = '\u00A0';
-  overlay.classList.add('show');
+  Object.assign(LSK, { on:true, mode:'chat', text:'', max:LSK_CHAT_MAX, sym:false, caps:false, cb:null });
+  const ttl = document.getElementById('chat-compose-title');
+  if(ttl) ttl.textContent = LT('Message to ', '\u0631\u0633\u0627\u0644\u0629 \u0625\u0644\u0649 \u0634\u0627\u062a ') + state.chatChannel;
+  const snd = document.getElementById('chat-compose-send');
+  if(snd) snd.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg><span>' + LT('Send', '\u0625\u0631\u0633\u0627\u0644') + '</span>';
+  lskHints('chat-compose-hints', [LT('OK select', '\u0627\u062e\u062a\u064a\u0627\u0631 OK'), LT('Back close', '\u0631\u062c\u0648\u0639 \u0625\u063a\u0644\u0627\u0642'), LT('Red clear all', '\u0627\u0644\u0632\u0631 \u0627\u0644\u0623\u062d\u0645\u0631 \u0645\u0633\u062d \u0627\u0644\u0643\u0644')]);
+  lskBuild(); lskShow();
+  document.getElementById('chat-compose-overlay').classList.add('show');
   focusIndex = 0;
-  refreshFocusables();
-}
-
-function openChatComposeKeysOnly(){
-  const kb = document.getElementById('chat-compose-keyboard');
-  let html = '';
-  const ks = (kbLang() === 'ar' ? KB_AR : KB_EN).concat(KB_SYM, KB_NUM);
-  ks.forEach(k => html += `<div class="key chat-key" data-nav tabindex="-1" data-key="${k}">${k}</div>`);
-  html += `<div class="key wide chat-key" data-nav tabindex="-1" data-key="__lang">${GLOBE_ICON}</div>`;
-  html += `<div class="key wide chat-key" data-nav tabindex="-1" data-key="__space">${t('space')}</div>`;
-  html += `<div class="key wide chat-key" data-nav tabindex="-1" data-key="__back">${t('del')}</div>`;
-  kb.innerHTML = html;
-  const g = kb.querySelector('[data-key="__lang"]');
-  refreshFocusables(g || undefined);
+  refreshFocusables(document.querySelector('#chat-compose-keyboard .key') || undefined);
 }
 
 function closeChatCompose(){
   const overlay = document.getElementById('chat-compose-overlay');
   if(!overlay || !overlay.classList.contains('show')) return;
   overlay.classList.remove('show');
+  if(LSK.mode === 'chat'){ LSK.on = false; LSK.mode = ''; }
   refreshFocusables();
 }
 
+// Text card (design B): o = { title, sub, label, def, max, ok, cancel }; cb(text) or cb(null) when cancelled.
+window.lsAskText = function(o, cb){
+  o = o || {};
+  Object.assign(LSK, { on:true, mode:'card', max:o.max || 40, sym:false, caps:false, cb:cb || null });
+  LSK.text = Array.from(String(o.def == null ? '' : o.def)).slice(0, LSK.max).join('');
+  const set = (id, v) => { const e = document.getElementById(id); if(e) e.textContent = v; };
+  set('lskb-title', o.title || ''); set('lskb-sub', o.sub || ''); set('lskb-label', o.label || o.title || '');
+  set('lskb-ok', o.ok || LT('Save', '\u062d\u0641\u0638')); set('lskb-cancel', o.cancel || LT('Cancel', '\u0625\u0644\u063a\u0627\u0621'));
+  lskHints('lskb-hints', [LT('OK select', '\u0627\u062e\u062a\u064a\u0627\u0631 OK'), LT('Back cancel', '\u0631\u062c\u0648\u0639 \u0625\u0644\u063a\u0627\u0621'), LT('Red clear all', '\u0627\u0644\u0632\u0631 \u0627\u0644\u0623\u062d\u0645\u0631 \u0645\u0633\u062d \u0627\u0644\u0643\u0644')]);
+  lskBuild(); lskShow();
+  document.getElementById('lskb-overlay').classList.add('show');
+  focusIndex = 0;
+  refreshFocusables(document.querySelector('#lskb-grid .key') || undefined);
+};
+function lsPrompt(msg, def, cb, max){ window.lsAskText({ title: String(msg || '').replace(/\s*:\s*$/, ''), def: def, max: max || 200 }, cb); }
+function lskCardDone(ok){
+  if(!LSK.on || LSK.mode !== 'card') return;
+  const val = LSK.text, cb = LSK.cb; LSK.cb = null; LSK.on = false; LSK.mode = '';
+  document.getElementById('lskb-overlay').classList.remove('show');
+  refreshFocusables();
+  if(cb) cb(ok ? val : null);
+}
+function lskRemoteKey(k, ev){
+  if(!LSK.on) return false;
+  if(k === 'ColorF0Red' || (ev && ev.keyCode === 403)){ LSK.text = ''; lskShow(); return true; }
+  return false;
+}
+
 function pressChatKey(k){
-  if(k === '__lang'){ state.kbLang = kbLang() === 'ar' ? 'en' : 'ar'; try{ localStorage.setItem('livescreen_kb', state.kbLang); }catch(e){} openChatComposeKeysOnly(); return; }
-  if(k === '__space') state.chatDraft += ' ';
-  else if(k === '__back') state.chatDraft = state.chatDraft.slice(0,-1);
-  else state.chatDraft += k;
-  document.getElementById('chat-compose-text').textContent = state.chatDraft || '\u00A0';
+  if(!LSK.on) return;
+  if(k === '__lang'){ state.kbLang = kbLang() === 'ar' ? 'en' : 'ar'; try{ localStorage.setItem('livescreen_kb', state.kbLang); }catch(e){} lskBuild(); refreshFocusables(lskKeyEl('__lang') || undefined); return; }
+  if(k === '__sym'){ LSK.sym = !LSK.sym; lskBuild(); refreshFocusables(lskKeyEl('__sym') || undefined); return; }
+  if(k === '__caps'){ LSK.caps = !LSK.caps; lskBuild(); refreshFocusables(lskKeyEl('__caps') || undefined); return; }
+  if(k === '__space') LSK.text += ' ';
+  else if(k === '__back') LSK.text = Array.from(LSK.text).slice(0, -1).join('');
+  else if(k === '__clear') LSK.text = '';
+  else LSK.text += k;
+  const ch = Array.from(LSK.text); if(ch.length > LSK.max) LSK.text = ch.slice(0, LSK.max).join('');
+  lskShow();
 }
 
 async function sendChatDraft(){
@@ -11189,6 +11289,7 @@ function focusPlayerEl(id){
 function playerKeyHandler(k, rtl, ev){
   if(state.playerMode !== 'native') return false;
   if(document.getElementById('chat-compose-overlay').classList.contains('show')) return false;
+  if(document.getElementById('lskb-overlay').classList.contains('show')) return false;
   if(document.getElementById('startup-suggestion-overlay').classList.contains('show')) return false;
   if(notifAskOpen()) return false;
   const kc = ev ? ev.keyCode : 0;
@@ -12606,16 +12707,17 @@ function exitPlayer(){
 
 /* ---------- Settings ---------- */
 function editSetting(key, label){
-  const val = prompt(label + ':', state[key] || '');
+  lsPrompt(label + ':', state[key] || '', function(val){
   if(val !== null){
     state[key] = val.trim();
     localStorage.setItem('livescreen_client_id', state[key]);
     renderSettings();
   }
+  });
 }
 function editChatKey(){
   let cur = ''; try{ cur = (localStorage.getItem('ls_chat_key') || '') + (localStorage.getItem('ls_chat_cluster') ? ',' + localStorage.getItem('ls_chat_cluster') : ''); }catch(e){}
-  const val = prompt(LT('Chat key and cluster, e.g. abc123...,us2 (empty = auto)', 'مفتاح الشات والـ cluster بهذا الشكل: المفتاح,الcluster (فاضي = تلقائي)') + ':', cur);
+  lsPrompt(LT('Chat key and cluster, e.g. abc123...,us2 (empty = auto)', 'مفتاح الشات والـ cluster بهذا الشكل: المفتاح,الcluster (فاضي = تلقائي)') + ':', cur, function(val){
   if(val === null) return;
   const parts = val.split(/[,\s]+/).filter(Boolean);
   try{
@@ -12623,14 +12725,16 @@ function editChatKey(){
     else{ localStorage.setItem('ls_chat_key', parts[0]); if(parts[1]) localStorage.setItem('ls_chat_cluster', parts[1]); }
   }catch(e){}
   renderSettings();
+  });
 }
 function editProxyWorker(){
-  const val = prompt(t('proxyWorkerLabel') + ':', state.proxyWorkerUrl || '');
+  lsPrompt(t('proxyWorkerLabel') + ':', state.proxyWorkerUrl || '', function(val){
   if(val !== null){
     state.proxyWorkerUrl = val.trim().replace(/\/$/, '');
     localStorage.setItem('livescreen_proxy_worker', state.proxyWorkerUrl);
     renderSettings();
   }
+  });
 }
 
 /* ---------- Kick account login (OAuth 2.1 + PKCE) ----------
@@ -12641,12 +12745,13 @@ function editProxyWorker(){
 const KICK_AUTH_URL = 'https://id.kick.com/oauth/authorize';
 const KICK_FN = '/api/kick-auth';
 function editKickClientId(){
-  const val = prompt(t('kickClientIdLabel') + ':', state.kickClientId || '');
+  lsPrompt(t('kickClientIdLabel') + ':', state.kickClientId || '', function(val){
   if(val !== null){
     state.kickClientId = val.trim();
     localStorage.setItem('livescreen_kick_client_id', state.kickClientId);
     renderSettings();
   }
+  });
 }
 
 function b64url(bytes){
@@ -12824,10 +12929,14 @@ document.getElementById('chat-new-pill').addEventListener('click', scrollChatToB
 document.getElementById('chat-compose-btn').addEventListener('click', e => { e.stopPropagation(); openChatCompose(); });
 document.getElementById('chat-compose-close').addEventListener('click', e => { e.stopPropagation(); closeChatCompose(); });
 document.getElementById('chat-compose-send').addEventListener('click', e => { e.stopPropagation(); sendChatDraft(); });
-document.getElementById('chat-compose-keyboard').addEventListener('click', e => {
-  const key = e.target.closest('.chat-key');
-  if(key) pressChatKey(key.dataset.key);
+document.addEventListener('click', e => {
+  const T = e.target; if(!T || !T.closest) return;
+  const key = T.closest('.chat-key');
+  if(key && LSK.on){ pressChatKey(key.dataset.key); return; }
+  if(T.closest('#lskb-ok')){ lskCardDone(true); return; }
+  if(T.closest('#lskb-cancel')){ lskCardDone(false); return; }
 });
+document.getElementById('lskb-overlay').addEventListener('click', e => { if(e.target.id === 'lskb-overlay') lskCardDone(false); });
 document.getElementById('chat-compose-overlay').addEventListener('click', e => {
   if(e.target.id === 'chat-compose-overlay') closeChatCompose();
 });
@@ -14275,12 +14384,9 @@ html[data-theme="light"] .chan-follow.focused, html[data-theme="mixed"] .chan-fo
   }
   window.__plReload = function(){ load(); try{ if(PL.open && !find(PL.open)) PL.open = null; render(); }catch(e){} };
   function find(id){ for(var i = 0; i < PL.list.length; i++) if(PL.list[i].id === id) return PL.list[i]; return null; }
-  // returns the typed text, null when cancelled, undefined when this app version cannot show a text box
-  function ask(msg, def){
-    var t0 = Date.now(), r = null;
-    try{ r = window.prompt(msg, def || ''); }catch(e){}
-    if(r === null && Date.now() - t0 < 60) return undefined;
-    return r;
+  // v205: the name box is the in-app keyboard card now (no native Android dialog). cb(text) or cb(null) when cancelled.
+  function askName(title, def, okLabel, cb){
+    window.lsAskText({ title: title, sub: L('Give it a name you will remember', 'سمّها باسم تتذكره'), label: L('Playlist name', 'اسم القائمة'), def: def || '', max: 40, ok: okLabel }, cb);
   }
   function armed(tok){
     var now = Date.now();
@@ -14416,13 +14522,14 @@ html[data-theme="light"] .chan-follow.focused, html[data-theme="mixed"] .chan-fo
 
   /* ---------- actions ---------- */
   function newFlow(thenAdd){
-    if(PL.list.length >= MAXL){ toast(L('Too many playlists', 'وصلت الحد الأقصى للقوائم'), { err:true, hide:3000 }); return null; }
-    var nm = ask(L('Playlist name', 'اسم القائمة'), '');
-    if(nm === null) return null;
-    var p = create(nm === undefined ? '' : nm); if(!p) return null;
-    if(thenAdd) addAndToast(p.id, thenAdd);
-    else toast(L('Playlist created', 'تم إنشاء القائمة'), { ok:true, hide:2000 });
-    return p;
+    if(PL.list.length >= MAXL){ toast(L('Too many playlists', 'وصلت للحد الأقصى من القوائم'), { err:true, hide:3000 }); return; }
+    askName(L('New playlist', 'قائمة جديدة'), '', L('Create', 'إنشاء'), function(nm){
+      if(nm === null) return;
+      var p = create(nm); if(!p) return;
+      if(thenAdd) addAndToast(p.id, thenAdd);
+      else toast(L('Playlist created', 'تم إنشاء القائمة'), { ok:true, hide:2000 });
+      if(state.screen === 'playlists') render();
+    });
   }
   function addAndToast(pid, item){
     var r = addItem(pid, item), p = find(pid);
@@ -14432,10 +14539,10 @@ html[data-theme="light"] .chan-follow.focused, html[data-theme="mixed"] .chan-fo
   }
   function renameFlow(pid){
     var p = find(pid); if(!p) return;
-    var nm = ask(L('New name', 'الاسم الجديد'), p.name);
-    if(nm === undefined){ toast(L('Update the app to rename lists', 'حدّث التطبيق لتتمكن من إعادة التسمية'), { err:true, hide:3500 }); return; }
-    if(nm === null) return;
-    if(rename(pid, nm)) render();
+    askName(L('Rename playlist', 'تغيير اسم القائمة'), p.name, L('Save', 'حفظ'), function(nm){
+      if(nm === null) return;
+      if(rename(pid, nm)) render();
+    });
   }
   function deleteFlow(pid){
     if(!armed('del:' + pid)){ toast(L('Press again to delete the list', 'اضغط مرة ثانية لتأكيد حذف القائمة'), { hide:3500 }); return; }
@@ -14443,7 +14550,7 @@ html[data-theme="light"] .chan-follow.focused, html[data-theme="mixed"] .chan-fo
   }
   window.plActivate = function(el){
     var a = el.dataset.pl, pid = el.dataset.pid || PL.open;
-    if(a === 'new'){ var p = newFlow(); if(p) render(); return; }
+    if(a === 'new'){ newFlow(); return; }
     if(a === 'back'){ PL.open = null; render(); return; }
     if(a === 'playall'){ playIndex(pid, 0); return; }
     if(a === 'rename'){ renameFlow(pid); return; }
@@ -14455,7 +14562,7 @@ html[data-theme="light"] .chan-follow.focused, html[data-theme="mixed"] .chan-fo
     var parts = act.split(':'), a = parts[1];
     if(I.kind === 'pick'){
       if(a === 'add'){ addAndToast(parts[2], I.item); if(state.screen === 'playlists') render(); return; }
-      if(a === 'addnew'){ newFlow(I.item); if(state.screen === 'playlists') render(); return; }
+      if(a === 'addnew'){ newFlow(I.item); return; }
       return;
     }
     if(a === 'open'){ PL.open = I.pid; render(); return; }
@@ -14591,6 +14698,69 @@ html[data-theme="light"] .fw-live, html[data-theme="mixed"] .fw-live{ box-shadow
 .clip-card .clip-cat{ font-weight:600; font-size:.92em; }
 #screen-favorites .fw-clips .clip-card .clip-meta{ font-size:1vw; margin-top:.9vh; padding:0 .2vw; }
 </style>
+<style id="v204-follow-fix">
+/* v204: Following + Home clips fixes */
+/* the Clips logo had no size inside the Following pane (it filled the screen as a giant white shape) */
+#screen-favorites .row-title .clips-logo{ width:1.5em; height:1.5em; vertical-align:-.3em; margin-inline-end:.45em; flex:none; }
+/* live channel = red ring around the avatar (no more small red dot) */
+.fw-live{ display:none !important; }
+.fw-av.is-live::after{ content:''; position:absolute; inset:-.42vw; border-radius:50%; border:.24vw solid #ff2b2b; pointer-events:none; }
+.fw-av.is-live{ margin:0 .3vw; }
+/* bigger video / live cards in the Following pane (YouTube TV Subscriptions size) */
+.fw-main{ --yt-w:27vw; }
+/* clips = YouTube Shorts size: about 4 cards across, 5:8 ratio (Home) */
+#home-clips .hrow .clip-card, #home-clips .hrow .sk-card{ flex:0 0 calc((100% - 3 * var(--gap14))/4.15); width:calc((100% - 3 * var(--gap14))/4.15); }
+#home-clips .hrow .clip-card .thumb, #home-clips .hrow .sk-thumb{ aspect-ratio:5/8; }
+#home-clips .clip-card .short-title{ font-size:1.45vw; }
+/* Following pane clips: same Shorts ratio */
+#screen-favorites .fw-clips .hrow .clip-card .thumb, #screen-favorites .fw-clips .hrow .sk-thumb{ aspect-ratio:5/8; }
+#screen-favorites .fw-clips .clip-card .short-title{ font-size:1.3vw; }
+
+/* ===== v205: ONE keyboard look - chat bottom sheet (A) + text card (B: playlist name, proxy, client id) ===== */
+@keyframes lskUp{ from{ transform:translateY(7vw); opacity:0; } to{ transform:none; opacity:1; } }
+#chat-compose-overlay{ align-items:flex-end; background:rgba(0,0,0,.55); }
+#chat-compose-card{ width:100vw; max-width:none; box-sizing:border-box; background:#141418; color:#F5F5F1; border-radius:2.2vw 2.2vw 0 0; padding:1.8vw 4.2vw 1.1vw; gap:.85vw; animation:lskUp .22s ease-out; }
+#chat-compose-card .cc-header{ font-size:1.25vw; font-weight:700; color:#9B9B9B; gap:1.2vw; }
+#chat-compose-title{ flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+#chat-compose-count{ font-size:1.15vw; font-weight:600; direction:ltr; }
+#chat-compose-val{ display:flex; align-items:center; gap:.2vw; background:#222228; border:0; border-radius:1vw; height:4.6vw; padding:0 1.8vw; margin:0; font-size:2.1vw; font-weight:600; box-shadow:none; box-sizing:border-box; overflow:hidden; }
+#chat-compose-val .val{ flex:0 1 auto; min-width:0; overflow:hidden; white-space:nowrap; text-overflow:clip; }
+#chat-compose-val .cursor{ color:#e50914; flex:none; }
+.lskb-grid{ display:grid; grid-template-columns:repeat(var(--cols,11),1fr); gap:.55vw; max-width:none; }
+.chat-key{ display:flex; align-items:center; justify-content:center; height:4.2vw; padding:0; border:0; border-radius:.8vw; background:#222228; color:#F5F5F1; font-size:1.9vw; font-weight:600; font-family:var(--font-body); }
+.chat-key.focused{ background:#fff; color:#000; box-shadow:0 0 0 .22vw #6b6b72; border:0; }
+.lskb-bottom{ display:flex; gap:.55vw; align-items:stretch; }
+.lskb-bottomkeys{ display:flex; gap:.55vw; flex:1 1 auto; min-width:0; }
+.lskb-bottomkeys .chat-key{ flex:0 0 8vw; font-size:1.45vw; font-weight:700; gap:.45vw; }
+.lskb-bottomkeys .chat-key.lk-space{ flex:1 1 auto; }
+.lskb-bottomkeys .chat-key svg{ width:1.6vw; height:1.6vw; }
+.lskb-send{ flex:0 0 17vw; display:flex; align-items:center; justify-content:center; gap:.8vw; height:4.2vw; width:auto; margin:0; padding:0; border:0; border-radius:.8vw; background:#e50914; color:#fff; font-family:var(--font-body); font-size:1.7vw; font-weight:800; cursor:pointer; }
+.lskb-send.focused{ background:#fff; color:#e50914; box-shadow:0 0 0 .22vw #6b6b72; border:0; }
+.lskb-send svg{ width:1.7vw; height:1.7vw; }
+.lskb-hints{ display:flex; justify-content:center; gap:2.4vw; font-size:1.05vw; color:#8d8d95; margin-top:.2vw; }
+#lskb-overlay{ position:fixed; inset:0; z-index:61; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,.72); }
+#lskb-overlay.show{ display:flex; }
+#lskb-card{ width:84vw; max-height:90vh; box-sizing:border-box; display:flex; background:#141418; color:#F5F5F1; border:1px solid #26262c; border-radius:2vw; overflow:hidden; animation:lskUp .2s ease-out; }
+.lskb-side{ flex:0 0 29vw; box-sizing:border-box; padding:2.4vw 2.2vw; display:flex; flex-direction:column; border-inline-end:1px solid #26262c; }
+.lskb-ico{ width:3.6vw; height:3.6vw; border-radius:1vw; background:#222228; display:flex; align-items:center; justify-content:center; margin-bottom:1.5vw; }
+.lskb-ico svg{ width:1.9vw; height:1.9vw; }
+.lskb-title{ font-size:2.3vw; font-weight:800; line-height:1.3; word-break:break-word; }
+.lskb-sub{ font-size:1.15vw; color:#9B9B9B; margin:.5vw 0 1.5vw; line-height:1.5; word-break:break-word; }
+.lskb-sub:empty{ display:none; }
+.lskb-field{ background:#222228; border:.15vw solid #fff; border-radius:1vw; padding:.8vw 1.2vw; min-height:4.4vw; box-sizing:border-box; }
+.lskb-label{ font-size:1vw; font-weight:700; color:#9B9B9B; }
+.lskb-val{ font-size:1.8vw; font-weight:700; margin-top:.25vw; word-break:break-all; display:flex; }
+.lskb-val .cursor{ color:#e50914; }
+.lskb-count{ font-size:1.05vw; color:#9B9B9B; text-align:end; margin:.7vw 0 auto; direction:ltr; }
+.lskb-btn{ display:block; width:100%; margin:.8vw 0 0; height:3.7vw; border:0; border-radius:.9vw; background:#26262c; color:#F5F5F1; font-family:var(--font-body); font-size:1.5vw; font-weight:800; cursor:pointer; padding:0; }
+.lskb-btn.ok{ background:#e50914; color:#fff; margin-top:2vw; }
+.lskb-btn.focused{ background:#fff; color:#000; box-shadow:0 0 0 .22vw #6b6b72; }
+.lskb-main{ flex:1 1 auto; min-width:0; box-sizing:border-box; padding:2.2vw 2vw 1.4vw; display:flex; flex-direction:column; gap:.55vw; justify-content:center; }
+#lskb-card .chat-key{ height:3.7vw; font-size:1.6vw; }
+#lskb-card .lskb-bottomkeys .chat-key{ flex:0 0 6.2vw; font-size:1.15vw; }
+#lskb-card .lskb-bottomkeys .chat-key.lk-space{ flex:1 1 auto; }
+#lskb-card .lskb-grid{ gap:.4vw; }
+</style>
 <script id="v202-follow">
 /* v202: Following (sidebar list + live/VODs/clips pane) and Watch later */
 (function(){
@@ -14713,7 +14883,7 @@ html[data-theme="light"] .fw-live, html[data-theme="mixed"] .fw-live{ box-shadow
     favSorted(isLive).forEach(function(c){
       var u = avOf(c);
       h += '<div class="fw-item' + (FW.sel === c ? ' sel' : '') + '" data-nav tabindex="-1" data-fw="' + esc(c) + '">' +
-        '<span class="fw-av"><b>' + esc(c.slice(0, 1).toUpperCase()) + '</b>' + (u ? '<img src="' + esc(u) + '" alt="" onerror="this.remove()">' : '') + '<i class="fw-live"' + (isLive(c) ? '' : ' hidden') + '></i></span>' +
+        '<span class="fw-av' + (isLive(c) ? ' is-live' : '') + '"><b>' + esc(c.slice(0, 1).toUpperCase()) + '</b>' + (u ? '<img src="' + esc(u) + '" alt="" onerror="this.remove()">' : '') + '</span>' +
         '<span class="fw-name">' + esc(c) + '</span><i class="fw-new"' + (hasNew(c) ? '' : ' hidden') + '></i></div>';
     });
     return h;
@@ -14721,8 +14891,8 @@ html[data-theme="light"] .fw-live, html[data-theme="mixed"] .fw-live{ box-shadow
   function updateDots(){
     document.querySelectorAll('#fw-list .fw-item').forEach(function(it){
       var c = it.dataset.fw; if(c === '__all__') return;
-      var lv = it.querySelector('.fw-live'), nw = it.querySelector('.fw-new');
-      if(lv) lv.hidden = !isLive(c);
+      var av = it.querySelector('.fw-av'), nw = it.querySelector('.fw-new');
+      if(av) av.classList.toggle('is-live', isLive(c));
       if(nw) nw.hidden = !hasNew(c);
     });
   }
@@ -14757,10 +14927,10 @@ html[data-theme="light"] .fw-live, html[data-theme="mixed"] .fw-live{ box-shadow
     favs.slice(0, MAXV).forEach(function(c){
       var l = need(FW.vods, 'v', c, fetchChannelVods);
       if(l === null){ pending = true; return; }
-      if(l.length) vods.push({ v: l[0], c: c, ts: vodTs(l[0]) });
+      l.slice(0, 4).forEach(function(v){ vods.push({ v: v, c: c, ts: vodTs(v) }); });
     });
     vods.sort(function(a, b){ return b.ts - a.ts; });
-    if(vods.length) out += row(t('vodsTitle'), '<div class="hrow">' + vods.slice(0, 20).map(function(x){ return vodCardHtml(x.v, x.c); }).join('') + '</div>');
+    if(vods.length) out += row(t('vodsTitle'), '<div class="hrow">' + vods.slice(0, 24).map(function(x){ return vodCardHtml(x.v, x.c); }).join('') + '</div>');
     else if(pending) out += row(t('vodsTitle'), hrow(null));
     var clips = [], cpend = false;
     favs.slice(0, MAXC).forEach(function(c){
