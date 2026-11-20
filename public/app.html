@@ -2000,6 +2000,24 @@ html #app[data-screen="channel"] #sidebar, html #app[data-screen="multi"] #sideb
 #pts-bar[data-st="login"]{box-shadow:0 0 0 2px rgba(245,182,66,.6)}
 #pts-bar.pts-pop{transform:scale(1.08);box-shadow:0 0 2.4vh rgba(83,252,24,.55)}
 #pts-bar:focus,#pts-bar.focused{outline:3px solid #fff}
+#pts-bar .pts-k{color:#000;display:flex;align-items:center;justify-content:center}
+#pts-bar .pts-k svg{width:72%;height:72%;display:block}
+#pts-bar[data-st="wait"] .pts-k{animation:ptsPulse 1.1s ease-in-out infinite}
+@keyframes ptsPulse{50%{opacity:.4}}
+#pts-bar[data-st="login"] .pts-k{background:#f5b642}
+#pts-bar[data-st="fail"] .pts-k{background:#8a8a8a}
+#pts-bar[data-st="fail"] #pts-val{color:#ff7b7b}
+#pts-bar{position:relative;background:rgba(0,0,0,.55);border:1px solid rgba(83,252,24,.5)}
+#pts-bar .pts-k{background:none!important;color:#53fc18;border-radius:0}
+#pts-bar .pts-k svg{width:100%;height:100%}
+#pts-bar[data-st="login"] .pts-k{color:#f5b642}
+#pts-bar[data-st="login"]{border-color:rgba(245,182,66,.6)}
+#pts-bar[data-st="fail"] .pts-k{color:#8a8a8a}
+#pts-bar[data-st="fail"]{border-color:rgba(255,255,255,.2)}
+#pts-val{color:#fff}
+#pts-bar .pts-up{position:absolute;right:1.8vh;top:-3.4vh;width:2.2vh;height:2.2vh;opacity:0;pointer-events:none}
+#pts-bar.pts-inc .pts-up{animation:ptsUp 2.4s ease-in-out}
+@keyframes ptsUp{0%{opacity:0;transform:translateY(8px)}25%{opacity:1;transform:translateY(0)}75%{opacity:1;transform:translateY(-5px)}100%{opacity:0;transform:translateY(-12px)}}
 @supports (corner-shape:squircle){
 #player-iframe-wrap,.quality-menu,#chat-compose-card,#nav-info-panel,.setting-row,.notif-item,.ss-chip,.ss-watch,#pts-bar .pts-k{corner-shape:squircle}
 }
@@ -4021,7 +4039,7 @@ window.__lsGateOpen = false;
                     <div class="channel-avatar" id="player-avatar" data-nav tabindex="-1" style="display:none;"></div>
                     <div class="mini-btn" id="player-fav" data-nav tabindex="-1"></div>
                   </div>
-                  <div id="pts-bar" data-st="off" data-nav tabindex="-1"><span class="pts-k">K</span><span class="pts-t"><span id="pts-val"></span><span id="pts-sub"></span></span></div>
+                  <div id="pts-bar" data-st="off" data-nav tabindex="-1"><span class="pts-k"><svg viewBox="0 0 28 28" fill="currentColor"><circle cx="10" cy="17" r="7"/><circle cx="19" cy="8" r="4.6"/><circle cx="21" cy="20" r="3.2"/></svg></span><svg class="pts-up" viewBox="0 0 24 24" fill="none" stroke="#53fc18" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg><span class="pts-t"><span id="pts-val"></span><span id="pts-sub"></span></span></div>
                   <div class="live-pill" id="player-golive" data-nav tabindex="-1">
                     <span class="live-pill-dot"></span><span id="golive-label"></span>
                   </div>
@@ -5308,7 +5326,7 @@ function activate(el){
     return;
   }
   if(state.screen === 'search' && (el.dataset.channel || el.dataset.sug)){ noteSearched(el.dataset.channel || el.dataset.sug); if(!el.classList.contains('key')) kbHide(); }
-  if(el.classList.contains('key')){ pressKey(el.dataset.key); return; }
+  if(el.classList.contains('key') && !el.classList.contains('chat-key')){ pressKey(el.dataset.key); return; }   // v2: chat keys have both classes; OK on the remote used to hit the search keyboard and stop here
   if(el.id === 'set-clientid'){ editSetting('clientId', t('clientId')); return; }
   if(el.id === 'set-proxyworker'){ editProxyWorker(); return; }
   if(el.id === 'set-chatkey'){ editChatKey(); return; }
@@ -12519,7 +12537,7 @@ function setStaticPlayerIcons(){
   const chatBtn = document.getElementById('toggle-chat');
   if(chatBtn){ chatBtn.innerHTML = ICONS.chatOff; chatBtn.setAttribute('data-label', t('chatLabel')); }
   const chatComposeBtn = document.getElementById('chat-compose-btn');
-  if(chatComposeBtn){ chatComposeBtn.innerHTML = ICONS.chat; chatComposeBtn.title = t('chatComposeTitle'); }
+  if(chatComposeBtn){ chatComposeBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>'; chatComposeBtn.title = t('chatComposeTitle'); }
   const viewersIcon = document.getElementById('viewers-icon');
   if(viewersIcon) viewersIcon.innerHTML = ICONS.viewers;
   const rw = document.getElementById('player-rewind');
@@ -15111,19 +15129,32 @@ html[data-theme="light"] .fw-live, html[data-theme="mixed"] .fw-live{ box-shadow
   function N(){try{return window.LiveNative||(window.parent&&window.parent.LiveNative)||null}catch(e){return null}}
   var bar=document.getElementById('pts-bar'),val=document.getElementById('pts-val'),sub=document.getElementById('pts-sub');
   if(!bar)return;
-  var started='',misses=0,lastVal='',mode='off';
+  var started='',misses=0,loSeen=0,cand='',candN=0,shown='',mode='off';
   function set(m,v,s){mode=m;bar.setAttribute('data-st',m);val.textContent=v;sub.textContent=s||''}
+  function reset(){misses=0;loSeen=0;cand='';candN=0;shown=''}
   function want(){try{return state.settings.showPts!==false&&state.screen==='player'&&state.contentKind==='live'&&state.currentChannel&&N()&&N().kickStart}catch(e){return false}}
   function full(s){var m=(s||'').match(/\d{1,3}(?:[,.\u066c\s]\d{3})+|\d{4,}/);return m?m[0]:null}
   function pick(items,titles){var c=items.filter(function(i){return /^[0-9][0-9.,]*\s?[KkMm]?$/.test(i.t)&&!/asphaltBlack|text-sm/.test(i.pc||'')});if(!c.length)return null;var a=c.filter(function(i){return !i.pc}),it=a.length?a[0]:c[0];var f=full(it.tt);if(f)return f;if(/[KkMm]$/.test(it.t)){var n=(titles||[]).filter(function(x){return Math.abs(x.y-it.y)<60&&Math.abs(x.x-it.x)<400});for(var k=0;k<n.length;k++){var g=full(n[k].s);if(g)return g}}return it.t}
+  /* a number is shown only after it is read twice in a row, so half-loaded pages never flash wrong numbers */
+  function onRead(p){
+    if(p===cand)candN++;else{cand=p;candN=1}
+    if(candN>=2&&p!==shown){var was=mode==='on';shown=p;set('on',p,'نقاطك');if(was){bar.classList.remove('pts-pop','pts-inc');void bar.offsetWidth;bar.classList.add('pts-pop','pts-inc');setTimeout(function(){bar.classList.remove('pts-pop')},500);setTimeout(function(){bar.classList.remove('pts-inc')},2500)}}
+    else if(mode!=='on'){set('wait','…','يتصل')}
+  }
   window.__kickPoints=function(json){try{var o=JSON.parse(json),p=pick(o.items||[],o.titles);
-    if(p){misses=0;var ch=lastVal&&p!==lastVal;lastVal=p;set('on',p,'نقاط');if(ch){bar.classList.remove('pts-pop');void bar.offsetWidth;bar.classList.add('pts-pop');setTimeout(function(){bar.classList.remove('pts-pop')},500)}}
-    else if(++misses>=3){set('login','Kick','سجّل دخول')}}catch(e){}};
+    if(p){misses=0;loSeen=0;onRead(p);return}
+    cand='';candN=0;misses++;loSeen=o.lo?loSeen+1:0;
+    if(mode==='on'){if(misses>=6)set('fail','!','تعذّرت القراءة')}
+    else if(loSeen>=2)set('login','Kick','سجّل دخول')
+    else if(misses>=6)set('fail','!','تعذّرت القراءة')}catch(e){}};
   try{if(window.parent&&window.parent!==window)window.parent.__kickPoints=window.__kickPoints}catch(e){}
   setInterval(function(){var n=N();if(!n||!n.kickStart)return;
-    if(want()){var ch=state.currentChannel;if(started!==ch){started=ch;misses=0;lastVal='';set('wait','…','يتصل');n.kickStart(ch)}}
-    else if(started){started='';n.kickStop();set('off','','')}},1500);
-  bar.addEventListener('click',function(){var n=N();if(!n)return;if(mode==='login'&&n.kickLogin)n.kickLogin();else if(mode==='on'&&n.kickPeek)n.kickPeek()});
+    if(want()){var ch=state.currentChannel;if(started!==ch){started=ch;reset();set('wait','…','يتصل');n.kickStart(ch)}}
+    else if(started){started='';n.kickStop();reset();set('off','','')}},1500);
+  bar.addEventListener('click',function(){var n=N();if(!n)return;
+    if(mode==='login'&&n.kickLogin)n.kickLogin();
+    else if(mode==='fail'){started='';try{n.kickStop()}catch(e){}}
+    else if(mode==='on'&&n.kickPeek)n.kickPeek()});
 })();
 </script>
 <script>
