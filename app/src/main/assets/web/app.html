@@ -4326,6 +4326,10 @@ window.__lsGateOpen = false;
         <span class="setting-label" data-i18n="showPtsLabel"></span>
         <span class="setting-val"></span>
       </div>
+      <div class="setting-row" id="set-showvote" data-nav tabindex="-1" data-setting="showVote">
+        <span class="setting-label" data-i18n="showVoteLabel"></span>
+        <span class="setting-val"></span>
+      </div>
       <div class="setting-row" id="set-limit" data-nav tabindex="-1" data-setting="discoverLimit">
         <span class="setting-label" data-i18n="limitLabel"></span>
         <span class="setting-val"></span>
@@ -4411,7 +4415,7 @@ const STRINGS = {
     offlineTitle:'غير مباشر', offlineBody:'',
     vodsTitle:'VODs', noVods:'لا توجد فيديوهات', vodPlayFail:'تعذر تشغيل هذا البث المسجل. جرب افتحه على كِك مباشرة.', watchOnKick:'شاهد على كِك', openChannel:'فتح القناة',
     recTitle:'مقترح لك', followTitle:'متابَعون مباشر الآن', gamingTitle:'Gaming', mayLikeTitle:'قد يعجبك', becauseFollow:'لأنك تتابع', similarTo:'مشابه لـ', contTitle:'تابع المشاهدة', clipsTitle:'كليبس', clipOne:'كليب', clipInfo:'معلومات', clipFrom:'من', clipBy:'قصّه', clipFromH:'مقتطع من', clipAtStream:'وقت الكليب في البث', clipStreamStart:'بدأ البث', clipVodNone:'البث المسجل غير متوفر', noClips:'لا توجد مقاطع', clipPlayFail:'تعذر تشغيل هذا المقطع. جرب افتحه على كِك مباشرة.',
-    showPtsLabel:'إظهار عدّاد نقاط Kick', generalSection:'عام', themeLabel:'المظهر', themeDark:'داكن', themeLight:'فاتح', themeMixed:'فاتح مع قائمة داكنة', uiLangLabel:'لغة الواجهة', kickClientIdLabel:'Kick OAuth Client ID', kickLoginLabel:'حساب Kick', kickLoginBtn:'تسجيل الدخول بحساب Kick', kickLogoutConfirm:'تسجيل الخروج من حساب Kick؟', kickNoClientId:'أدخل Client ID أول (بالخانة اللي فوق) قبل تسجيل الدخول.',
+    showPtsLabel:'إظهار عدّاد نقاط Kick', showVoteLabel:'التصويت والتوقعات', generalSection:'عام', themeLabel:'المظهر', themeDark:'داكن', themeLight:'فاتح', themeMixed:'فاتح مع قائمة داكنة', uiLangLabel:'لغة الواجهة', kickClientIdLabel:'Kick OAuth Client ID', kickLoginLabel:'حساب Kick', kickLoginBtn:'تسجيل الدخول بحساب Kick', kickLogoutConfirm:'تسجيل الخروج من حساب Kick؟', kickNoClientId:'أدخل Client ID أول (بالخانة اللي فوق) قبل تسجيل الدخول.',
     stop:'إيقاف', stoppedTitle:'تم إيقاف التشغيل', resume:'متابعة المشاهدة',
     otherCategory:'أخرى', suggestedTitle:'قد يعجبك أيضاً', suggestedVodsTitle:'بثوث سابقة أخرى', otherLiveTitle:'بث مباشر الآن',
     unsaveFav:'إلغاء المتابعة', isLiveNow:'يبث مباشر الآن',
@@ -4472,7 +4476,7 @@ const STRINGS = {
     offlineTitle:'Offline', offlineBody:'',
     vodsTitle:'VODs', noVods:'No videos', vodPlayFail:'Could not play this VOD. Try opening it on Kick directly.', watchOnKick:'Watch on Kick', openChannel:'Open Channel',
     recTitle:'Recommended', followTitle:'Following live now', gamingTitle:'Gaming', mayLikeTitle:'You May be liked', becauseFollow:'Because you follow', similarTo:'Similar to', contTitle:'Continue watching', clipsTitle:'Clips', clipOne:'Clip', clipInfo:'Info', clipFrom:'From', clipBy:'Clipped by', clipFromH:'Clipped from', clipAtStream:'Time in the stream', clipStreamStart:'Stream started', clipVodNone:'Recorded broadcast not available', noClips:'No clips', clipPlayFail:'Could not play this clip. Try opening it on Kick directly.',
-    showPtsLabel:'Show Kick points counter', generalSection:'General', themeLabel:'Appearance', themeDark:'Dark', themeLight:'Light', themeMixed:'Light + dark sidebar', uiLangLabel:'Interface language', kickClientIdLabel:'Kick OAuth Client ID', kickLoginLabel:'Kick account', kickLoginBtn:'Log in with Kick', kickLogoutConfirm:'Log out of your Kick account?', kickNoClientId:'Enter a Client ID above first before logging in.',
+    showPtsLabel:'Show Kick points counter', showVoteLabel:'Voting and predictions', generalSection:'General', themeLabel:'Appearance', themeDark:'Dark', themeLight:'Light', themeMixed:'Light + dark sidebar', uiLangLabel:'Interface language', kickClientIdLabel:'Kick OAuth Client ID', kickLoginLabel:'Kick account', kickLoginBtn:'Log in with Kick', kickLogoutConfirm:'Log out of your Kick account?', kickNoClientId:'Enter a Client ID above first before logging in.',
     stop:'Stop', stoppedTitle:'Playback stopped', resume:'Resume watching',
     otherCategory:'Other', suggestedTitle:'You might also like', suggestedVodsTitle:'More past broadcasts', otherLiveTitle:'Live now',
     unsaveFav:'Unfollow', isLiveNow:'is Live Now',
@@ -4511,6 +4515,7 @@ const DEFAULT_SETTINGS = {
   refreshInterval: 0,
   showChat: false,
   showPts: true,
+  showVote: true,
   ambient: true,
   remoteTestMode: false,
   theme: 'light',
@@ -4529,6 +4534,7 @@ const OPTIONS = {
   defaultScreen: ['discover','favorites','search'],
   showChat: [false, true],
   showPts: [true, false],
+  showVote: [true, false],
   remoteTestMode: [false, true],
   discoverLimit: [12, 24, 48, 100],
   languageFilter: ['', 'ar', 'en'],
@@ -4538,7 +4544,7 @@ const OPTIONS = {
 };
 function labelFor(key, val){
   switch(key){
-    case 'autoplay': case 'autoFullscreen': case 'showChat': case 'showPts': case 'hideMature': case 'remoteTestMode':
+    case 'autoplay': case 'autoFullscreen': case 'showChat': case 'showPts': case 'showVote': case 'hideMature': case 'remoteTestMode':
     case 'hoverPreview': case 'bgAudio': case 'autoDl':
       return val ? t('on') : t('off');
     case 'dataSaver': return val === 'auto' ? t('dsAuto') : val ? t('on') : t('off');
@@ -15130,7 +15136,8 @@ html[data-theme="light"] .fw-live, html[data-theme="mixed"] .fw-live{ box-shadow
   var bar=document.getElementById('pts-bar'),val=document.getElementById('pts-val'),sub=document.getElementById('pts-sub');
   if(!bar)return;
   var started='',misses=0,loSeen=0,cand='',candN=0,shown='',mode='off';
-  function set(m,v,s){mode=m;bar.setAttribute('data-st',m);val.textContent=v;sub.textContent=s||''}
+  function fmt(v){v=String(v);if(/[KkMm]$/.test(v))return v;var n=parseInt(v.replace(/\D/g,''),10);if(isNaN(n))return v;if(n<1000)return String(n);var u=n<1e6?'K':'M',d=n<1e6?1e3:1e6,x=Math.floor(n/(d/10))/10;return (x%1===0?String(x):x.toFixed(1))+u}
+  function set(m,v,s){mode=m;bar.setAttribute('data-st',m);val.textContent=m==='on'?fmt(v):v;sub.textContent=s||''}
   function reset(){misses=0;loSeen=0;cand='';candN=0;shown=''}
   function want(){try{return state.settings.showPts!==false&&state.screen==='player'&&state.contentKind==='live'&&state.currentChannel&&N()&&N().kickStart}catch(e){return false}}
   function full(s){var m=(s||'').match(/\d{1,3}(?:[,.\u066c\s]\d{3})+|\d{4,}/);return m?m[0]:null}
