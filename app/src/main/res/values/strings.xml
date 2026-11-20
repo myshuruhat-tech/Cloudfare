@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">5AL</string>
     <string name="press_back_again">اضغط رجوع مرة ثانية للخروج</string>
+    <string name="service_desc">LiveScreen TV</string>
 </resources>
