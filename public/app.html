@@ -15133,10 +15133,10 @@ html[data-theme="light"] .fw-live, html[data-theme="mixed"] .fw-live{ box-shadow
   box.style.cssText='position:fixed;left:1vw;right:1vw;top:1vh;z-index:99999;max-height:45%;overflow:auto;background:rgba(0,0,0,.88);color:#9f9;font:1.5vh/1.4 monospace;white-space:pre-wrap;padding:1vh;border-radius:1.2vh;display:none;pointer-events:none';
   document.body.appendChild(box);var hide=0;
   window.__voteDump=function(json){try{var o=JSON.parse(json);if(!o.n)return;
-    box.textContent='VOTE? '+o.n+'\n'+o.items.map(function(x,i){return '#'+i+' <'+x.tag+'> cls='+x.c+'\ntext: '+x.t+'\nbuttons: '+JSON.stringify(x.b)+'\nhtml: '+x.h}).join('\n---\n');
+    box.textContent='VOTE? '+o.n+'\n'+o.items.map(function(x,i){return '#'+i+' <'+x.tag+'> cls='+x.c+'\ntext: '+x.t+'\nbuttons: '+JSON.stringify(x.b)+'\nhtml: '+String(x.h).replace(/<svg[\s\S]*?<\/svg>/g,'[svg]')}).join('\n---\n');
     box.style.display='block';clearTimeout(hide);hide=setTimeout(function(){box.style.display='none'},25000)}catch(e){}};
   window.__peekDump=function(r,json){try{var o=JSON.parse(json);
-    box.textContent='PEEK '+r+' | found '+o.n+'\n'+o.items.map(function(x,i){return '#'+i+' <'+x.tag+'> cls='+x.c+'\ntext: '+x.t+'\nbuttons: '+JSON.stringify(x.b)+'\nhtml: '+x.h}).join('\n---\n');
+    box.textContent='PEEK '+r+' | found '+o.n+'\n'+o.items.map(function(x,i){return '#'+i+' <'+x.tag+'> cls='+x.c+'\ntext: '+x.t+'\nbuttons: '+JSON.stringify(x.b)+'\nhtml: '+String(x.h).replace(/<svg[\s\S]*?<\/svg>/g,'[svg]')}).join('\n---\n');
     box.style.display='block';clearTimeout(hide);hide=setTimeout(function(){box.style.display='none'},30000)}catch(e){}};
   try{if(window.parent&&window.parent!==window)window.parent.__voteDump=window.__voteDump}catch(e){}
   try{if(window.parent&&window.parent!==window)window.parent.__peekDump=window.__peekDump}catch(e){}
