@@ -249,18 +249,34 @@ class MainActivity : Activity() {
         web.requestFocus()
     }
 
-    /** TEMP: taps the points on the Kick page, waits, then reports any popup / pinned message / poll it finds. */
+    /** TEMP: taps the points, opens the latest prediction/poll row inside the rewards panel, then reports what it finds. */
     private fun peekKick() {
         val click = readAsset("kick/peekclick.js") ?: return
+        val click2 = readAsset("kick/peekclick2.js") ?: return
         val dump = readAsset("kick/peekdump.js") ?: return
+        fun send(label: String, raw: String?) {
+            try {
+                val s = JSONTokener(raw ?: return).nextValue() as? String ?: return
+                web.evaluateJavascript("window.__peekDump&&window.__peekDump(" + JSONObject.quote(label) + "," + JSONObject.quote(s) + ")", null)
+            } catch (e: Exception) { }
+        }
         kickWeb.evaluateJavascript(click) { r1 ->
             handler.postDelayed({
-                kickWeb.evaluateJavascript(dump) { raw ->
-                    try {
-                        val s = JSONTokener(raw ?: return@evaluateJavascript).nextValue() as? String ?: return@evaluateJavascript
-                        web.evaluateJavascript("window.__peekDump&&window.__peekDump(" + JSONObject.quote(r1 ?: "") + "," + JSONObject.quote(s) + ")", null)
-                    } catch (e: Exception) { }
-                    kickWeb.evaluateJavascript(click, null)
+                kickWeb.evaluateJavascript(click2) { r2raw ->
+                    val r2 = (r2raw ?: "").trim('"')
+                    if (r2.startsWith("no ")) {
+                        kickWeb.evaluateJavascript(dump) { raw ->
+                            send((r1 ?: "") + " | " + r2, raw)
+                            kickWeb.evaluateJavascript(click, null)
+                        }
+                    } else {
+                        handler.postDelayed({
+                            kickWeb.evaluateJavascript(dump) { raw ->
+                                send("STEP2 " + r2, raw)
+                                kickWeb.evaluateJavascript(click, null)
+                            }
+                        }, 1500L)
+                    }
                 }
             }, 1500L)
         }
