@@ -19,5 +19,6 @@
   var vs=[], vids=document.querySelectorAll('video');
   for(var j=0;j<vids.length&&j<4;j++){ vs.push({paused:vids[j].paused, muted:vids[j].muted, t:Math.round(vids[j].currentTime)}); }
   var tl=[],tq=document.querySelectorAll('[title],[aria-label]');for(var q=0;q<tq.length&&tl.length<12;q++){var sv=tq[q].getAttribute('title')||tq[q].getAttribute('aria-label')||'';if(!/\d/.test(sv))continue;var rr=tq[q].getBoundingClientRect();tl.push({s:sv.slice(0,60),y:Math.round(rr.top),x:Math.round(rr.left)})}
-  return JSON.stringify({url:location.href, vw:innerWidth, vh:innerHeight, videos:vs, items:out, titles:tl});
+  var lo=Array.prototype.some.call(document.querySelectorAll("button,a"),function(b){return /^(log ?in|login|sign ?in|sign ?up|تسجيل الدخول)$/i.test((b.innerText||"").trim())});
+  return JSON.stringify({url:location.href, vw:innerWidth, vh:innerHeight, videos:vs, items:out, titles:tl, lo:lo});
 })()
