@@ -4330,6 +4330,10 @@ window.__lsGateOpen = false;
         <span class="setting-label" data-i18n="showVoteLabel"></span>
         <span class="setting-val"></span>
       </div>
+      <div class="setting-row" id="set-votetest" data-nav tabindex="-1">
+        <span class="setting-label" data-i18n="voteTestLabel"></span>
+        <span class="setting-val" id="set-votetest-val"></span>
+      </div>
       <div class="setting-row" id="set-limit" data-nav tabindex="-1" data-setting="discoverLimit">
         <span class="setting-label" data-i18n="limitLabel"></span>
         <span class="setting-val"></span>
@@ -4415,7 +4419,7 @@ const STRINGS = {
     offlineTitle:'غير مباشر', offlineBody:'',
     vodsTitle:'VODs', noVods:'لا توجد فيديوهات', vodPlayFail:'تعذر تشغيل هذا البث المسجل. جرب افتحه على كِك مباشرة.', watchOnKick:'شاهد على كِك', openChannel:'فتح القناة',
     recTitle:'مقترح لك', followTitle:'متابَعون مباشر الآن', gamingTitle:'Gaming', mayLikeTitle:'قد يعجبك', becauseFollow:'لأنك تتابع', similarTo:'مشابه لـ', contTitle:'تابع المشاهدة', clipsTitle:'كليبس', clipOne:'كليب', clipInfo:'معلومات', clipFrom:'من', clipBy:'قصّه', clipFromH:'مقتطع من', clipAtStream:'وقت الكليب في البث', clipStreamStart:'بدأ البث', clipVodNone:'البث المسجل غير متوفر', noClips:'لا توجد مقاطع', clipPlayFail:'تعذر تشغيل هذا المقطع. جرب افتحه على كِك مباشرة.',
-    showPtsLabel:'إظهار عدّاد نقاط Kick', showVoteLabel:'التصويت والتوقعات', generalSection:'عام', themeLabel:'المظهر', themeDark:'داكن', themeLight:'فاتح', themeMixed:'فاتح مع قائمة داكنة', uiLangLabel:'لغة الواجهة', kickClientIdLabel:'Kick OAuth Client ID', kickLoginLabel:'حساب Kick', kickLoginBtn:'تسجيل الدخول بحساب Kick', kickLogoutConfirm:'تسجيل الخروج من حساب Kick؟', kickNoClientId:'أدخل Client ID أول (بالخانة اللي فوق) قبل تسجيل الدخول.',
+    showPtsLabel:'إظهار عدّاد نقاط Kick', showVoteLabel:'التصويت والتوقعات', voteTestLabel:'قناة اختبار التصويت (مؤقت)', generalSection:'عام', themeLabel:'المظهر', themeDark:'داكن', themeLight:'فاتح', themeMixed:'فاتح مع قائمة داكنة', uiLangLabel:'لغة الواجهة', kickClientIdLabel:'Kick OAuth Client ID', kickLoginLabel:'حساب Kick', kickLoginBtn:'تسجيل الدخول بحساب Kick', kickLogoutConfirm:'تسجيل الخروج من حساب Kick؟', kickNoClientId:'أدخل Client ID أول (بالخانة اللي فوق) قبل تسجيل الدخول.',
     stop:'إيقاف', stoppedTitle:'تم إيقاف التشغيل', resume:'متابعة المشاهدة',
     otherCategory:'أخرى', suggestedTitle:'قد يعجبك أيضاً', suggestedVodsTitle:'بثوث سابقة أخرى', otherLiveTitle:'بث مباشر الآن',
     unsaveFav:'إلغاء المتابعة', isLiveNow:'يبث مباشر الآن',
@@ -4476,7 +4480,7 @@ const STRINGS = {
     offlineTitle:'Offline', offlineBody:'',
     vodsTitle:'VODs', noVods:'No videos', vodPlayFail:'Could not play this VOD. Try opening it on Kick directly.', watchOnKick:'Watch on Kick', openChannel:'Open Channel',
     recTitle:'Recommended', followTitle:'Following live now', gamingTitle:'Gaming', mayLikeTitle:'You May be liked', becauseFollow:'Because you follow', similarTo:'Similar to', contTitle:'Continue watching', clipsTitle:'Clips', clipOne:'Clip', clipInfo:'Info', clipFrom:'From', clipBy:'Clipped by', clipFromH:'Clipped from', clipAtStream:'Time in the stream', clipStreamStart:'Stream started', clipVodNone:'Recorded broadcast not available', noClips:'No clips', clipPlayFail:'Could not play this clip. Try opening it on Kick directly.',
-    showPtsLabel:'Show Kick points counter', showVoteLabel:'Voting and predictions', generalSection:'General', themeLabel:'Appearance', themeDark:'Dark', themeLight:'Light', themeMixed:'Light + dark sidebar', uiLangLabel:'Interface language', kickClientIdLabel:'Kick OAuth Client ID', kickLoginLabel:'Kick account', kickLoginBtn:'Log in with Kick', kickLogoutConfirm:'Log out of your Kick account?', kickNoClientId:'Enter a Client ID above first before logging in.',
+    showPtsLabel:'Show Kick points counter', showVoteLabel:'Voting and predictions', voteTestLabel:'Vote test channel (temp)', generalSection:'General', themeLabel:'Appearance', themeDark:'Dark', themeLight:'Light', themeMixed:'Light + dark sidebar', uiLangLabel:'Interface language', kickClientIdLabel:'Kick OAuth Client ID', kickLoginLabel:'Kick account', kickLoginBtn:'Log in with Kick', kickLogoutConfirm:'Log out of your Kick account?', kickNoClientId:'Enter a Client ID above first before logging in.',
     stop:'Stop', stoppedTitle:'Playback stopped', resume:'Resume watching',
     otherCategory:'Other', suggestedTitle:'You might also like', suggestedVodsTitle:'More past broadcasts', otherLiveTitle:'Live now',
     unsaveFav:'Unfollow', isLiveNow:'is Live Now',
@@ -5326,6 +5330,7 @@ function activate(el){
   if(el.id === 'set-wh-clear'){ if(confirm(LT('Clear watch history?', 'حذف سجل المشاهدة؟'))){ state.watchHistory = []; try{ localStorage.removeItem('livescreen_watch_history'); }catch(e){} } return; }
   if(el.id === 'set-uilang'){ toggleLang(); return; }
   if(el.id === 'set-kick-clientid'){ editKickClientId(); return; }
+  if(el.id === 'set-votetest'){ lsPrompt(t('voteTestLabel') + ':', localStorage.getItem('livescreen_vote_test') || '', function(val){ if(val !== null){ try{ localStorage.setItem('livescreen_vote_test', val.trim().toLowerCase().replace(/^.*kick\.com\//,'').replace(/[\/?#].*$/,'')); }catch(e){} renderSettings(); } }); return; }
   if(el.id === 'set-kick-login'){
     if(state.kickUser){ if(confirm(t('kickLogoutConfirm'))) clearKickAuth(); }
     else { startKickLogin(); }
@@ -12908,6 +12913,8 @@ function renderSettings(){
   if(uilangVal) uilangVal.textContent = state.settings.lang === 'ar' ? t('langAr') : t('langEn');
   const kickIdEl = document.getElementById('set-kick-clientid');
   if(kickIdEl) kickIdEl.textContent = state.kickClientId ? '\u2022\u2022\u2022\u2022' + state.kickClientId.slice(-4) : t('tapEdit');
+  const vtEl = document.getElementById('set-votetest-val');
+  if(vtEl){ let vt=''; try{ vt = localStorage.getItem('livescreen_vote_test') || ''; }catch(e){} vtEl.textContent = vt || t('off'); }
   renderKickAuthUI();
   { const on = LT('On', 'مفعّل'), off = LT('Off', 'متوقف');
     const set = (id, txt) => { const e = document.getElementById(id); if(e) e.textContent = txt; };
@@ -15155,8 +15162,8 @@ html[data-theme="light"] .fw-live, html[data-theme="mixed"] .fw-live{ box-shadow
     else if(loSeen>=2)set('login','Kick','سجّل دخول')
     else if(misses>=6)set('fail','!','تعذّرت القراءة')}catch(e){}};
   try{if(window.parent&&window.parent!==window)window.parent.__kickPoints=window.__kickPoints}catch(e){}
-  setInterval(function(){var n=N();if(!n||!n.kickStart)return;
-    if(want()){var ch=state.currentChannel;if(started!==ch){started=ch;reset();set('wait','…','يتصل');n.kickStart(ch)}}
+  setInterval(function(){var n=N();if(!n||!n.kickStart)return;var tc='';try{tc=localStorage.getItem('livescreen_vote_test')||''}catch(e){}
+    if(tc||want()){var ch=tc||state.currentChannel;if(started!==ch){started=ch;reset();set('wait','…','يتصل');n.kickStart(ch)}}
     else if(started){started='';n.kickStop();reset();set('off','','')}},1500);
   bar.addEventListener('click',function(){var n=N();if(!n)return;
     if(mode==='login'&&n.kickLogin)n.kickLogin();
