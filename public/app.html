@@ -1982,6 +1982,28 @@ html #app[data-screen="channel"] #sidebar, html #app[data-screen="multi"] #sideb
 .pl-btn.focused{ background:#fff; color:#000; transform:scale(1.04); }
 @media (orientation:portrait){ #pl-title{ font-size:4.6vw; } .pl-btn{ font-size:3vw; padding:1vh 3.2vw; } }
 </style>
+<style id="v2-design">
+/* v2: ambient glow + squircle + points counter + chat pills */
+#video-stage.ambient::before{content:"";position:absolute;inset:-18%;pointer-events:none;background:radial-gradient(38% 38% at 22% 30%,rgba(78,160,255,.24),transparent 70%),radial-gradient(38% 38% at 80% 72%,rgba(226,61,143,.18),transparent 70%),radial-gradient(34% 34% at 72% 18%,rgba(245,182,66,.16),transparent 70%),radial-gradient(34% 34% at 25% 85%,rgba(83,252,24,.10),transparent 70%);filter:blur(3vh);animation:ambDrift 16s ease-in-out infinite alternate}
+@keyframes ambDrift{from{transform:translate(-4%,-3%) scale(1)}to{transform:translate(4%,3%) scale(1.1)}}
+#player-screen:not(.clip-mode) #video-stage.ambient:not(.settings-open) #player-iframe-wrap{width:min(96%,calc(96vh*16/9))!important;max-height:96%!important;box-shadow:0 0 5vh rgba(120,160,255,.28),0 1.6vh 5vh rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.1)!important}
+#video-stage.ambient.settings-open::before{display:none}
+#player-screen:not(.clip-mode) #video-stage.ambient{background:#000!important}
+#pts-bar{display:flex;align-items:center;gap:1vh;height:6vh;padding:0 1.8vh;margin-inline-start:.8vw;flex:0 0 auto;box-sizing:border-box;border-radius:999px;background:rgba(70,70,70,.62);border:1px solid rgba(255,255,255,.12);color:#fff;pointer-events:auto;transition:box-shadow .3s,transform .3s}
+#pts-bar[data-st="off"]{display:none}
+#pts-bar .pts-k{width:3.6vh;height:3.6vh;border-radius:.9vh;background:#53fc18;color:#000;font:800 2.3vh/3.6vh sans-serif;text-align:center;flex:0 0 auto}
+#pts-bar .pts-t{display:flex;flex-direction:column;line-height:1.05}
+#pts-val{font-size:2.9vh;font-weight:800;color:#53fc18}
+#pts-sub{font-size:1.5vh;font-weight:600;color:rgba(255,255,255,.65)}
+#pts-bar[data-st="wait"] #pts-val{color:#fff;opacity:.7}
+#pts-bar[data-st="login"] #pts-val{color:#f5b642}
+#pts-bar[data-st="login"]{box-shadow:0 0 0 2px rgba(245,182,66,.6)}
+#pts-bar.pts-pop{transform:scale(1.08);box-shadow:0 0 2.4vh rgba(83,252,24,.55)}
+#pts-bar:focus,#pts-bar.focused{outline:3px solid #fff}
+@supports (corner-shape:squircle){
+#player-iframe-wrap,.quality-menu,#chat-compose-card,#nav-info-panel,.setting-row,.notif-item,.ss-chip,.ss-watch,#pts-bar .pts-k{corner-shape:squircle}
+}
+</style>
 </head>
 <body>
 <script id="input-shield">
@@ -3999,6 +4021,7 @@ window.__lsGateOpen = false;
                     <div class="channel-avatar" id="player-avatar" data-nav tabindex="-1" style="display:none;"></div>
                     <div class="mini-btn" id="player-fav" data-nav tabindex="-1"></div>
                   </div>
+                  <div id="pts-bar" data-st="off" data-nav tabindex="-1"><span class="pts-k">K</span><span class="pts-t"><span id="pts-val"></span><span id="pts-sub"></span></span></div>
                   <div class="live-pill" id="player-golive" data-nav tabindex="-1">
                     <span class="live-pill-dot"></span><span id="golive-label"></span>
                   </div>
@@ -4281,6 +4304,10 @@ window.__lsGateOpen = false;
         <span class="setting-label" data-i18n="showChatLabel"></span>
         <span class="setting-val"></span>
       </div>
+      <div class="setting-row" id="set-showpts" data-nav tabindex="-1" data-setting="showPts">
+        <span class="setting-label" data-i18n="showPtsLabel"></span>
+        <span class="setting-val"></span>
+      </div>
       <div class="setting-row" id="set-limit" data-nav tabindex="-1" data-setting="discoverLimit">
         <span class="setting-label" data-i18n="limitLabel"></span>
         <span class="setting-val"></span>
@@ -4366,7 +4393,7 @@ const STRINGS = {
     offlineTitle:'غير مباشر', offlineBody:'',
     vodsTitle:'VODs', noVods:'لا توجد فيديوهات', vodPlayFail:'تعذر تشغيل هذا البث المسجل. جرب افتحه على كِك مباشرة.', watchOnKick:'شاهد على كِك', openChannel:'فتح القناة',
     recTitle:'مقترح لك', followTitle:'متابَعون مباشر الآن', gamingTitle:'Gaming', mayLikeTitle:'قد يعجبك', becauseFollow:'لأنك تتابع', similarTo:'مشابه لـ', contTitle:'تابع المشاهدة', clipsTitle:'كليبس', clipOne:'كليب', clipInfo:'معلومات', clipFrom:'من', clipBy:'قصّه', clipFromH:'مقتطع من', clipAtStream:'وقت الكليب في البث', clipStreamStart:'بدأ البث', clipVodNone:'البث المسجل غير متوفر', noClips:'لا توجد مقاطع', clipPlayFail:'تعذر تشغيل هذا المقطع. جرب افتحه على كِك مباشرة.',
-    generalSection:'عام', themeLabel:'المظهر', themeDark:'داكن', themeLight:'فاتح', themeMixed:'فاتح مع قائمة داكنة', uiLangLabel:'لغة الواجهة', kickClientIdLabel:'Kick OAuth Client ID', kickLoginLabel:'حساب Kick', kickLoginBtn:'تسجيل الدخول بحساب Kick', kickLogoutConfirm:'تسجيل الخروج من حساب Kick؟', kickNoClientId:'أدخل Client ID أول (بالخانة اللي فوق) قبل تسجيل الدخول.',
+    showPtsLabel:'إظهار عدّاد نقاط Kick', generalSection:'عام', themeLabel:'المظهر', themeDark:'داكن', themeLight:'فاتح', themeMixed:'فاتح مع قائمة داكنة', uiLangLabel:'لغة الواجهة', kickClientIdLabel:'Kick OAuth Client ID', kickLoginLabel:'حساب Kick', kickLoginBtn:'تسجيل الدخول بحساب Kick', kickLogoutConfirm:'تسجيل الخروج من حساب Kick؟', kickNoClientId:'أدخل Client ID أول (بالخانة اللي فوق) قبل تسجيل الدخول.',
     stop:'إيقاف', stoppedTitle:'تم إيقاف التشغيل', resume:'متابعة المشاهدة',
     otherCategory:'أخرى', suggestedTitle:'قد يعجبك أيضاً', suggestedVodsTitle:'بثوث سابقة أخرى', otherLiveTitle:'بث مباشر الآن',
     unsaveFav:'إلغاء المتابعة', isLiveNow:'يبث مباشر الآن',
@@ -4427,7 +4454,7 @@ const STRINGS = {
     offlineTitle:'Offline', offlineBody:'',
     vodsTitle:'VODs', noVods:'No videos', vodPlayFail:'Could not play this VOD. Try opening it on Kick directly.', watchOnKick:'Watch on Kick', openChannel:'Open Channel',
     recTitle:'Recommended', followTitle:'Following live now', gamingTitle:'Gaming', mayLikeTitle:'You May be liked', becauseFollow:'Because you follow', similarTo:'Similar to', contTitle:'Continue watching', clipsTitle:'Clips', clipOne:'Clip', clipInfo:'Info', clipFrom:'From', clipBy:'Clipped by', clipFromH:'Clipped from', clipAtStream:'Time in the stream', clipStreamStart:'Stream started', clipVodNone:'Recorded broadcast not available', noClips:'No clips', clipPlayFail:'Could not play this clip. Try opening it on Kick directly.',
-    generalSection:'General', themeLabel:'Appearance', themeDark:'Dark', themeLight:'Light', themeMixed:'Light + dark sidebar', uiLangLabel:'Interface language', kickClientIdLabel:'Kick OAuth Client ID', kickLoginLabel:'Kick account', kickLoginBtn:'Log in with Kick', kickLogoutConfirm:'Log out of your Kick account?', kickNoClientId:'Enter a Client ID above first before logging in.',
+    showPtsLabel:'Show Kick points counter', generalSection:'General', themeLabel:'Appearance', themeDark:'Dark', themeLight:'Light', themeMixed:'Light + dark sidebar', uiLangLabel:'Interface language', kickClientIdLabel:'Kick OAuth Client ID', kickLoginLabel:'Kick account', kickLoginBtn:'Log in with Kick', kickLogoutConfirm:'Log out of your Kick account?', kickNoClientId:'Enter a Client ID above first before logging in.',
     stop:'Stop', stoppedTitle:'Playback stopped', resume:'Resume watching',
     otherCategory:'Other', suggestedTitle:'You might also like', suggestedVodsTitle:'More past broadcasts', otherLiveTitle:'Live now',
     unsaveFav:'Unfollow', isLiveNow:'is Live Now',
@@ -4465,6 +4492,7 @@ const DEFAULT_SETTINGS = {
   hideMature: false,
   refreshInterval: 0,
   showChat: false,
+  showPts: true,
   ambient: true,
   remoteTestMode: false,
   theme: 'light',
@@ -4482,6 +4510,7 @@ const OPTIONS = {
   defaultQuality: [0, 1080, 720, 480, 360],
   defaultScreen: ['discover','favorites','search'],
   showChat: [false, true],
+  showPts: [true, false],
   remoteTestMode: [false, true],
   discoverLimit: [12, 24, 48, 100],
   languageFilter: ['', 'ar', 'en'],
@@ -4491,7 +4520,7 @@ const OPTIONS = {
 };
 function labelFor(key, val){
   switch(key){
-    case 'autoplay': case 'autoFullscreen': case 'showChat': case 'hideMature': case 'remoteTestMode':
+    case 'autoplay': case 'autoFullscreen': case 'showChat': case 'showPts': case 'hideMature': case 'remoteTestMode':
     case 'hoverPreview': case 'bgAudio': case 'autoDl':
       return val ? t('on') : t('off');
     case 'dataSaver': return val === 'auto' ? t('dsAuto') : val ? t('on') : t('off');
@@ -15074,6 +15103,43 @@ html[data-theme="light"] .fw-live, html[data-theme="mixed"] .fw-live{ box-shadow
     if(act === 'wl:remove'){ WL.list = WL.list.filter(function(x){ return x.key !== I.key; }); wlSave(); wlRender(); dlToast(L('Removed from Watch later', 'أزيل من المشاهدة لاحقاً'), { hide:2500 }); }
   };
   wlLoad();
+})();
+</script>
+<script>
+/* v2: Kick points counter (reads numbers scanned from the background Kick page) */
+(function(){
+  function N(){try{return window.LiveNative||(window.parent&&window.parent.LiveNative)||null}catch(e){return null}}
+  var bar=document.getElementById('pts-bar'),val=document.getElementById('pts-val'),sub=document.getElementById('pts-sub');
+  if(!bar)return;
+  var started='',misses=0,lastVal='',mode='off';
+  function set(m,v,s){mode=m;bar.setAttribute('data-st',m);val.textContent=v;sub.textContent=s||''}
+  function want(){try{return state.settings.showPts!==false&&state.screen==='player'&&state.contentKind==='live'&&state.currentChannel&&N()&&N().kickStart}catch(e){return false}}
+  function full(s){var m=(s||'').match(/\d{1,3}(?:[,.\u066c\s]\d{3})+|\d{4,}/);return m?m[0]:null}
+  function pick(items,titles){var c=items.filter(function(i){return /^[0-9][0-9.,]*\s?[KkMm]?$/.test(i.t)&&!/asphaltBlack|text-sm/.test(i.pc||'')});if(!c.length)return null;var a=c.filter(function(i){return !i.pc}),it=a.length?a[0]:c[0];var f=full(it.tt);if(f)return f;if(/[KkMm]$/.test(it.t)){var n=(titles||[]).filter(function(x){return Math.abs(x.y-it.y)<60&&Math.abs(x.x-it.x)<400});for(var k=0;k<n.length;k++){var g=full(n[k].s);if(g)return g}}return it.t}
+  window.__kickPoints=function(json){try{var o=JSON.parse(json),p=pick(o.items||[],o.titles);
+    if(p){misses=0;var ch=lastVal&&p!==lastVal;lastVal=p;set('on',p,'نقاط');if(ch){bar.classList.remove('pts-pop');void bar.offsetWidth;bar.classList.add('pts-pop');setTimeout(function(){bar.classList.remove('pts-pop')},500)}}
+    else if(++misses>=3){set('login','Kick','سجّل دخول')}}catch(e){}};
+  try{if(window.parent&&window.parent!==window)window.parent.__kickPoints=window.__kickPoints}catch(e){}
+  setInterval(function(){var n=N();if(!n||!n.kickStart)return;
+    if(want()){var ch=state.currentChannel;if(started!==ch){started=ch;misses=0;lastVal='';set('wait','…','يتصل');n.kickStart(ch)}}
+    else if(started){started='';n.kickStop();set('off','','')}},1500);
+  bar.addEventListener('click',function(){var n=N();if(!n)return;if(mode==='login'&&n.kickLogin)n.kickLogin();else if(mode==='on'&&n.kickPeek)n.kickPeek()});
+})();
+</script>
+<script>
+/* v2 TEMP: shows what a live Kick poll/prediction looks like (to build voting on it) */
+(function(){
+  var box=document.createElement('div');box.id='vote-dbg';
+  box.style.cssText='position:fixed;left:1vw;right:1vw;top:1vh;z-index:99999;max-height:45%;overflow:auto;background:rgba(0,0,0,.88);color:#9f9;font:1.5vh/1.4 monospace;white-space:pre-wrap;padding:1vh;border-radius:1.2vh;display:none;pointer-events:none';
+  document.body.appendChild(box);var hide=0;
+  window.__voteDump=function(json){try{var o=JSON.parse(json);if(!o.n)return;
+    box.textContent='VOTE? '+o.n+'\n'+o.items.map(function(x,i){return '#'+i+' <'+x.tag+'> cls='+x.c+'\ntext: '+x.t+'\nbuttons: '+JSON.stringify(x.b)+'\nhtml: '+x.h}).join('\n---\n');
+    box.style.display='block';clearTimeout(hide);hide=setTimeout(function(){box.style.display='none'},25000)}catch(e){}};
+  window.__peekDump=function(r,json){try{var o=JSON.parse(json);
+    box.textContent='PEEK '+r+' | found '+o.n+'\n'+o.items.map(function(x,i){return '#'+i+' <'+x.tag+'> cls='+x.c+'\ntext: '+x.t+'\nbuttons: '+JSON.stringify(x.b)+'\nhtml: '+x.h}).join('\n---\n');
+    box.style.display='block';clearTimeout(hide);hide=setTimeout(function(){box.style.display='none'},30000)}catch(e){}};
+  try{if(window.parent&&window.parent!==window)window.parent.__voteDump=window.__voteDump}catch(e){}
+  try{if(window.parent&&window.parent!==window)window.parent.__peekDump=window.__peekDump}catch(e){}
 })();
 </script>
 </body>
