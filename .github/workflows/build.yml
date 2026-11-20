@@ -1,0 +1,51 @@
+name: Build APK
+on:
+  push:
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Find the project (unpack any zip in the repo, else use the sources directly)
+        run: |
+          set -e
+          mkdir -p _src
+          ZIPS=$(find . -maxdepth 3 -iname '*.zip' -not -path './_src/*' -not -path './.git/*' -not -path '*/node_modules/*')
+          if [ -n "$ZIPS" ]; then
+            while IFS= read -r z; do
+              d="_src/$(basename "${z%.*}")"
+              mkdir -p "$d" && unzip -oq "$z" -d "$d"
+              echo "Unpacked: $z"
+            done <<< "$ZIPS"
+          else
+            cp -r . _src/ 2>/dev/null || true
+          fi
+          S=$(find _src -name settings.gradle.kts -not -path '*/node_modules/*' | head -1)
+          [ -n "$S" ] || { echo "settings.gradle.kts not found"; exit 1; }
+          echo "PROJ=$(dirname "$S")" >> "$GITHUB_ENV"
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - name: Set up Android SDK (preinstalled on the runner, wired explicitly)
+        run: |
+          set -e
+          SDK="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-/usr/local/lib/android/sdk}}"
+          echo "ANDROID_HOME=$SDK" >> "$GITHUB_ENV"
+          echo "ANDROID_SDK_ROOT=$SDK" >> "$GITHUB_ENV"
+          echo "$SDK/cmdline-tools/latest/bin" >> "$GITHUB_PATH"
+          export PATH="$SDK/cmdline-tools/latest/bin:$PATH"
+          yes | sdkmanager --licenses > /dev/null || true
+          sdkmanager "platforms;android-34" "build-tools;34.0.0"
+          test -d "$SDK/platforms/android-34"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: 8.7
+      - name: Build
+        working-directory: ${{ env.PROJ }}
+        run: gradle assembleDebug --no-daemon
+      - uses: actions/upload-artifact@v4
+        with:
+          name: LiveScreenTV-apk
+          path: ${{ env.PROJ }}/app/build/outputs/apk/debug/app-debug.apk
