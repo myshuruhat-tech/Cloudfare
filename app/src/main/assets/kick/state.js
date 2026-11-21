@@ -38,6 +38,15 @@
     if(!cd)continue;var ttl=cd.querySelector('p');
     var sm=T(cd).replace(/\s+/g,' ');var mv=sm.match(/([\d.,KkMm]+)\s*vs\s*([\d.,KkMm]+)/i);
     out.pred={title:ttl?T(ttl).slice(0,120):'',action:T(pb[z]),options:[],summary:mv?mv[1]+' vs '+mv[2]:'',t:null,ended:false}}}
+  // open prediction panel (viewer): <form> with option buttons, amount input, balance, "closes in"
+  var fm=document.querySelectorAll('form');
+  for(var f=0;f<fm.length;f++){var ft=T(fm[f]);if(!/prediction amount/i.test(ft)||!fm[f].querySelector('input'))continue;
+    var po2=[],fb=fm[f].querySelectorAll('button[type=button]');
+    for(var y=0;y<fb.length;y++){var L=T(fb[y]).split(/\n+/).map(function(s){return s.trim()}).filter(Boolean);
+      if(!L.length||/^(predict|not now)$/i.test(L[0]))continue;po2.push({name:L[0],amt:L[1]||'',ratio:L[2]||''})}
+    var bal=ft.match(/your balance:\s*([\d.,KkMm]+)/i),cl=ft.match(/closes in\s*([\d:]+)/i);
+    if(!out.pred)out.pred={title:'',action:'',options:[],summary:'',t:null,ended:false};
+    out.pred.panel={options:po2,balance:bal?bal[1]:'',closes:cl?cl[1]:''};break}
   // ---- pinned message
   var pm=document.querySelector('[data-testid=pinned-message-content]');
   if(pm&&vis(pm)){var s=document.querySelector('[data-testid=sent-by]');out.pinned={text:T(pm).slice(0,400),sender:s?T(s).replace(/^sent by\s*/i,'').slice(0,40):''}}

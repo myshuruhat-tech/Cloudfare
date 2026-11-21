@@ -357,6 +357,46 @@ class MainActivity : Activity() {
             }
         }
 
+        /** Opens the prediction panel (the Predict button on the chat card only opens it). */
+        @android.webkit.JavascriptInterface
+        fun kickPredOpen() { runOnUiThread { readAsset("kick/openpred.js")?.let { kickWeb.evaluateJavascript(it, null) } } }
+
+        @android.webkit.JavascriptInterface
+        fun kickPredClose() { runOnUiThread { readAsset("kick/closepred.js")?.let { kickWeb.evaluateJavascript(it, null) } } }
+
+        /** Places a prediction: picks the option by exact name, types the points, presses Predict. */
+        @android.webkit.JavascriptInterface
+        fun kickPredict(option: String, amount: Int) {
+            runOnUiThread {
+                val tpl = readAsset("kick/predvote.js") ?: return@runOnUiThread
+                fun js(step: String) = tpl.replace("__STEP__", JSONObject.quote(step)).replace("__OPT__", JSONObject.quote(option)).replace("__AMT__", amount.toString())
+                fun report(r: String?) { web.evaluateJavascript("window.__kickVoteResult&&window.__kickVoteResult(" + JSONObject.quote((r ?: "").trim('"')) + ")", null) }
+                kickWeb.evaluateJavascript(js("select")) { r1 ->
+                    if ((r1 ?: "").contains("ok")) {
+                        handler.postDelayed({
+                            kickWeb.evaluateJavascript(js("amount")) { r2 ->
+                                if ((r2 ?: "").contains("ok")) {
+                                    handler.postDelayed({
+                                        kickWeb.evaluateJavascript(js("submit")) { r3 ->
+                                            if ((r3 ?: "").contains("ok")) {
+                                                handler.postDelayed({
+                                                    kickWeb.evaluateJavascript(js("confirm")) { r4 ->
+                                                        handler.postDelayed({
+                                                            kickWeb.evaluateJavascript(js("result")) { r5 -> report("submitted | " + (r4 ?: "").trim('"') + " | " + (r5 ?: "").trim('"')) }
+                                                        }, 1500L)
+                                                    }
+                                                }, 1200L)
+                                            } else report(r3)
+                                        }
+                                    }, 700L)
+                                } else report(r2)
+                            }
+                        }, 500L)
+                    } else report(r1)
+                }
+            }
+        }
+
         @android.webkit.JavascriptInterface
         fun kickPeek() { runOnUiThread { peekKick() } }
 
