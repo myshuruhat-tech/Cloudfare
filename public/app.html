@@ -5331,7 +5331,7 @@ function activate(el){
   if(el.id === 'set-wh-clear'){ if(confirm(LT('Clear watch history?', 'حذف سجل المشاهدة؟'))){ state.watchHistory = []; try{ localStorage.removeItem('livescreen_watch_history'); }catch(e){} } return; }
   if(el.id === 'set-uilang'){ toggleLang(); return; }
   if(el.id === 'set-kick-clientid'){ editKickClientId(); return; }
-  if(el.id === 'set-votetest'){ lsPrompt(t('voteTestLabel') + ':', localStorage.getItem('livescreen_vote_test') || '', function(val){ if(val !== null){ try{ localStorage.setItem('livescreen_vote_test', val.trim().toLowerCase().replace(/^.*kick\.com\//,'').replace(/[\/?#].*$/,'')); }catch(e){} renderSettings(); try{ var vr=document.getElementById('set-votetest'); if(vr){ refreshFocusables(vr); vr.scrollIntoView({block:'center'}); } }catch(e){} } }); return; }
+  if(el.id === 'set-votetest'){ lsPrompt(t('voteTestLabel') + ':', localStorage.getItem('livescreen_vote_test') || '', function(val){ if(val !== null){ try{ localStorage.setItem('livescreen_vote_test', val.trim().toLowerCase().replace(/^.*kick\.com\//,'').replace(/_/g,'-').replace(/[\/?#].*$/,'')); }catch(e){} renderSettings(); try{ var vr=document.getElementById('set-votetest'); if(vr){ refreshFocusables(vr); vr.scrollIntoView({block:'center'}); } }catch(e){} } }); return; }
   if(el.id === 'set-kick-login'){
     if(state.kickUser){ if(confirm(t('kickLogoutConfirm'))) clearKickAuth(); }
     else { startKickLogin(); }
