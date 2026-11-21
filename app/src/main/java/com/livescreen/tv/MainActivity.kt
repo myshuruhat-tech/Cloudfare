@@ -292,6 +292,14 @@ class MainActivity : Activity() {
                 val str = JSONTokener(raw ?: return@evaluateJavascript).nextValue() as? String ?: return@evaluateJavascript
                 web.evaluateJavascript("window.__kickDump&&window.__kickDump(" + JSONObject.quote(str) + ")", null)
                 web.evaluateJavascript("window.__kickPoints&&window.__kickPoints(" + JSONObject.quote(str) + ")", null)
+                readAsset("kick/state.js")?.let { sjs ->
+                    kickWeb.evaluateJavascript(sjs) { sraw ->
+                        try {
+                            val ss = JSONTokener(sraw ?: return@evaluateJavascript).nextValue() as? String ?: return@evaluateJavascript
+                            web.evaluateJavascript("window.__kickState&&window.__kickState(" + JSONObject.quote(ss) + ")", null)
+                        } catch (e: Exception) { }
+                    }
+                }
                 readAsset("kick/votescan.js")?.let { vjs ->
                     kickWeb.evaluateJavascript(vjs) { vraw ->
                         try {
@@ -317,6 +325,17 @@ class MainActivity : Activity() {
 
         @android.webkit.JavascriptInterface
         fun kickScanNow() { runOnUiThread { scanKick() } }
+
+        /** Clicks the poll option with this exact name on the background Kick page. */
+        @android.webkit.JavascriptInterface
+        fun kickVote(option: String) {
+            runOnUiThread {
+                val js = readAsset("kick/vote.js")?.replace("__OPTION__", JSONObject.quote(option)) ?: return@runOnUiThread
+                kickWeb.evaluateJavascript(js) { r ->
+                    web.evaluateJavascript("window.__kickVoteResult&&window.__kickVoteResult(" + JSONObject.quote((r ?: "").trim('"')) + ")", null)
+                }
+            }
+        }
 
         @android.webkit.JavascriptInterface
         fun kickPeek() { runOnUiThread { peekKick() } }

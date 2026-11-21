@@ -15172,6 +15172,50 @@ html[data-theme="light"] .fw-live, html[data-theme="mixed"] .fw-live{ box-shadow
     else if(mode==='on'&&n.kickPeek)n.kickPeek()});
 })();
 </script>
+<style>
+#kv-wrap{position:fixed;top:2vh;inset-inline-end:2vh;width:34vh;z-index:9000;display:none;flex-direction:column;gap:1vh;pointer-events:none;font-family:inherit}
+#kv-wrap.on{display:flex}
+#kv-wrap .kv-card{background:rgba(20,20,20,.88);border:1px solid rgba(255,255,255,.14);border-radius:1.4vh;padding:1.2vh 1.4vh;color:#fff;font-size:1.7vh;line-height:1.35}
+#kv-wrap .kv-h{font-size:1.4vh;opacity:.65;margin-bottom:.4vh;display:flex;justify-content:space-between;gap:1vh}
+#kv-wrap .kv-pin-t{word-break:break-word}
+#kv-wrap .kv-opt{position:relative;margin-top:.7vh;border-radius:.8vh;background:rgba(255,255,255,.08);overflow:hidden;padding:.7vh 1vh;display:flex;justify-content:space-between;gap:1vh}
+#kv-wrap .kv-opt i{position:absolute;inset:0 auto 0 0;background:rgba(83,252,24,.28)}
+#kv-wrap .kv-opt span{position:relative}
+#kv-wrap .kv-opt.tap{pointer-events:auto;cursor:pointer}
+</style>
+<div id="kv-wrap"><div class="kv-card" id="kv-pin" style="display:none"></div><div class="kv-card" id="kv-poll" style="display:none"></div></div>
+<script>
+/* v222: Kick pinned message + poll display (read from the background Kick page via state.js).
+   Voting by tap stays OFF until confirmed: set localStorage livescreen_vote_click=1 to enable it for testing. */
+(function(){
+  var wrap=document.getElementById('kv-wrap'),pin=document.getElementById('kv-pin'),poll=document.getElementById('kv-poll');
+  if(!wrap)return;
+  function N(){try{return window.LiveNative||(window.parent&&window.parent.LiveNative)||null}catch(e){return null}}
+  function esc(x){return String(x==null?'':x).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+  function tap(){try{return localStorage.getItem('livescreen_vote_click')==='1'}catch(e){return false}}
+  var miss=0,lastP='',lastK='';
+  function ar(){try{return (state.settings.uiLang||document.documentElement.lang)==='ar'||document.documentElement.dir==='rtl'}catch(e){return false}}
+  function render(o){
+    var on=false,showV=true;try{showV=state.settings.showVote!==false}catch(e){}
+    if(!showV)o={};
+    if(o.pinned&&o.pinned.text){var k='p'+o.pinned.text+o.pinned.sender;if(k!==lastP){lastP=k;pin.innerHTML='<div class="kv-h"><span>'+(ar()?'رسالة مثبّتة':'Pinned message')+'</span><span>'+esc(o.pinned.sender)+'</span></div><div class="kv-pin-t">'+esc(o.pinned.text)+'</div>'}pin.style.display='';on=true}
+    else{pin.style.display='none';lastP=''}
+    if(o.poll&&o.poll.options&&o.poll.options.length){
+      var h='<div class="kv-h"><span>'+(o.poll.ended?(ar()?'انتهى التصويت':'Poll ended'):(ar()?'تصويت':'Poll'))+'</span></div><div>'+esc(o.poll.title)+'</div>';
+      var can=tap()&&!o.poll.ended;
+      o.poll.options.forEach(function(op){h+='<div class="kv-opt'+(can?' tap':'')+'" data-opt="'+esc(op.name)+'"><i style="width:'+Math.max(0,Math.min(100,op.pct))+'%"></i><span>'+esc(op.name)+'</span><span>'+op.pct+'% ('+op.votes+')</span></div>'});
+      if(h!==lastK){lastK=h;poll.innerHTML=h}poll.style.display='';on=true}
+    else{poll.style.display='none';lastK=''}
+    wrap.classList.toggle('on',on);
+  }
+  window.__kickState=function(json){try{miss=0;render(JSON.parse(json))}catch(e){}};
+  window.__kickVoteResult=function(r){try{if(typeof dlToast==='function')dlToast('Vote: '+r,{hide:2000})}catch(e){}};
+  poll.addEventListener('click',function(e){var el=e.target.closest&&e.target.closest('.kv-opt.tap');if(!el)return;var n=N();if(n&&n.kickVote)n.kickVote(el.getAttribute('data-opt'))});
+  try{if(window.parent&&window.parent!==window){window.parent.__kickState=window.__kickState;window.parent.__kickVoteResult=window.__kickVoteResult}}catch(e){}
+  /* hide when leaving the live player */
+  setInterval(function(){var live=false;try{live=state.screen==='player'&&state.contentKind==='live'}catch(e){}if(!live&&wrap.classList.contains('on')){lastP='';lastK='';render({})}},2000);
+})();
+</script>
 <script>
 /* v2 TEMP: shows what a live Kick poll/prediction looks like (to build voting on it) */
 (function(){
