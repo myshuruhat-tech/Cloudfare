@@ -15197,6 +15197,7 @@ html[data-theme="light"] .fw-live, html[data-theme="mixed"] .fw-live{ box-shadow
 #kv-wrap .kv-opt.tap{pointer-events:auto;cursor:pointer}
 </style>
 <div id="kv-wrap"><div class="kv-card" id="kv-pin" style="display:none"></div><div class="kv-card" id="kv-poll" style="display:none"></div><div class="kv-card" id="kv-pred" style="display:none"></div></div>
+<div id="kv-diag" style="position:fixed;left:50%;bottom:1vh;transform:translateX(-50%);z-index:99998;background:rgba(0,0,0,.85);color:#ff0;font:1.5vh monospace;padding:.6vh 1.2vh;border-radius:1vh;display:none;pointer-events:none"></div>
 <script>
 /* v222: Kick pinned message + poll display (read from the background Kick page via state.js).
    Voting by tap stays OFF until confirmed: set localStorage livescreen_vote_click=1 to enable it for testing. */
@@ -15236,7 +15237,13 @@ html[data-theme="light"] .fw-live, html[data-theme="mixed"] .fw-live{ box-shadow
   }
   window.lastKvRefresh=function(){try{lastR='';lastK='';if(window.__kvLast)render(window.__kvLast)}catch(e){}};
   setInterval(function(){var vv=document.getElementById('set-voteclick-val');if(vv)vv.textContent=tap()?'On':'Off'},700);
-  window.__kickState=function(json){try{miss=0;var o=JSON.parse(json);window.__kvLast=o;render(o)}catch(e){}};
+  window.__kickState=function(json){try{miss=0;window.__kvT=Date.now();var o=JSON.parse(json);window.__kvLast=o;render(o)}catch(e){window.__kvErr=String(e)}};
+  /* test-mode diagnostic: tells whether the APK delivers state.js results */
+  setInterval(function(){var d=document.getElementById('kv-diag');if(!d)return;var tc='';try{tc=localStorage.getItem('livescreen_vote_test')||''}catch(e){}
+    if(!tc){d.style.display='none';return}
+    var ago=window.__kvT?Math.round((Date.now()-window.__kvT)/1000):-1;
+    d.textContent=ago<0?'state.js: NOT received (APK old or not updated)':'state.js OK '+ago+'s ago'+(window.__kvErr?' | err '+window.__kvErr:'');
+    d.style.display='block'},2000);
   window.__kickVoteResult=function(r){try{if(typeof dlToast==='function')dlToast('Vote: '+r,{hide:2000})}catch(e){}};
   poll.addEventListener('click',function(e){var el=e.target.closest&&e.target.closest('.kv-opt.tap');if(!el)return;var n=N();if(n&&n.kickVote)n.kickVote(el.getAttribute('data-opt'))});
   pred.addEventListener('click',function(e){var tg=e.target.closest?e.target.closest('[data-popt],[data-pamt],[data-pgo],[data-pno],[data-popen]'):null;if(!tg)return;var n=N();if(!n)return;
