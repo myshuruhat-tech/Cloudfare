@@ -15164,7 +15164,7 @@ html[data-theme="light"] .fw-live, html[data-theme="mixed"] .fw-live{ box-shadow
     else if(misses>=6)set('fail','!','تعذّرت القراءة')}catch(e){}};
   try{if(window.parent&&window.parent!==window)window.parent.__kickPoints=window.__kickPoints}catch(e){}
   setInterval(function(){var n=N();if(!n||!n.kickStart)return;var tc='';try{tc=localStorage.getItem('livescreen_vote_test')||''}catch(e){}
-    if(tc||want()){var ch=tc||state.currentChannel;if(started!==ch){started=ch;reset();set('wait','…','يتصل');n.kickStart(ch)}}
+    if(tc||want()){var ch=tc||state.currentChannel;if(started!==ch){started=ch;reset();set('wait','…','يتصل');n.kickStart(tc?'popout:'+tc:ch)}}
     else if(started){started='';n.kickStop();reset();set('off','','')}},1500);
   bar.addEventListener('click',function(){var n=N();if(!n)return;
     if(mode==='login'&&n.kickLogin)n.kickLogin();

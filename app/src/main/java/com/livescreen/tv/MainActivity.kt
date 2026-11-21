@@ -245,7 +245,8 @@ class MainActivity : Activity() {
         kickWeb.isFocusableInTouchMode = false
         kickClose.visibility = View.GONE
         CookieManager.getInstance().flush()
-        if (kickChannel.isNotEmpty()) kickWeb.loadUrl("https://kick.com/$kickChannel") else kickWeb.loadUrl("about:blank")
+        val kickUrl = if (kickChannel.startsWith("popout:")) "https://kick.com/popout/" + kickChannel.removePrefix("popout:") + "/chat" else "https://kick.com/" + kickChannel
+        if (kickChannel.isNotEmpty()) kickWeb.loadUrl(kickUrl) else kickWeb.loadUrl("about:blank")
         web.requestFocus()
     }
 
