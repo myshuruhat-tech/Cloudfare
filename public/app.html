@@ -15267,7 +15267,7 @@ html[data-theme="light"] .fw-live, html[data-theme="mixed"] .fw-live{ box-shadow
 /* v2 TEMP: shows what a live Kick poll/prediction looks like (to build voting on it) */
 (function(){
   var box=document.createElement('div');box.id='vote-dbg';
-  box.style.cssText='position:fixed;left:1vw;right:1vw;top:1vh;z-index:99999;max-height:85%;overflow:auto;background:rgba(0,0,0,.9);color:#9f9;font:1.3vh/1.35 monospace;white-space:pre-wrap;padding:1vh;border-radius:1.2vh;display:none;pointer-events:none';
+  box.style.cssText='position:fixed;left:1vw;right:1vw;top:1vh;z-index:8000;max-height:85%;overflow:auto;background:rgba(0,0,0,.9);color:#9f9;font:1.3vh/1.35 monospace;white-space:pre-wrap;padding:1vh;border-radius:1.2vh;display:none;pointer-events:none';
   document.body.appendChild(box);var hide=0;
   window.__voteDump=function(json){try{var o=JSON.parse(json);if(!o.n){var tc='';try{tc=localStorage.getItem('livescreen_vote_test')||''}catch(e){}if(tc){box.textContent='SCAN n=0 | '+(o.u||'?')+' | icons '+((o.icons||[]).length)+'\n'+(o.tx||'(no text)');box.style.display='block';clearTimeout(hide);hide=setTimeout(function(){box.style.display='none'},7000)}return}
     box.textContent='VOTE? '+o.n+' | '+(o.tx||'').slice(0,420)+'\n'+o.items.map(function(x,i){return '#'+i+' <'+x.tag+'> cls='+x.c+'\ntext: '+x.t+'\nbuttons: '+JSON.stringify(x.b)+'\nhtml: '+String(x.h).replace(/<svg[\s\S]*?<\/svg>/g,'[svg]')}).join('\n---\n');
