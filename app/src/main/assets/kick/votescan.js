@@ -32,5 +32,5 @@
   var ic=[],all=document.querySelectorAll('button,[role=button]');
   for(var q=0;q<all.length&&ic.length<14;q++){var bt=all[q];if(T(bt)||!vis(bt))continue;
     ic.push({c:cls(bt).slice(0,50),l:(bt.getAttribute('aria-label')||bt.getAttribute('title')||'').slice(0,30),y:Math.round(bt.getBoundingClientRect().top),w:Math.round(bt.getBoundingClientRect().width)})}
-  return JSON.stringify({n:out.length,items:out.map(function(o){delete o.el;return o}),icons:ic});
+  return JSON.stringify({n:out.length,items:out.map(function(o){delete o.el;return o}),icons:ic,u:location.href.slice(0,80),tx:((document.body&&document.body.innerText)||'').replace(/\s+/g,' ').slice(0,260)});
 })()
