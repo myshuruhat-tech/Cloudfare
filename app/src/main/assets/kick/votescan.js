@@ -5,7 +5,7 @@
   function T(e){return (e.innerText||e.textContent||'').trim()}
   function cls(e){return (e.className&&e.className.toString?e.className.toString():'')}
   // outline: one line per element (tag, short class, role/aria/testid, leaf text) instead of raw HTML
-  function outline(root){var L=[];(function walk(e,d){if(L.length>=70||d>9)return;
+  function outline(root){var L=[];(function walk(e,d){if(L.length>=42||d>7)return;
     var t=e.tagName.toLowerCase();if(t==='svg'){L.push(Array(d+1).join(' ')+'svg');return}
     var a=[];['role','aria-label','data-testid','type','disabled'].forEach(function(k){var v=e.getAttribute(k);if(v!==null)a.push(k+'='+String(v).slice(0,25))});
     var own=e.children.length===0?T(e).slice(0,40):'';
@@ -28,7 +28,7 @@
       var c=up(e,G.ok,G.max);if(!c)continue;
       if(out.some(function(o){return o.el===c||o.el.contains(c)||c.contains(o.el)}))continue;
       var bs=c.querySelectorAll('button,[role=button],input,[role=radio],[role=option]'),b=[];
-      for(var j=0;j<bs.length&&j<10;j++)b.push({t:(T(bs[j])||bs[j].value||bs[j].tagName).slice(0,30),c:cls(bs[j]).slice(0,40)});
+      for(var j=0;j<bs.length&&j<10;j++)b.push({t:(T(bs[j])||bs[j].value||bs[j].tagName).slice(0,24),a:(bs[j].getAttribute('aria-label')||bs[j].getAttribute('data-testid')||'').slice(0,24)});
       out.push({el:c,tag:G.k+':'+c.tagName.toLowerCase(),c:cls(c).slice(0,80),t:T(c).replace(/\s+/g,' ').slice(0,200),b:b,h:outline(c)})}}
   var ic=[],all=document.querySelectorAll('button,[role=button]');
   for(var q=0;q<all.length&&ic.length<14;q++){var bt=all[q];if(T(bt)||!vis(bt))continue;

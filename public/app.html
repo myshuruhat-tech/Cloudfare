@@ -679,20 +679,20 @@ html[data-theme] #player-screen, html[data-theme] #multi-screen{ --text:#F5F5F1;
   #remote-test-pad{
     position:fixed; bottom:2vh; inset-inline-end:2vw; z-index:2147483647; display:none;
     background:rgba(10,10,10,.85); border-radius:16px; padding:1.4vh;
-    grid-template-columns:repeat(3, 44px); grid-template-rows:repeat(3, 44px); gap:6px;
+    grid-template-columns:repeat(3, 84px); grid-template-rows:repeat(3, 84px); gap:10px;
     box-shadow:0 4px 24px rgba(0,0,0,.5);
   }
   body.remote-test-on #remote-test-pad{ display:grid; }
   #remote-test-pad button{
-    border:0; border-radius:10px; background:#242424; color:var(--text); font-size:1.1rem;
+    border:0; border-radius:16px; background:#242424; color:var(--text); font-size:2rem;
     display:flex; align-items:center; justify-content:center;
   }
   #remote-test-pad button:active{ background:var(--accent); }
   #rtp-up{ grid-column:2; grid-row:1; } #rtp-left{ grid-column:1; grid-row:2; }
-  #rtp-ok{ grid-column:2; grid-row:2; background:var(--accent); font-weight:800; font-size:.75rem; }
+  #rtp-ok{ grid-column:2; grid-row:2; background:var(--accent); font-weight:800; font-size:1.5rem; }
   #rtp-right{ grid-column:3; grid-row:2; } #rtp-down{ grid-column:2; grid-row:3; }
-  #rtp-back{ grid-column:1; grid-row:1; font-size:.8rem; }
-  #rtp-close{ grid-column:3; grid-row:1; font-size:.9rem; color:var(--muted); }
+  #rtp-back{ grid-column:1; grid-row:1; font-size:1.5rem; }
+  #rtp-close{ grid-column:3; grid-row:1; font-size:1.6rem; color:var(--muted); }
 
   /* ---------- Temporary nav-info panel (YouTube-TV style) shown while
      paging through the suggestions row with the remote. ---------- */
@@ -4146,8 +4146,8 @@ window.__lsGateOpen = false;
 .mv-ttl{font-size:1.5em;font-weight:800;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 .1em .4em #000}
 .mv-cat{background:rgba(255,255,255,.18);border-radius:.4em;padding:.05em .6em;font-size:.8em;font-weight:600;direction:ltr;white-space:nowrap;color:#e8ebf0}
 .mv-mi svg{width:4vh;height:4vh;flex:0 0 auto;margin-inline-end:1.4vw}.mv-mi .mt{flex:1}
-#remote-test-pad{grid-template-rows:repeat(3,44px) 24px}
-#rtp-colors{grid-column:1 / -1;grid-row:4;display:flex;gap:6px}
+#remote-test-pad{grid-template-rows:repeat(3,84px) 44px}
+#rtp-colors{grid-column:1 / -1;grid-row:4;display:flex;gap:10px}
 #remote-test-pad #rtp-colors button{flex:1;min-width:0;border-radius:99px;height:100%;border:2px solid rgba(255,255,255,.18)}
 #rtp-red{background:#e5342d !important}#rtp-green{background:#1fa34a !important}#rtp-yellow{background:#f2c200 !important}#rtp-blue{background:#2a6df0 !important}
 #remote-test-pad #rtp-colors button:active{filter:brightness(1.35);transform:scale(.94)}
