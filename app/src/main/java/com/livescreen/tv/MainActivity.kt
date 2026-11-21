@@ -211,9 +211,10 @@ class MainActivity : Activity() {
     }
 
     private fun startKick(ch: String) {
-        if (!Regex("[A-Za-z0-9_-]{1,40}").matches(ch)) return
+        val name = ch.removePrefix("popout:")
+        if (!Regex("[A-Za-z0-9_-]{1,40}").matches(name)) return
         kickChannel = ch
-        kickWeb.loadUrl("https://kick.com/$ch")
+        kickWeb.loadUrl(if (ch.startsWith("popout:")) "https://kick.com/popout/" + name + "/chat" else "https://kick.com/" + name)
         handler.removeCallbacks(kickScanLoop)
         handler.postDelayed(kickScanLoop, 6_000L)
     }
