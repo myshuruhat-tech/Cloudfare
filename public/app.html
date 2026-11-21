@@ -15181,14 +15181,15 @@ html[data-theme="light"] .fw-live, html[data-theme="mixed"] .fw-live{ box-shadow
 #kv-wrap .kv-opt{position:relative;margin-top:.7vh;border-radius:.8vh;background:rgba(255,255,255,.08);overflow:hidden;padding:.7vh 1vh;display:flex;justify-content:space-between;gap:1vh}
 #kv-wrap .kv-opt i{position:absolute;inset:0 auto 0 0;background:rgba(83,252,24,.28)}
 #kv-wrap .kv-opt span{position:relative}
+#kv-wrap .kv-t{height:.6vh;border-radius:1vh;background:rgba(255,255,255,.15);margin-top:.8vh;overflow:hidden}#kv-wrap .kv-t i{display:block;height:100%;background:#fff}
 #kv-wrap .kv-opt.tap{pointer-events:auto;cursor:pointer}
 </style>
-<div id="kv-wrap"><div class="kv-card" id="kv-pin" style="display:none"></div><div class="kv-card" id="kv-poll" style="display:none"></div></div>
+<div id="kv-wrap"><div class="kv-card" id="kv-pin" style="display:none"></div><div class="kv-card" id="kv-poll" style="display:none"></div><div class="kv-card" id="kv-pred" style="display:none"></div></div>
 <script>
 /* v222: Kick pinned message + poll display (read from the background Kick page via state.js).
    Voting by tap stays OFF until confirmed: set localStorage livescreen_vote_click=1 to enable it for testing. */
 (function(){
-  var wrap=document.getElementById('kv-wrap'),pin=document.getElementById('kv-pin'),poll=document.getElementById('kv-poll');
+  var wrap=document.getElementById('kv-wrap'),pin=document.getElementById('kv-pin'),poll=document.getElementById('kv-poll'),pred=document.getElementById('kv-pred');
   if(!wrap)return;
   function N(){try{return window.LiveNative||(window.parent&&window.parent.LiveNative)||null}catch(e){return null}}
   function esc(x){return String(x==null?'':x).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
@@ -15206,6 +15207,10 @@ html[data-theme="light"] .fw-live, html[data-theme="mixed"] .fw-live{ box-shadow
       o.poll.options.forEach(function(op){h+='<div class="kv-opt'+(can?' tap':'')+'" data-opt="'+esc(op.name)+'"><i style="width:'+Math.max(0,Math.min(100,op.pct))+'%"></i><span>'+esc(op.name)+'</span><span>'+op.pct+'% ('+op.votes+')</span></div>'});
       if(h!==lastK){lastK=h;poll.innerHTML=h}poll.style.display='';on=true}
     else{poll.style.display='none';lastK=''}
+    if(o.pred&&o.pred.options&&o.pred.options.length){var P=o.pred,g='<div class="kv-h"><span>'+(P.ended?(ar()?'انتهى التوقّع':'Prediction ended'):(ar()?'توقّع':'Prediction'))+'</span></div><div>'+esc(P.title)+'</div>';
+      P.options.forEach(function(op){g+='<div class="kv-opt"><span>'+op.i+'. '+esc(op.name)+'</span><span>'+esc(op.amt)+'</span></div>'});
+      if(P.t!=null&&!P.ended)g+='<div class="kv-t"><i style="width:'+Math.round(Math.max(0,Math.min(1,P.t))*100)+'%"></i></div>';
+      pred.innerHTML=g;pred.style.display='';on=true}else pred.style.display='none';
     wrap.classList.toggle('on',on);
   }
   window.__kickState=function(json){try{miss=0;render(JSON.parse(json))}catch(e){}};
@@ -15213,7 +15218,10 @@ html[data-theme="light"] .fw-live, html[data-theme="mixed"] .fw-live{ box-shadow
   poll.addEventListener('click',function(e){var el=e.target.closest&&e.target.closest('.kv-opt.tap');if(!el)return;var n=N();if(n&&n.kickVote)n.kickVote(el.getAttribute('data-opt'))});
   try{if(window.parent&&window.parent!==window){window.parent.__kickState=window.__kickState;window.parent.__kickVoteResult=window.__kickVoteResult}}catch(e){}
   /* hide when leaving the live player */
-  setInterval(function(){var live=false;try{live=state.screen==='player'&&state.contentKind==='live'}catch(e){}if(!live&&wrap.classList.contains('on')){lastP='';lastK='';render({})}},2000);
+  function tcOn(){try{return !!localStorage.getItem('livescreen_vote_test')}catch(e){return false}}
+  setInterval(function(){var live=false;try{live=state.screen==='player'&&state.contentKind==='live'}catch(e){}if(!live&&!tcOn()&&wrap.classList.contains('on')){lastP='';lastK='';render({})}},2000);
+  /* test channel set: no stream and no tap needed — open the rewards panel by itself every 30s so a live prediction gets captured */
+  setInterval(function(){var n=N();if(tcOn()&&n&&n.kickPeek)n.kickPeek()},30000);
 })();
 </script>
 <script>
