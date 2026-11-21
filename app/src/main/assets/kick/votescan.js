@@ -14,7 +14,7 @@
   function ot(e){var r='';for(var c=e.firstChild;c;c=c.nextSibling){if(c.nodeType===3)r+=c.nodeValue}return r.trim()}
   function up(e,test,max){for(var n=e,i=0;n&&i<max;n=n.parentElement,i++){if(test(n))return n}return null}
   var groups=[
-    {k:'poll',   a:/^(current poll|poll ended)$/i,                                     ok:function(n){return /%/.test(T(n))&&/\(\d+\)/.test(T(n))},max:8},
+    {k:'poll',   a:/^(current poll|poll ended|poll)$/i,                                     ok:function(n){return /%/.test(T(n))&&/\(\d+\)/.test(T(n))},max:8},
     {k:'predict',a:/^prediction amount$/i,                                ok:function(n){return /options/i.test(T(n))&&/your balance/i.test(T(n))&&/predict/i.test(T(n))},max:14},
     {k:'banner', a:/(distributed|prediction ended|prediction closes in|predictions? (?:is )?open)/i, ok:function(n){return T(n).length>25},max:4}
   ];
@@ -33,5 +33,5 @@
   var ic=[],all=document.querySelectorAll('button,[role=button]');
   for(var q=0;q<all.length&&ic.length<14;q++){var bt=all[q];if(T(bt)||!vis(bt))continue;
     ic.push({c:cls(bt).slice(0,50),l:(bt.getAttribute('aria-label')||bt.getAttribute('title')||'').slice(0,30),y:Math.round(bt.getBoundingClientRect().top),w:Math.round(bt.getBoundingClientRect().width)})}
-  return JSON.stringify({n:out.length,items:out.map(function(o){delete o.el;return o}),icons:ic,u:location.href.slice(0,80),tx:((document.body&&document.body.innerText)||'').replace(/\s+/g,' ').slice(0,260)});
+  return JSON.stringify({n:out.length,items:out.map(function(o){delete o.el;return o}),icons:ic,u:location.href.slice(0,80),tx:((document.body&&document.body.innerText)||'').replace(/\s+/g,' ').slice(0,420)});
 })()
