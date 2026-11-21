@@ -262,6 +262,26 @@ class MainActivity : Activity() {
                 web.evaluateJavascript("window.__peekDump&&window.__peekDump(" + JSONObject.quote(label) + "," + JSONObject.quote(s) + ")", null)
             } catch (e: Exception) { }
         }
+        // viewer account: a "Predict" button sits on the chat card. Open that panel first, dump it, close it later.
+        val openPred = readAsset("kick/openpred.js")
+        val closePred = readAsset("kick/closepred.js")
+        if (openPred != null) {
+            kickWeb.evaluateJavascript(openPred) { pr ->
+                if ((pr ?: "").contains("clicked")) {
+                    handler.postDelayed({
+                        kickWeb.evaluateJavascript(dump) { raw -> send("PREDICT PANEL", raw) }
+                    }, 1500L)
+                    handler.postDelayed({ closePred?.let { kickWeb.evaluateJavascript(it, null) } }, 20_000L)
+                    return@evaluateJavascript
+                }
+                peekRewards(click, click2, dump) { a, b -> send(a, b) }
+            }
+            return
+        }
+        peekRewards(click, click2, dump) { a, b -> send(a, b) }
+    }
+
+    private fun peekRewards(click: String, click2: String, dump: String, send: (String, String?) -> Unit) {
         kickWeb.evaluateJavascript(click) { r1 ->
             handler.postDelayed({
                 kickWeb.evaluateJavascript(click2) { r2raw ->

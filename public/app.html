@@ -4274,6 +4274,10 @@ window.__lsGateOpen = false;
         <span class="setting-label" data-i18n="voteTestLabel"></span>
         <span class="setting-val" id="set-votetest-val"></span>
       </div>
+      <div class="setting-row" id="set-kicklogin" data-nav tabindex="-1">
+        <span class="setting-label">Kick login for points/voting (hidden window) · تسجيل دخول Kick للنقاط والتصويت</span>
+        <span class="setting-val">›</span>
+      </div>
 
       <div class="row-title" style="margin-top:3vh;" data-i18n="remoteTestSection"></div>
       <div class="setting-row" id="set-remotetest" data-nav tabindex="-1" data-setting="remoteTestMode">
@@ -5331,6 +5335,7 @@ function activate(el){
   if(el.id === 'set-wh-clear'){ if(confirm(LT('Clear watch history?', 'حذف سجل المشاهدة؟'))){ state.watchHistory = []; try{ localStorage.removeItem('livescreen_watch_history'); }catch(e){} } return; }
   if(el.id === 'set-uilang'){ toggleLang(); return; }
   if(el.id === 'set-kick-clientid'){ editKickClientId(); return; }
+  if(el.id === 'set-kicklogin'){ try{ var KN=window.LiveNative||(window.parent&&window.parent.LiveNative); if(KN&&KN.kickLogin)KN.kickLogin(); else dlToast(L('Only in the Android app','فقط في تطبيق الأندرويد'),{hide:2500}); }catch(e){} return; }
   if(el.id === 'set-votetest'){ lsPrompt(t('voteTestLabel') + ':', localStorage.getItem('livescreen_vote_test') || '', function(val){ if(val !== null){ try{ localStorage.setItem('livescreen_vote_test', val.trim().toLowerCase().replace(/^.*kick\.com\//,'').replace(/_/g,'-').replace(/[\/?#].*$/,'')); }catch(e){} renderSettings(); try{ var vr=document.getElementById('set-votetest'); if(vr){ refreshFocusables(vr); vr.scrollIntoView({block:'center'}); } }catch(e){} } }); return; }
   if(el.id === 'set-kick-login'){
     if(state.kickUser){ if(confirm(t('kickLogoutConfirm'))) clearKickAuth(); }
@@ -15207,8 +15212,9 @@ html[data-theme="light"] .fw-live, html[data-theme="mixed"] .fw-live{ box-shadow
       o.poll.options.forEach(function(op){h+='<div class="kv-opt'+(can?' tap':'')+'" data-opt="'+esc(op.name)+'"><i style="width:'+Math.max(0,Math.min(100,op.pct))+'%"></i><span>'+esc(op.name)+'</span><span>'+op.pct+'% ('+op.votes+')</span></div>'});
       if(h!==lastK){lastK=h;poll.innerHTML=h}poll.style.display='';on=true}
     else{poll.style.display='none';lastK=''}
-    if(o.pred&&o.pred.options&&o.pred.options.length){var P=o.pred,g='<div class="kv-h"><span>'+(P.ended?(ar()?'انتهى التوقّع':'Prediction ended'):(ar()?'توقّع':'Prediction'))+'</span></div><div>'+esc(P.title)+'</div>';
-      P.options.forEach(function(op){g+='<div class="kv-opt"><span>'+op.i+'. '+esc(op.name)+'</span><span>'+esc(op.amt)+'</span></div>'});
+    if(o.pred&&(o.pred.options&&o.pred.options.length||o.pred.summary)){var P=o.pred,g='<div class="kv-h"><span>'+(P.ended?(ar()?'انتهى التوقّع':'Prediction ended'):(ar()?'توقّع':'Prediction'))+'</span></div><div>'+esc(P.title)+'</div>';
+      if(P.summary&&!(P.options&&P.options.length))g+='<div class="kv-opt"><span>'+esc(P.summary)+'</span><span>'+esc(P.action)+'</span></div>';
+      (P.options||[]).forEach(function(op){g+='<div class="kv-opt"><span>'+op.i+'. '+esc(op.name)+'</span><span>'+esc(op.amt)+'</span></div>'});
       if(P.t!=null&&!P.ended)g+='<div class="kv-t"><i style="width:'+Math.round(Math.max(0,Math.min(1,P.t))*100)+'%"></i></div>';
       pred.innerHTML=g;pred.style.display='';on=true}else pred.style.display='none';
     wrap.classList.toggle('on',on);

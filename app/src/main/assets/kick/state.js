@@ -31,6 +31,13 @@
     if(bar){var tr=getComputedStyle(bar).transform;var mt=tr&&tr.match(/matrix\(([^,]+)/);if(mt)frac=parseFloat(mt[1]);else if(bar.style.width)frac=parseFloat(bar.style.width)/100}
     out.pred={title:tp?T(tp).slice(0,120):'',action:act?T(act).slice(0,20):'',options:po,t:frac,ended:/ended|distributed/i.test(T(card))}
   }
+  // viewer card (no <ol>): header with title + "Predict" button and "<n> vs <n>" summary
+  if(!out.pred){var pb=document.querySelectorAll('button');for(var z=0;z<pb.length&&!out.pred;z++){
+    if(!/^(predict|توقع|توقّع)$/i.test(T(pb[z])))continue;
+    var cd=pb[z].parentElement;for(var w=0;w<5&&cd&&!cd.querySelector('p');w++)cd=cd.parentElement;
+    if(!cd)continue;var ttl=cd.querySelector('p');
+    var sm=T(cd).replace(/\s+/g,' ');var mv=sm.match(/([\d.,KkMm]+)\s*vs\s*([\d.,KkMm]+)/i);
+    out.pred={title:ttl?T(ttl).slice(0,120):'',action:T(pb[z]),options:[],summary:mv?mv[1]+' vs '+mv[2]:'',t:null,ended:false}}}
   // ---- pinned message
   var pm=document.querySelector('[data-testid=pinned-message-content]');
   if(pm&&vis(pm)){var s=document.querySelector('[data-testid=sent-by]');out.pinned={text:T(pm).slice(0,400),sender:s?T(s).replace(/^sent by\s*/i,'').slice(0,40):''}}
