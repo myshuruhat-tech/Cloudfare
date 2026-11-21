@@ -13,7 +13,7 @@
       c:(e.className&&e.className.toString?e.className.toString():'').slice(0,50),
       pc:(p&&p.className&&p.className.toString?p.className.toString():'').slice(0,50),
       y:Math.round(r.top), x:Math.round(r.left),
-      icon:!!(p&&p.querySelector('svg,img')),tt:(function(){var n=e;for(var d=0;d<4&&n;d++,n=n.parentElement){var v=n.getAttribute&&(n.getAttribute('title')||n.getAttribute('aria-label')||n.getAttribute('data-tooltip'));if(v)return v.slice(0,60)}return ''})()
+      icon:!!(p&&p.querySelector('svg,img')),btn:!!(e.closest&&e.closest('button,[role=button]')),tt:(function(){var n=e;for(var d=0;d<4&&n;d++,n=n.parentElement){var v=n.getAttribute&&(n.getAttribute('title')||n.getAttribute('aria-label')||n.getAttribute('data-tooltip'));if(v)return v.slice(0,60)}return ''})()
     });
   }
   var vs=[], vids=document.querySelectorAll('video');

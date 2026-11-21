@@ -4827,10 +4827,11 @@ function refreshFocusables(preserveEl){
     const navEls = Array.from(document.querySelectorAll('#nav [data-nav], #nav-bottom [data-nav]')).filter(el => isNavVisible(el));
     // Elements that float above every screen (notification bell, the floating
     // chat panel) but aren't inside #nav or the active screen either.
-    const globalEls = Array.from(document.querySelectorAll('#app > [data-nav], #chat-overlay [data-nav], #kv-wrap [data-nav]'))
+    const globalEls = Array.from(document.querySelectorAll('#app > [data-nav], #chat-overlay [data-nav]'))
       .filter(el => isNavVisible(el));
     const screenEls = Array.from(screenEl.querySelectorAll('[data-nav], .card, .key')).filter(el => isNavVisible(el));
-    focusables = [...navEls, ...globalEls, ...screenEls];
+    const kvEls = Array.from(document.querySelectorAll('#kv-wrap [data-nav]')).filter(el => isNavVisible(el));   // vote card: always last so it never shifts focus
+    focusables = [...navEls, ...globalEls, ...screenEls, ...kvEls];
   }
   if(preserveEl){
     const idx = focusables.indexOf(preserveEl);
@@ -15160,7 +15161,7 @@ html[data-theme="light"] .fw-live, html[data-theme="mixed"] .fw-live{ box-shadow
   function reset(){misses=0;loSeen=0;cand='';candN=0;shown=''}
   function want(){try{return state.settings.showPts!==false&&state.screen==='player'&&state.contentKind==='live'&&state.currentChannel&&N()&&N().kickStart}catch(e){return false}}
   function full(s){var m=(s||'').match(/\d{1,3}(?:[,.\u066c\s]\d{3})+|\d{4,}/);return m?m[0]:null}
-  function pick(items,titles){var c=items.filter(function(i){return /^[0-9][0-9.,]*\s?[KkMm]?$/.test(i.t)&&!/asphaltBlack|text-sm/.test(i.pc||'')});if(!c.length)return null;var a=c.filter(function(i){return !i.pc}),it=a.length?a[0]:c[0];var f=full(it.tt);if(f)return f;if(/[KkMm]$/.test(it.t)){var n=(titles||[]).filter(function(x){return Math.abs(x.y-it.y)<60&&Math.abs(x.x-it.x)<400});for(var k=0;k<n.length;k++){var g=full(n[k].s);if(g)return g}}return it.t}
+  function pick(items,titles){var c=items.filter(function(i){return /^[0-9][0-9.,]*\s?[KkMm]?$/.test(i.t)&&!/asphaltBlack|text-sm/.test(i.pc||'')});if(!c.length)return null;var sc=function(i){return (full(i.tt)?4:0)+(i.btn?3:0)+(i.icon?2:0)+(!i.pc?1:0)},it=c[0];for(var q=1;q<c.length;q++)if(sc(c[q])>sc(it))it=c[q];var f=full(it.tt);if(f)return f;if(/[KkMm]$/.test(it.t)){var n=(titles||[]).filter(function(x){return Math.abs(x.y-it.y)<60&&Math.abs(x.x-it.x)<400});for(var k=0;k<n.length;k++){var g=full(n[k].s);if(g)return g}}return it.t}
   /* a number is shown only after it is read twice in a row, so half-loaded pages never flash wrong numbers */
   function onRead(p){
     if(p===cand)candN++;else{cand=p;candN=1}
@@ -15207,7 +15208,8 @@ html[data-theme="light"] .fw-live, html[data-theme="mixed"] .fw-live{ box-shadow
   function N(){try{return window.LiveNative||(window.parent&&window.parent.LiveNative)||null}catch(e){return null}}
   function esc(x){return String(x==null?'':x).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
   function tap(){try{return localStorage.getItem('livescreen_vote_click')==='1'}catch(e){return false}}
-  var miss=0,lastP='',lastK='',lastR='',selOpt='',selAmt=null;
+  var miss=0,lastP='',lastK='',lastR='',selOpt='',selAmt=null,armed='',armT=0,busyUntil=0,msg='',msgT=0;
+  function setMsg(m){msg=m;clearTimeout(msgT);msgT=setTimeout(function(){msg='';lastR='';try{render(window.__kvLast||{})}catch(e){}},12000);lastR='';try{render(window.__kvLast||{})}catch(e){}}
   function ar(){try{return (state.settings.uiLang||document.documentElement.lang)==='ar'||document.documentElement.dir==='rtl'}catch(e){return false}}
   function render(o){
     var on=false,showV=true;try{showV=state.settings.showVote!==false}catch(e){}
@@ -15226,13 +15228,14 @@ html[data-theme="light"] .fw-live, html[data-theme="mixed"] .fw-live{ box-shadow
         PN.options.forEach(function(op){g+='<div class="kv-opt'+(can2?' tap':'')+(selOpt===op.name?' sel':'')+'"'+(can2?' data-nav tabindex="-1"':'')+' data-popt="'+esc(op.name)+'"><span>'+esc(op.name)+'</span><span>'+esc(op.amt)+' \u00b7 '+esc(op.ratio)+'</span></div>'});
         g+='<div class="kv-h" style="margin-top:.8vh"><span>'+(ar()?'رصيدك':'Balance')+'</span><span>'+esc(PN.balance)+'</span></div>';
         if(can2){g+='<div class="kv-chips">';[100,500,1000,'MAX'].forEach(function(c){g+='<span class="kv-chip tap'+(selAmt===c?' sel':'')+'" data-nav tabindex="-1" data-pamt="'+c+'">'+c+'</span>'});g+='</div>';
-          g+='<div class="kv-btns"><span class="kv-btn tap go" data-nav tabindex="-1" data-pgo="1">'+(ar()?'تأكيد':'Confirm')+'</span><span class="kv-btn tap" data-nav tabindex="-1" data-pno="1">'+(ar()?'لاحقاً':'Not now')+'</span></div>'}
+          g+='<div class="kv-btns"><span class="kv-btn tap go" data-nav tabindex="-1" data-pgo="1">'+(armed?(ar()?'اضغط مرة ثانية':'Press again'):(ar()?'تأكيد':'Confirm'))+'</span><span class="kv-btn tap" data-nav tabindex="-1" data-pno="1">'+(ar()?'لاحقاً':'Not now')+'</span></div>'}
       }else{
         if(P.summary)g+='<div class="kv-opt"><span>'+esc(P.summary)+'</span>'+(can2?'<span class="kv-btn tap go" data-nav tabindex="-1" data-popen="1">'+esc(P.action||'Predict')+'</span>':'<span>'+esc(P.action)+'</span>')+'</div>';
         (P.options||[]).forEach(function(op){g+='<div class="kv-opt"><span>'+op.i+'. '+esc(op.name)+'</span><span>'+esc(op.amt)+'</span></div>'});
         if(P.t!=null&&!P.ended)g+='<div class="kv-t"><i style="width:'+Math.round(Math.max(0,Math.min(1,P.t))*100)+'%"></i></div>'}
+      if(msg)g+='<div class="kv-h" style="margin-top:.8vh;color:#ff0;font-size:1.6vh"><span>'+esc(msg)+'</span></div>';
       window.__kvBal=PN?PN.balance:'';
-      if(g!==lastR){lastR=g;pred.innerHTML=g;try{refreshFocusables(document.activeElement&&document.activeElement.closest&&document.activeElement.closest('#kv-wrap')?document.activeElement:undefined)}catch(x){}}pred.style.display='';on=true}else{pred.style.display='none';lastR=''}
+      if(g!==lastR){lastR=g;pred.innerHTML=g;try{refreshFocusables(focusables[focusIndex])}catch(x){}}pred.style.display='';on=true}else{pred.style.display='none';lastR=''}
     wrap.classList.toggle('on',on);
   }
   window.lastKvRefresh=function(){try{lastR='';lastK='';if(window.__kvLast)render(window.__kvLast)}catch(e){}};
@@ -15244,7 +15247,7 @@ html[data-theme="light"] .fw-live, html[data-theme="mixed"] .fw-live{ box-shadow
     var ago=window.__kvT?Math.round((Date.now()-window.__kvT)/1000):-1;
     d.textContent=ago<0?'state.js: NOT received (APK old or not updated)':'state.js OK '+ago+'s ago'+(window.__kvErr?' | err '+window.__kvErr:'');
     d.style.display='block'},2000);
-  window.__kickVoteResult=function(r){try{if(typeof dlToast==='function')dlToast('Vote: '+r,{hide:2000})}catch(e){}};
+  window.__kickVoteResult=function(r){try{setMsg('Result: '+r);if(typeof dlToast==='function')dlToast('Vote: '+r,{hide:2000})}catch(e){}};
   poll.addEventListener('click',function(e){var el=e.target.closest&&e.target.closest('.kv-opt.tap');if(!el)return;var n=N();if(n&&n.kickVote)n.kickVote(el.getAttribute('data-opt'))});
   pred.addEventListener('click',function(e){var tg=e.target.closest?e.target.closest('[data-popt],[data-pamt],[data-pgo],[data-pno],[data-popen]'):null;if(!tg)return;var n=N();if(!n)return;
     if(tg.hasAttribute('data-popen')){if(n.kickPredOpen)n.kickPredOpen();return}
@@ -15252,8 +15255,17 @@ html[data-theme="light"] .fw-live, html[data-theme="mixed"] .fw-live{ box-shadow
     if(tg.hasAttribute('data-popt')){selOpt=tg.getAttribute('data-popt');lastR='';render(window.__kvLast||{});return}
     if(tg.hasAttribute('data-pamt')){var v=tg.getAttribute('data-pamt');selAmt=v==='MAX'?'MAX':parseInt(v,10);lastR='';render(window.__kvLast||{});return}
     if(tg.hasAttribute('data-pgo')){
-      var amt=selAmt==='MAX'?parseInt(String(window.__kvBal||'0').replace(/\D/g,''),10):selAmt;
-      if(!selOpt||!amt||isNaN(amt)){try{dlToast(L('Pick an option and an amount first','اختر خياراً ومبلغاً أولاً'),{hide:2500})}catch(x){}return}
+      var bal=parseInt(String(window.__kvBal||'0').replace(/\D/g,''),10)||0;
+      var amt=selAmt==='MAX'?bal:selAmt;
+      function say(a,b){setMsg(ar()?b:a)}
+      if(bal<=0){say('Your balance is 0 - no points to spend','رصيدك 0 - ما عندك نقاط للصرف');return}
+      if(!selOpt||!amt||isNaN(amt)){say('Pick an option and an amount first','اختر خياراً ومبلغاً أولاً');return}
+      if(amt>bal){say('Not enough balance ('+bal+')','الرصيد لا يكفي ('+bal+')');return}
+      if(Date.now()<busyUntil){say('Wait, a prediction was just sent','انتظر، تم إرسال توقّع قبل قليل');return}
+      var key=selOpt+'|'+amt;
+      if(armed!==key){armed=key;clearTimeout(armT);armT=setTimeout(function(){armed='';lastR='';if(window.__kvLast)render(window.__kvLast)},6000);
+        say('Press Confirm again to spend '+amt+' on '+selOpt,'اضغط تأكيد مرة ثانية لصرف '+amt+' على '+selOpt);lastR='';render(window.__kvLast||{});return}
+      armed='';clearTimeout(armT);busyUntil=Date.now()+20000;
       if(n.kickPredict)n.kickPredict(selOpt,amt)}});
   try{if(window.parent&&window.parent!==window){window.parent.__kickState=window.__kickState;window.parent.__kickVoteResult=window.__kickVoteResult}}catch(e){}
   /* hide when leaving the live player */
