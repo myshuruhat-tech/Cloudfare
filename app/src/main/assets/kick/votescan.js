@@ -14,7 +14,7 @@
   function ot(e){var r='';for(var c=e.firstChild;c;c=c.nextSibling){if(c.nodeType===3)r+=c.nodeValue}return r.trim()}
   function up(e,test,max){for(var n=e,i=0;n&&i<max;n=n.parentElement,i++){if(test(n))return n}return null}
   var groups=[
-    {k:'poll',   a:/^(current poll|poll ended|poll)$/i,                                     ok:function(n){var x=T(n);return /%/.test(x)&&/\(\d+\)/.test(x)&&x.length<500},max:12},
+    {k:'poll',   a:/^(current poll|poll ended|poll)\b/i,                                     ok:function(n){var x=T(n);return /%/.test(x)&&/\(\d+\)/.test(x)&&x.length<500},max:12},
     {k:'predict',a:/^prediction amount$/i,                                ok:function(n){return /options/i.test(T(n))&&/your balance/i.test(T(n))&&/predict/i.test(T(n))},max:14},
     {k:'banner', a:/(distributed|prediction ended|prediction closes in|predictions? (?:is )?open)/i, ok:function(n){return T(n).length>25},max:4}
   ];
@@ -24,12 +24,12 @@
   var out=[],leaves=document.querySelectorAll('body *');
   for(var i=0;i<leaves.length&&out.length<8;i++){var e=leaves[i];
     var t=e.children.length===0?T(e):ot(e);if(!t||t.length>60)continue;
-    for(var g=0;g<groups.length;g++){var G=groups[g];if(!G.a.test(t)||!vis(e))continue;
+    for(var g=0;g<groups.length;g++){var G=groups[g];if(!G.a.test(t))continue;
       var c=up(e,G.ok,G.max);if(!c)continue;
       if(out.some(function(o){return o.el===c||(o.k===G.k&&(o.el.contains(c)||c.contains(o.el)))}))continue;
       var bs=c.querySelectorAll('button,[role=button],input,[role=radio],[role=option]'),b=[];
       for(var j=0;j<bs.length&&j<10;j++)b.push({t:(T(bs[j])||bs[j].value||bs[j].tagName).slice(0,24),a:(bs[j].getAttribute('aria-label')||bs[j].getAttribute('data-testid')||'').slice(0,24)});
-      out.push({el:c,k:G.k,tag:G.k+':'+c.tagName.toLowerCase(),c:cls(c).slice(0,80),t:T(c).replace(/\s+/g,' ').slice(0,200),b:b,h:outline(c)})}}
+      out.push({el:c,k:G.k,tag:G.k+':'+c.tagName.toLowerCase()+(vis(c)?'':' HIDDEN'),c:cls(c).slice(0,80),t:T(c).replace(/\s+/g,' ').slice(0,200),b:b,h:outline(c)})}}
   var ic=[],all=document.querySelectorAll('button,[role=button]');
   for(var q=0;q<all.length&&ic.length<14;q++){var bt=all[q];if(T(bt)||!vis(bt))continue;
     ic.push({c:cls(bt).slice(0,50),l:(bt.getAttribute('aria-label')||bt.getAttribute('title')||'').slice(0,30),y:Math.round(bt.getBoundingClientRect().top),w:Math.round(bt.getBoundingClientRect().width)})}
